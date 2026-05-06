@@ -95,11 +95,6 @@ const std::unordered_map<std::string_view, UTokenType> m_stringToTokenType
     { "?", UTokenType::QUESTION },
     { "&", UTokenType::AMPERSAND },
 
-    // comment
-    { "//", UTokenType::LINE_COMMENT },
-    { "/*", UTokenType::BLOCK_COMMENT_START },
-    { "*/", UTokenType::BLOCK_COMMENT_END },
-
     { "new", UTokenType::NEW },
     { "delete", UTokenType::DELETE },
 
@@ -179,11 +174,6 @@ const std::unordered_set<UTokenType> m_tokensSeparator
     UTokenType::QUESTION,  // ?
     UTokenType::AMPERSAND, // &
 
-    // comment
-    UTokenType::LINE_COMMENT,        // //
-    UTokenType::BLOCK_COMMENT_START, // /*
-    UTokenType::BLOCK_COMMENT_END,   // */
-
     UTokenType::ACCESS_OPERATOR, // ::
 };
 
@@ -194,9 +184,9 @@ std::string FToken::Debug() const
     result += "\", type: \"";
     result += internal::TokenTypeToString(Type);
     result += "\", Line: ";
-    result += std::to_string(Line);
+    result += std::to_string(Line+1);
     result += ", Row: ";
-    result += std::to_string(Row);
+    result += std::to_string(Row+1);
     return result;
 }
 

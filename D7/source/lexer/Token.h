@@ -117,11 +117,6 @@ enum class UTokenType
     QUESTION,  // ?
     AMPERSAND, // &
 
-    // comment
-    LINE_COMMENT,        // //
-    BLOCK_COMMENT_START, // /*
-    BLOCK_COMMENT_END,   // */
-
 
     NEW,
     DELETE,

@@ -1,11 +1,17 @@
-#include <drevniilib>
+#include <dx7>
 
 /*
 	Hi! I'm invisible.
+	// comment in comment
 */
 
 int main()
 {
-	// Goodbye
-	return 42;
+	// Hello... world?
+
+	dx::string Str = "Hello, world!\n";
+	int ReturnValue = 41;
+	ReturnValue++;
+	
+	return ReturnValue /* WORLD */; 
 }

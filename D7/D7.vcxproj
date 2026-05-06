@@ -19,15 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Notify\Notify.h" />
+    <ClInclude Include="source\preprocessor\Preprocessor.h" />
+    <ClInclude Include="source\notify\Notify.h" />
     <ClInclude Include="source\lexer\Lexer.h" />
     <ClInclude Include="source\lexer\Token.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp" />
-    <ClCompile Include="source\Notify\Notify.cpp" />
+    <ClCompile Include="source\preprocessor\Preprocessor.cpp" />
+    <ClCompile Include="source\notify\Notify.cpp" />
     <ClCompile Include="source\lexer\Lexer.cpp" />
     <ClCompile Include="source\lexer\Token.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test_code.d7" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -24,7 +24,10 @@
     <ClInclude Include="source\lexer\Token.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\Notify\Notify.h">
+    <ClInclude Include="source\notify\Notify.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\preprocessor\Preprocessor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,8 +41,14 @@
     <ClCompile Include="source\lexer\Token.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\Notify\Notify.cpp">
+    <ClCompile Include="source\notify\Notify.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\preprocessor\Preprocessor.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test_code.d7" />
   </ItemGroup>
 </Project>
