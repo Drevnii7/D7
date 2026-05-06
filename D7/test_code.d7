@@ -1,0 +1,11 @@
+#include <drevniilib>
+
+/*
+	Hi! I'm invisible.
+*/
+
+int main()
+{
+	// Goodbye
+	return 42;
+}
