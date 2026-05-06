@@ -13,6 +13,11 @@ void Error(UNotifyFrom errorType, const std::string& message)
             errorMessage = "Lexical error! ";
             break;
         }
+        case UNotifyFrom::PREPROCESSOR:
+        {
+            errorMessage = "Preprocessing error! ";
+            break;
+        }
         case UNotifyFrom::PARSER:
         {
             errorMessage = "Syntax error! ";
@@ -48,6 +53,11 @@ void Warning(UNotifyFrom warningType, const std::string& message)
             warningMessage = "Lexical warning. ";
             break;
         }
+        case UNotifyFrom::PREPROCESSOR:
+        {
+            warningMessage = "Preprocessing warning. ";
+            break;
+        }
         case UNotifyFrom::PARSER:
         {
             warningMessage = "Syntax warning. ";
@@ -70,35 +80,40 @@ void Warning(UNotifyFrom warningType, const std::string& message)
     std::cout << warningMessage;
 }
 
-void Succes(UNotifyFrom succesType, const std::string& message)
+void Success(UNotifyFrom succesType, const std::string& message)
 {
-    std::string succesMessage;
+    std::string successMessage;
 
     switch (succesType)
     {
         case UNotifyFrom::LEXER:
         {
-            succesMessage = "Lexical succes. ";
+            successMessage = "Lexical success. ";
+            break;
+        }
+        case UNotifyFrom::PREPROCESSOR:
+        {
+            successMessage = "Preprocessing success. ";
             break;
         }
         case UNotifyFrom::PARSER:
         {
-            succesMessage = "Syntax succes. ";
+            successMessage = "Syntax success. ";
             break;
         }
         case UNotifyFrom::SEMANTIC:
         {
-            succesMessage = "Semantic succes. ";
+            successMessage = "Semantic success. ";
             break;
         }
         case UNotifyFrom::CODE_GENERATION:
         {
-            succesMessage = "Code generation succes. ";
+            successMessage = "Code generation success. ";
             break;
         }
     }
 
-    succesMessage += message + '\n';
+    successMessage += message + '\n';
 
-    std::cout << succesMessage;
+    std::cout << successMessage;
 }

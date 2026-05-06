@@ -8,8 +8,10 @@
 
 #include <string>
 #include <string_view>
+#include <iostream>
+#include <fstream>
 
-enum class UTokenType
+enum class UTokenType : uint8_t
 {
     IDENTIFIER,
 
@@ -128,16 +130,17 @@ enum class UTokenType
     ACCESS_OPERATOR, // ::
 };
 
+#pragma pack(push, 1)   
 struct FToken
 {
     std::string Lexeme = "";
     UTokenType Type = UTokenType::UNDEFINED;
 
-    size_t Line = 0;
-    size_t Row = 0;
+    int32_t Line = 0;
+    int32_t Row = 0;
 
     FToken() = default;
-    explicit FToken(std::string lexeme, size_t line, size_t row)
+    explicit FToken(std::string lexeme, int32_t line, int32_t row)
     {
         Lexeme = lexeme;
         Type = internal::StringToTokenType(lexeme);
@@ -161,4 +164,75 @@ struct FToken
         static std::string_view TokenTypeToString(UTokenType tokenType);
         static UTokenType StringToTokenType(std::string_view lexeme);
     };  
+
+    // call throw std::runtime_error on fail
+    template <typename Container>
+    static void Serialize(const Container& tokens, const std::string& filename)
+    {
+        std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open file for writing: " + filename);
+        }
+
+        size_t count = tokens.size();
+        file.write(reinterpret_cast<const char*>(&count), sizeof(count));
+
+        for (const auto& token : tokens)
+        {
+            file << token;
+            if (!file.good())
+            {
+                throw std::runtime_error("Error writing token to file: " + filename);
+            }
+        }
+
+        file.close();
+    }
+
+    // call throw std::runtime_error on fail
+    template <typename Container>
+    static Container Deserialize(const std::string& filename)
+    {
+        std::ifstream file(filename, std::ios::binary);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open file for reading: " + filename);
+        }
+
+        size_t count = 0;
+        file.read(reinterpret_cast<char*>(&count), sizeof(count));
+
+        if (!file.good())
+        {
+            throw std::runtime_error("Error reading count from file: " + filename);
+        }
+
+        Container tokens;
+
+        if constexpr (requires { tokens.reserve(count); }) {
+            tokens.reserve(count);
+        }
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            FToken token;
+            file >> token;
+
+            if (!file.good())
+            {
+                throw std::runtime_error("Error reading token at index " + std::to_string(i) + " from file: " + filename);
+            }
+
+            tokens.emplace_back(std::move(token));
+        }
+
+        file.close();
+        return tokens;
+    }
+    
+
+    friend std::ostream& operator<<(std::ostream& os, const FToken& token);
+    friend std::istream& operator>>(std::istream& is, FToken& token);
 };
+#pragma pack(pop)

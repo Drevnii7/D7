@@ -1,8 +1,46 @@
 #include "Lexer.h"
+#include "../Notify/Notify.h"
 #include <fstream>
 #include <iostream>
 
-void CLexer::OpenFile(const std::string& filePath)
+bool CLexer::args(int argc, char* argv[])
+{
+    if (argc < 3)
+    {
+        std::cout << "[0] input file, [1] output file, [2>=]  -dp/--debugPrint \n";
+        return false;
+    }
+
+    std::string m_inputPath = argv[1];
+    std::string m_outputPath = argv[2];
+    bool m_enableDebugPrint = false;
+
+    for (int i = 3; i < argc; ++i)
+    {
+        std::string arg = argv[i];
+        if (arg == "-dp" || arg == "--debugPrint")
+        {
+            m_enableDebugPrint = true;
+        }
+        else
+        {
+            LexerWarning("Unknown argument: " + arg);
+        }
+    }
+
+    LoadCode(m_inputPath);
+    Run();
+    SaveTokens(m_outputPath);
+
+    if (m_enableDebugPrint)
+    {
+        DebugPrint();
+    }
+
+    return true;
+}
+
+void CLexer::LoadCode(const std::string& filePath)
 {
     Reset();
     m_filePath = filePath;
@@ -15,7 +53,7 @@ void CLexer::OpenFile(const std::string& filePath)
         return;
     }
 
-    LexerSucces("Succes open file: \"" + m_filePath + "\"");
+    LexerSuccess("Succes open file: \"" + m_filePath + "\"");
 
     std::string line;
     while (std::getline(opennedFile, line))
@@ -24,12 +62,25 @@ void CLexer::OpenFile(const std::string& filePath)
     }
 }
 
+void CLexer::SaveTokens(const std::string& filePath)
+{
+    FToken::Serialize<std::vector<FToken>>(m_tokens, filePath);
+}
+
 void CLexer::SetCode(const std::vector<std::string>& code)
 {
 	Reset();
 
 	m_filePath = "CLexer::SetCode()";
 	m_code = code;
+}
+
+void CLexer::SetCode(std::vector<std::string>&& code)
+{
+    Reset();
+
+    m_filePath = "CLexer::SetCode()";
+    m_code = std::move(code);
 }
 
 void CLexer::SetCode(const std::string& code)
@@ -167,8 +218,9 @@ void CLexer::Run()
 }
 
 
-void CLexer::DebugPrint()
+void CLexer::DebugPrint() const
 {
+    LexerWarning("DebugPrint()");
     for (const FToken& token : m_tokens)
     {
         std::cout << token.Debug() << '\n';

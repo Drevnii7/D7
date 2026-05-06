@@ -303,3 +303,30 @@ UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)
 
     return UTokenType::IDENTIFIER;
 }
+
+std::ostream& operator<<(std::ostream& os, const FToken& token)
+{
+    size_t len = token.Lexeme.size();
+    os.write(reinterpret_cast<const char*>(&len), sizeof(len));
+    os.write(token.Lexeme.c_str(), len);
+
+    os.write(reinterpret_cast<const char*>(&token.Type), sizeof(token.Type));
+    os.write(reinterpret_cast<const char*>(&token.Line), sizeof(token.Line));
+    os.write(reinterpret_cast<const char*>(&token.Row), sizeof(token.Row));
+
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, FToken& token)
+{
+    size_t len;
+    is.read(reinterpret_cast<char*>(&len), sizeof(len));
+    token.Lexeme.resize(len);
+    is.read(&token.Lexeme[0], len);
+
+    is.read(reinterpret_cast<char*>(&token.Type), sizeof(token.Type));
+    is.read(reinterpret_cast<char*>(&token.Line), sizeof(token.Line));
+    is.read(reinterpret_cast<char*>(&token.Row), sizeof(token.Row));
+
+    return is;
+}
