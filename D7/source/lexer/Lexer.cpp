@@ -10,9 +10,9 @@ bool CLexer::LoadCode(const std::string& filePath)
     Reset();
     if (!filePath.empty()) { m_inputFilePath = filePath; }
 
-    std::ifstream opennedFile(m_inputFilePath, std::ios::binary);
+    std::ifstream openedFile(m_inputFilePath, std::ios::binary);
 
-    if (!opennedFile.is_open())
+    if (!openedFile.is_open())
     {
         Error("Fail open file: \"" + m_inputFilePath + "\"");
         return false;
@@ -21,7 +21,7 @@ bool CLexer::LoadCode(const std::string& filePath)
     Success("Succes open file: \"" + m_inputFilePath + "\"");
 
     std::string line;
-    while (std::getline(opennedFile, line))
+    while (std::getline(openedFile, line))
     {
         m_code.push_back(line);
     }
@@ -94,20 +94,21 @@ void CLexer::RunProcessing()
     lexeme.reserve(LEXEME_DEFAULT_RESERVE);
     uint8_t inBlockComment = 0;
 
-    auto FlushLexeme = [&](size_t line, size_t rowEnd) 
-    {
-        if (!lexeme.empty())
+    auto FlushLexeme = [&](size_t line, size_t startPos, size_t endPos)
         {
-            m_tokens.emplace_back(lexeme, line, rowEnd - lexeme.size());
-            lexeme.clear(); // lexeme.reserve(...); not reset!
-        }
-    };
+            if (!lexeme.empty())
+            {
+                m_tokens.emplace_back(lexeme, line, startPos);
+                lexeme.clear();
+            }
+        };
 
     for (size_t lineIdx = 0; lineIdx < m_code.size(); ++lineIdx)
     {
         const std::string& lineStr = m_code[lineIdx];
         size_t len = lineStr.size();
         bool inLineComment = false;
+        size_t lexemeStart = 0;
 
         for (size_t i = 0; i < len; ++i)
         {
@@ -130,37 +131,57 @@ void CLexer::RunProcessing()
 
             if (!inLineComment && inBlockComment == 0)
             {
-                // Comments
                 if (i + 1 < len)
                 {
                     std::string_view two(&lineStr[i], 2);
-                    if (two == "//") { FlushLexeme(lineIdx, i); inLineComment = true; ++i; continue; }
-                    if (two == "/*") { FlushLexeme(lineIdx, i); inBlockComment++; ++i; continue; }
+                    if (two == "//") {
+                        FlushLexeme(lineIdx, lexemeStart, i - 1);
+                        inLineComment = true;
+                        ++i;
+                        continue;
+                    }
+                    if (two == "/*") {
+                        FlushLexeme(lineIdx, lexemeStart, i - 1);
+                        inBlockComment++;
+                        ++i;
+                        continue;
+                    }
                 }
             }
 
             // Strings and chars
             if (c == '"' || c == '\'')
             {
-                FlushLexeme(lineIdx, i);
+                FlushLexeme(lineIdx, lexemeStart, i - 1);
+                lexemeStart = i;
                 std::string literal(1, c);
                 ++i;
                 while (i < len)
                 {
                     char ch = lineStr[i];
                     literal += ch;
-                    if (ch == '\\') { if (i + 1 < len) { literal += lineStr[i + 1]; ++i; } }
-                    else if (ch == c) { ++i; break; }
+                    if (ch == '\\') {
+                        if (i + 1 < len) {
+                            literal += lineStr[i + 1];
+                            ++i;
+                        }
+                    }
+                    else if (ch == c) {
+                        ++i;
+                        break;
+                    }
                     ++i;
                 }
-                m_tokens.emplace_back(std::move(literal), lineIdx, i - 1);
+                m_tokens.emplace_back(std::move(literal), lineIdx, lexemeStart);
+                lexemeStart = i;
                 continue;
             }
 
-            // Spaces \n \r \r\n
+            // Spaces
             if (std::isspace(static_cast<unsigned char>(c)))
             {
-                FlushLexeme(lineIdx, i);
+                FlushLexeme(lineIdx, lexemeStart, i - 1);
+                lexemeStart = i + 1;
                 continue;
             }
 
@@ -171,10 +192,11 @@ void CLexer::RunProcessing()
                 std::string_view two(&lineStr[i], 2);
                 if (FToken::internal::is_separator(two))
                 {
-                    FlushLexeme(lineIdx, i);
+                    FlushLexeme(lineIdx, lexemeStart, i - 1);
                     m_tokens.emplace_back(std::string(two), lineIdx, i);
                     ++i;
                     isSep = true;
+                    lexemeStart = i + 1;
                 }
             }
 
@@ -184,18 +206,24 @@ void CLexer::RunProcessing()
                 std::string_view one(&c, 1);
                 if (FToken::internal::is_separator(one))
                 {
-                    FlushLexeme(lineIdx, i);
+                    FlushLexeme(lineIdx, lexemeStart, i - 1);
                     m_tokens.emplace_back(std::string(one), lineIdx, i);
                     isSep = true;
+                    lexemeStart = i + 1;
                 }
             }
 
             if (isSep) continue;
 
+            if (lexeme.empty())
+            {
+                lexemeStart = i;
+            }
             lexeme += c;
         }
 
-        FlushLexeme(lineIdx, len);
+        FlushLexeme(lineIdx, lexemeStart, len - 1);
+        lexemeStart = len;
     }
 }
 

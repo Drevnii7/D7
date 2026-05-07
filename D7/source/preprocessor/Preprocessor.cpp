@@ -55,11 +55,6 @@ void IPreprocessor::SetTokens(std::list<FToken>&& tokens)
     m_tokens = std::move(tokens);
 }
 
-void IPreprocessor::RunProcessing()
-{
-    // Placeholder
-}
-
 bool IPreprocessor::RunFullCycle()
 {
     if (!LoadTokens())

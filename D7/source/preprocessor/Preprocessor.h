@@ -14,7 +14,7 @@ public: // CBaseService
 	// virtual bool Main(int argc, char* argv[]);
 
 	// Start preprocessing
-	virtual void RunProcessing() override;
+	virtual void RunProcessing() override {};
 
 	virtual bool RunFullCycle() override;
 
