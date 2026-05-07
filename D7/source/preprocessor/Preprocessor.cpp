@@ -5,42 +5,55 @@
 
 bool CPreprocessor::Main(int argc, char* argv[])
 {
-    if (argc < 3)
+    std::vector<std::string> l_args;
+    l_args.reserve(argc);
+
+    for (int i = 0; i < argc; ++i)
+    {
+        l_args.emplace_back(argv[i]);
+    }
+
+    return Main(l_args);
+}
+
+bool CPreprocessor::Main(const std::vector<std::string>& args)
+{
+    if (args.size() < 3)
     {
         std::cout << "[1] input file, [2] output file, [3+]  -dp/--debugPrint \n";
         return false;
     }
 
-    std::string m_inputPath = argv[1];
-    std::string m_outputPath = argv[2];
-    bool m_enableDebugPrint = false;
+    std::string l_inputPath = args[0];
+    std::string l_outputPath = args[1];
+    bool l_enableDebugPrint = false;
 
-    for (int i = 3; i < argc; ++i)
+    for (size_t i = 3; i < args.size(); ++i)
     {
-        std::string arg = argv[i];
+        std::string arg = args[i];
         if (arg == "-dp" || arg == "--debugPrint")
         {
-            m_enableDebugPrint = true;
+            l_enableDebugPrint = true;
         }
         else
         {
-            PreprocessorWarning("Unknown argument: " + arg);
+            LexerWarning("Unknown argument: " + arg);
         }
     }
 
     try
     {
-        LoadTokens(m_inputPath);
+        LoadTokens(l_inputPath);
         Run();
-        SaveTokens(m_outputPath);
+        SaveTokens(l_outputPath);
     }
     catch (const std::exception& e)
     {
-        PreprocessorError(std::string("Critical error during processing: ") + e.what());
+        LexerError(std::string("Critical error during processing: ") + e.what());
         return false;
     }
 
-    if (m_enableDebugPrint)
+    if (l_enableDebugPrint)
     {
         DebugPrint();
     }

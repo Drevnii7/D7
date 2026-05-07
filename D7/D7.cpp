@@ -20,3 +20,22 @@ int main()
     Preprocessor->DebugPrint();
     Preprocessor->SaveTokens(File_TokensAfterLexer);
 }
+
+
+
+/*
+int main(int argc, char* argv[])
+{
+    CLexer* Lexer = new CLexer();
+    return Lexer->Main(argc, argv);
+}
+*/
+
+/*
+int main(int argc, char* argv[])
+{
+    CPreprocessor* Preprocessor = new CPreprocessor();
+    return Preprocessor->Main(argc, argv);
+}
+*/
+

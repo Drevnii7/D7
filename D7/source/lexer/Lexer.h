@@ -11,8 +11,10 @@ public:
 
 	CLexer() = default;
 	CLexer(int argc, char* argv[]) { Main(argc, argv); }
+	CLexer(const std::vector<std::string>& args) { Main(args); }
 
-	bool Main(int argc, char* argv[]);
+	virtual bool Main(int argc, char* argv[]);
+	virtual bool Main(const std::vector<std::string>& args);
 
 	void LoadCode(const std::string& filePath);
 	void SaveTokens(const std::string& filePath);
@@ -38,6 +40,4 @@ private:
 	std::string m_filePath = "";
 	std::vector <std::string> m_code;
 	std::vector<FToken> m_tokens;
-
-	size_t currentTokenIndex = 0;
 };

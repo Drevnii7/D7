@@ -13,8 +13,10 @@ public:
 
 	CPreprocessor() = default;
 	CPreprocessor(int argc, char* argv[]) { Main(argc, argv); }
+	CPreprocessor(const std::vector<std::string>& args) { Main(args); }
 
 	virtual bool Main(int argc, char* argv[]);
+	virtual bool Main(const std::vector<std::string>& args);
 
 	void LoadTokens(const std::string& filePath);
 	void SaveTokens(const std::string& filePath);

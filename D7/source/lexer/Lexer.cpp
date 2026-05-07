@@ -5,22 +5,35 @@
 
 bool CLexer::Main(int argc, char* argv[])
 {
-    if (argc < 3)
+    std::vector<std::string> l_args; 
+    l_args.reserve(argc);
+
+    for (int i = 0; i < argc; ++i)
+    {
+        l_args.emplace_back(argv[i]);
+    }
+
+    return Main(l_args);
+}
+
+bool CLexer::Main(const std::vector<std::string>& args)
+{
+    if (args.size() < 3)
     {
         std::cout << "[1] input file, [2] output file, [3+]  -dp/--debugPrint \n";
         return false;
     }
 
-    std::string m_inputPath = argv[1];
-    std::string m_outputPath = argv[2];
-    bool m_enableDebugPrint = false;
+    std::string l_inputPath = args[0];
+    std::string l_outputPath = args[1];
+    bool l_enableDebugPrint = false;
 
-    for (int i = 3; i < argc; ++i)
+    for (size_t i = 3; i < args.size(); ++i)
     {
-        std::string arg = argv[i];
+        std::string arg = args[i];
         if (arg == "-dp" || arg == "--debugPrint")
         {
-            m_enableDebugPrint = true;
+            l_enableDebugPrint = true;
         }
         else
         {
@@ -30,9 +43,9 @@ bool CLexer::Main(int argc, char* argv[])
 
     try
     {
-        LoadCode(m_inputPath);
+        LoadCode(l_inputPath);
         Run();
-        SaveTokens(m_outputPath);
+        SaveTokens(l_outputPath);
     }
     catch (const std::exception& e)
     {
@@ -40,13 +53,14 @@ bool CLexer::Main(int argc, char* argv[])
         return false;
     }
 
-    if (m_enableDebugPrint)
+    if (l_enableDebugPrint)
     {
         DebugPrint();
     }
 
     return true;
 }
+
 
 void CLexer::LoadCode(const std::string& filePath)
 {
@@ -119,7 +133,6 @@ void CLexer::Run()
     }
 
     m_tokens.clear();
-    currentTokenIndex = 0;
     std::string lexeme;
     bool inBlockComment = false;
 
@@ -250,5 +263,4 @@ void CLexer::Reset()
 	m_filePath = "";
 	m_code.clear();
 	m_tokens.clear();
-	currentTokenIndex = 0;
 }
