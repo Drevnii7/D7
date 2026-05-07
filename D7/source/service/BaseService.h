@@ -9,11 +9,22 @@ public:
 	virtual ~CBaseService() = default;
 
 	// Example work as a tool with command line arguments
-	virtual bool Main(int argc, char* argv[]) = 0;
+	virtual bool Main(int argc, char* argv[]);
 
-	virtual void Run() = 0;
+	virtual void RunProcessing() = 0;
+	virtual bool RunFullCycle() = 0;
 
 	virtual void DebugPrint() const = 0;
 
 	virtual void Reset() = 0;
+
+protected:
+
+	virtual void Fatal(const std::string& message) const = 0;
+	virtual void Error(const std::string& message) const = 0;
+	virtual void Warning(const std::string& message) const = 0;
+	virtual void Success(const std::string& message) const = 0;
+
+	std::string m_inputFilePath = "";
+	std::string m_outputFilePath = "";
 };

@@ -10,30 +10,30 @@ enum class UNotifyFrom
     CODE_GENERATION
 };
 
+void FatalBase(UNotifyFrom fatalType, const std::string& message);
 
-void Error(UNotifyFrom errorType, const std::string& message);
-
-#define LexerError(message) Error(UNotifyFrom::LEXER, message)
-#define PreprocessorError(message) Error(UNotifyFrom::PREPROCESSOR, message)
-#define ParserError(message) Error(UNotifyFrom::PARSER, message)
-#define SemanticError(message) Error(UNotifyFrom::SEMANTIC, message)
-#define CodeGenerationError(message) Error(UNotifyFrom::CODE_GENERATION, message)
+//#define ParserFatal(message) FatalBase(UNotifyFrom::PARSER, message)
+//#define SemanticFatal(message) FatalBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationFatal(message) FatalBase(UNotifyFrom::CODE_GENERATION, message)
 
 
-void Warning(UNotifyFrom warningType, const std::string& message);
+void ErrorBase(UNotifyFrom errorType, const std::string& message);
 
-#define LexerWarning(message) Warning(UNotifyFrom::LEXER, message)
-#define PreprocessorWarning(message) Warning(UNotifyFrom::PREPROCESSOR, message)
-#define ParserWarning(message) Warning(UNotifyFrom::PARSER, message)
-#define SemanticWarning(message) Warning(UNotifyFrom::SEMANTIC, message)
-#define CodeGenerationWarning(message) Warning(UNotifyFrom::CODE_GENERATION, message)
+//#define ParserError(message) ErrorBase(UNotifyFrom::PARSER, message)
+//#define SemanticError(message) ErrorBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationError(message) ErrorBase(UNotifyFrom::CODE_GENERATION, message)
 
 
+void WarningBase(UNotifyFrom warningType, const std::string& message);
 
-void Success(UNotifyFrom succesType, const std::string& message);
+//#define ParserWarning(message) WarningBase(UNotifyFrom::PARSER, message)
+//#define SemanticWarning(message) WarningBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationWarning(message) WarningBase(UNotifyFrom::CODE_GENERATION, message)
 
-#define LexerSuccess(message) Success(UNotifyFrom::LEXER, message)
-#define PreprocessorSuccess(message) Success(UNotifyFrom::PREPROCESSOR, message)
-#define ParserSuccess(message) Success(UNotifyFrom::PARSER, message)
-#define SemanticSuccess(message) Success(UNotifyFrom::SEMANTIC, message)
-#define CodeGenerationSuccess(message) Success(UNotifyFrom::CODE_GENERATION, message)
+
+
+void SuccessBase(UNotifyFrom succesType, const std::string& message);
+
+//#define ParserSuccess(message) SuccessBase(UNotifyFrom::PARSER, message)
+//#define SemanticSuccess(message) SuccessBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationSuccess(message) SuccessBase(UNotifyFrom::CODE_GENERATION, message)

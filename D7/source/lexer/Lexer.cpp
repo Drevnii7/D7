@@ -3,84 +3,52 @@
 #include <fstream>
 #include <iostream>
 
-bool CLexer::Main(int argc, char* argv[])
-{
-    if (argc < 3)
-    {
-        LexerWarning("[1] input file, [2] output file, [3+]  -dp/--debugPrint");
-        return false;
-    }
-
-    std::string m_inputPath = argv[1];
-    std::string m_outputPath = argv[2];
-    bool m_enableDebugPrint = false;
-
-    for (int i = 3; i < argc; ++i)
-    {
-        std::string arg = argv[i];
-        if (arg == "-dp" || arg == "--debugPrint")
-        {
-            m_enableDebugPrint = true;
-        }
-        else
-        {
-            LexerWarning("Unknown argument: " + arg);
-        }
-    }
-
-    try
-    {
-        LoadCode(m_inputPath);
-        Run();
-        SaveTokens(m_outputPath);
-    }
-    catch (const std::exception& e)
-    {
-        LexerWarning(std::string("Stop. Critical error during processing: ") + e.what());
-        return false;
-    }
-
-    if (m_enableDebugPrint)
-    {
-        DebugPrint();
-    }
-
-    return true;
-}
-
-
-void CLexer::LoadCode(const std::string& filePath)
+bool CLexer::LoadCode(const std::string& filePath)
 {
     Reset();
-    m_filePath = filePath;
+    if (!filePath.empty()) { m_inputFilePath = filePath; }
 
-    std::ifstream opennedFile(m_filePath, std::ios::binary);
+    std::ifstream opennedFile(m_inputFilePath, std::ios::binary);
 
     if (!opennedFile.is_open())
     {
-        LexerError("Fail open file: \"" + m_filePath + "\"");
-        return;
+        Error("Fail open file: \"" + m_inputFilePath + "\"");
+        return false;
     }
 
-    LexerSuccess("Succes open file: \"" + m_filePath + "\"");
+    Success("Succes open file: \"" + m_inputFilePath + "\"");
 
     std::string line;
     while (std::getline(opennedFile, line))
     {
         m_code.push_back(line);
     }
+
+    return true;
 }
 
-void CLexer::SaveTokens(const std::string& filePath)
+bool CLexer::SaveTokens(const std::string& filePath)
 {
-    FToken::Serialize<std::vector<FToken>>(m_tokens, filePath);
+    if (!filePath.empty()) { m_outputFilePath = filePath; }
+
+    try
+    {
+        FToken::Serialize<std::vector<FToken>>(m_tokens, m_outputFilePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokens: " + std::string(error.what()));
+        return false;
+    }
+
+    return true;
 }
 
 void CLexer::SetCode(const std::vector<std::string>& code)
 {
 	Reset();
 
-	m_filePath = "CLexer::SetCode()";
+    m_inputFilePath = "CLexer::SetCode()";
 	m_code = code;
 }
 
@@ -88,7 +56,7 @@ void CLexer::SetCode(std::vector<std::string>&& code)
 {
     Reset();
 
-    m_filePath = "CLexer::SetCode()";
+    m_inputFilePath = "CLexer::SetCode()";
     m_code = std::move(code);
 }
 
@@ -111,11 +79,11 @@ void CLexer::SetCode(const std::string& code)
     }
 }
 
-void CLexer::Run()
+void CLexer::RunProcessing()
 {
     if (m_code.empty())
     {
-        LexerWarning("Empty code");
+        Warning("Empty code");
         return;
     }
 
@@ -225,10 +193,22 @@ void CLexer::Run()
     }
 }
 
+bool CLexer::RunFullCycle()
+{
+    if (!LoadCode())
+        return false;
+
+    RunProcessing();
+
+    if (!SaveTokens())
+        return false;
+
+    return true;
+}
 
 void CLexer::DebugPrint() const
 {
-    LexerWarning("DebugPrint()");
+    Warning("DebugPrint()");
     for (const FToken& token : m_tokens)
     {
         std::cout << token.Debug() << '\n';
@@ -247,7 +227,28 @@ std::vector<FToken> CLexer::ExtractTokens()
 
 void CLexer::Reset()
 {
-	m_filePath = "";
+    m_inputFilePath = "";
+    m_outputFilePath = "";
 	m_code.clear();
 	m_tokens.clear();
+}
+
+void CLexer::Fatal(const std::string& message) const
+{
+    FatalBase(UNotifyFrom::LEXER, message);
+}
+
+void CLexer::Error(const std::string& message) const
+{
+    ErrorBase(UNotifyFrom::LEXER, message);
+}
+
+void CLexer::Warning(const std::string& message) const
+{
+    WarningBase(UNotifyFrom::LEXER, message);
+}
+
+void CLexer::Success(const std::string& message) const
+{
+    SuccessBase(UNotifyFrom::LEXER, message);
 }

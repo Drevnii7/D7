@@ -50,6 +50,9 @@
     <ClCompile Include="source\preprocessor\Preprocessor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\service\BaseService.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />

@@ -3,88 +3,79 @@
 #include <fstream>
 #include <iostream>
 
-bool CPreprocessor::Main(int argc, char* argv[])
+bool CPreprocessor::LoadTokens(const std::string& filePath)
 {
-    if (argc < 3)
-    {
-        PreprocessorWarning("[1] input file, [2] output file, [3+]  -dp/--debugPrint");
-        return false;
-    }
-
-    std::string m_inputPath = argv[1];
-    std::string m_outputPath = argv[2];
-    bool m_enableDebugPrint = false;
-
-    for (int i = 3; i < argc; ++i)
-    {
-        std::string arg = argv[i];
-        if (arg == "-dp" || arg == "--debugPrint")
-        {
-            m_enableDebugPrint = true;
-        }
-        else
-        {
-            PreprocessorWarning("Unknown argument: " + arg);
-        }
-    }
+    if (!filePath.empty()) { m_inputFilePath = filePath; }
 
     try
     {
-        LoadTokens(m_inputPath);
-        Run();
-        SaveTokens(m_outputPath);
+        m_tokens = FToken::Deserialize<std::list<FToken>>(m_inputFilePath);
     }
-    catch (const std::exception& e)
+    catch (const std::runtime_error& error)
     {
-        PreprocessorWarning(std::string("Stop. Critical error during processing: ") + e.what());
+        Error("LoadTokens: " + std::string(error.what()));
         return false;
-    }
-
-    if (m_enableDebugPrint)
-    {
-        DebugPrint();
     }
 
     return true;
 }
 
-void CPreprocessor::LoadTokens(const std::string& filePath)
+bool CPreprocessor::SaveTokens(const std::string& filePath)
 {
-    m_filePath = filePath;
-    m_tokens = FToken::Deserialize<std::list<FToken>>(m_filePath);
-}
+    if (!filePath.empty()) { m_outputFilePath = filePath; }
 
-void CPreprocessor::SaveTokens(const std::string& filePath)
-{
-    FToken::Serialize<std::list<FToken>>(m_tokens, filePath);
+    try
+    {
+        FToken::Serialize<std::list<FToken>>(m_tokens, filePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokens: " + std::string(error.what()));
+        return false;
+    }
+
+    return true;
 }
 
 void CPreprocessor::SetTokens(const std::vector<FToken>& tokens)
 {
-    m_filePath = "CPreprocessor::SetTokens()";
+    m_inputFilePath = "CPreprocessor::SetTokens()";
     m_tokens = { tokens.begin(), tokens.end() };
 }
 
 void CPreprocessor::SetTokens(const std::list<FToken>& tokens)
 {
-    m_filePath = "CPreprocessor::SetTokens()";
+    m_inputFilePath = "CPreprocessor::SetTokens()";
     m_tokens = tokens;
 }
 
 void CPreprocessor::SetTokens(std::list<FToken>&& tokens)
 {
-    m_filePath = "CPreprocessor::SetTokens()";
+    m_inputFilePath = "CPreprocessor::SetTokens()";
     m_tokens = std::move(tokens);
 }
 
-void CPreprocessor::Run()
+void CPreprocessor::RunProcessing()
 {
     // Placeholder
 }
 
+bool CPreprocessor::RunFullCycle()
+{
+    if (!LoadTokens())
+        return false;
+    
+    RunProcessing();
+
+    if (!SaveTokens())
+        return false;
+
+    return true;
+}
+
 void CPreprocessor::DebugPrint() const
 {
-    PreprocessorWarning("DebugPrint()");
+    Warning("DebugPrint()");
     for (const FToken& token : m_tokens)
     {
         std::cout << token.Debug() << '\n';
@@ -103,5 +94,27 @@ std::list<FToken> CPreprocessor::ExtractTokens()
 
 void CPreprocessor::Reset()
 {
+    m_inputFilePath = "";
+    m_outputFilePath = "";
 	m_tokens.clear();
+}
+
+void CPreprocessor::Fatal(const std::string& message) const
+{
+    FatalBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+void CPreprocessor::Error(const std::string& message) const
+{
+    ErrorBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+void CPreprocessor::Warning(const std::string& message) const
+{
+    WarningBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+void CPreprocessor::Success(const std::string& message) const
+{
+    SuccessBase(UNotifyFrom::PREPROCESSOR, message);
 }

@@ -12,10 +12,12 @@ class CPreprocessor : public CBaseService
 {
 public: // CBaseService
 
-	virtual bool Main(int argc, char* argv[]) override;
+	// virtual bool Main(int argc, char* argv[]);
 
 	// Start preprocessing
-	virtual void Run() override;
+	virtual void RunProcessing() override;
+
+	virtual bool RunFullCycle() override;
 
 	// std::cout all tokens
 	virtual void DebugPrint() const override;
@@ -23,10 +25,20 @@ public: // CBaseService
 	// Reset state
 	virtual void Reset() override;
 
+protected: // CBaseService
+
+	virtual void Fatal(const std::string& message) const override;
+	virtual void Error(const std::string& message) const override;
+	virtual void Warning(const std::string& message) const override;
+	virtual void Success(const std::string& message) const override;
+
+	// std::string m_inputFilePath = "";
+	// std::string m_outputFilePath = "";
+
 public: // CPreprocessor
 
-	void LoadTokens(const std::string& filePath);
-	void SaveTokens(const std::string& filePath);
+	[[nodiscard]] bool LoadTokens(const std::string& filePath = "");
+	[[nodiscard]] bool SaveTokens(const std::string& filePath = "");
 
 	// Set tokens raw
 	void SetTokens(const std::vector<FToken>& tokens);
@@ -38,8 +50,8 @@ public: // CPreprocessor
 	const std::list<FToken>& GetTokens() const;
 	std::list<FToken> ExtractTokens();
 
-private:
-	std::string m_filePath = "";
+protected:
+
 	std::list<FToken> m_tokens;
 };
 

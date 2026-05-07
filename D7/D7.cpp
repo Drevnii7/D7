@@ -10,13 +10,13 @@ int main()
 
     CLexer* Lexer = new CLexer();
     Lexer->LoadCode(File_SourceCode);
-    Lexer->Run();
+    Lexer->RunProcessing();
     Lexer->DebugPrint();
     Lexer->SaveTokens(File_TokensAfterLexer);
 
     CPreprocessor* Preprocessor = new CPreprocessor();
     Preprocessor->LoadTokens(File_TokensAfterLexer);
-    Preprocessor->Run();
+    Preprocessor->RunProcessing();
     Preprocessor->DebugPrint();
     Preprocessor->SaveTokens(File_TokensAfterLexer);
 }
