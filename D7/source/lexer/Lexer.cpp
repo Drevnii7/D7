@@ -116,9 +116,12 @@ void CLexer::RunProcessing()
             // Comments
             if (inBlockComment > 0)
             {
-                if (c == '*' && i + 1 < len && lineStr[i + 1] == '/')
-                {
-                    inBlockComment--;
+                if (c == '/' && i + 1 < len && lineStr[i + 1] == '*') {
+                    inBlockComment++;
+                    ++i;
+                }
+                else if (c == '*' && i + 1 < len && lineStr[i + 1] == '/') {
+                    if (inBlockComment > 0) inBlockComment--;
                     ++i;
                 }
                 continue;

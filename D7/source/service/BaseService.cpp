@@ -1,6 +1,6 @@
 #include "BaseService.h"
 
-bool CBaseService::Main(int argc, char* argv[])
+bool IBaseService::Main(int argc, char* argv[])
 {
     if (argc < 3)
     {

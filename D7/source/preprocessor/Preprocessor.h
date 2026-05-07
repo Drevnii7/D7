@@ -7,7 +7,7 @@
 #include <forward_list>
 #include <list>
 
-class CPreprocessor : public CBaseService
+class IPreprocessor : public IBaseService
 {
 public: // CBaseService
 

@@ -14,7 +14,7 @@ int main()
     Lexer->DebugPrint();
     Lexer->SaveTokens(File_TokensAfterLexer);
 
-    CPreprocessor* Preprocessor = new CPreprocessor();
+    IPreprocessor* Preprocessor = new IPreprocessor();
     Preprocessor->LoadTokens(File_TokensAfterLexer);
     Preprocessor->RunProcessing();
     Preprocessor->DebugPrint();
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 /*
 int main(int argc, char* argv[])
 {
-    CPreprocessor* Preprocessor = new CPreprocessor();
+    IPreprocessor* Preprocessor = new IPreprocessor();
     return Preprocessor->Main(argc, argv);
 }
 */

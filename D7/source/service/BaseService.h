@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
 
-class CBaseService
+class IBaseService
 {
 public:
 
-	CBaseService() = default;
-	virtual ~CBaseService() = default;
+	IBaseService() = default;
+	virtual ~IBaseService() = default;
 
 	// Example work as a tool with command line arguments
 	virtual bool Main(int argc, char* argv[]);

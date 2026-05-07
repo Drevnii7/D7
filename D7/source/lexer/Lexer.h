@@ -14,7 +14,7 @@
 #endif
 
 
-class CLexer : public CBaseService
+class CLexer : public IBaseService
 {
 public: // CBaseService
 

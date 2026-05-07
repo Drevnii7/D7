@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-bool CPreprocessor::LoadTokens(const std::string& filePath)
+bool IPreprocessor::LoadTokens(const std::string& filePath)
 {
     if (!filePath.empty()) { m_inputFilePath = filePath; }
 
@@ -20,7 +20,7 @@ bool CPreprocessor::LoadTokens(const std::string& filePath)
     return true;
 }
 
-bool CPreprocessor::SaveTokens(const std::string& filePath)
+bool IPreprocessor::SaveTokens(const std::string& filePath)
 {
     if (!filePath.empty()) { m_outputFilePath = filePath; }
 
@@ -37,30 +37,30 @@ bool CPreprocessor::SaveTokens(const std::string& filePath)
     return true;
 }
 
-void CPreprocessor::SetTokens(const std::vector<FToken>& tokens)
+void IPreprocessor::SetTokens(const std::vector<FToken>& tokens)
 {
-    m_inputFilePath = "CPreprocessor::SetTokens()";
+    m_inputFilePath = "IPreprocessor::SetTokens()";
     m_tokens = { tokens.begin(), tokens.end() };
 }
 
-void CPreprocessor::SetTokens(const std::list<FToken>& tokens)
+void IPreprocessor::SetTokens(const std::list<FToken>& tokens)
 {
-    m_inputFilePath = "CPreprocessor::SetTokens()";
+    m_inputFilePath = "IPreprocessor::SetTokens()";
     m_tokens = tokens;
 }
 
-void CPreprocessor::SetTokens(std::list<FToken>&& tokens)
+void IPreprocessor::SetTokens(std::list<FToken>&& tokens)
 {
-    m_inputFilePath = "CPreprocessor::SetTokens()";
+    m_inputFilePath = "IPreprocessor::SetTokens()";
     m_tokens = std::move(tokens);
 }
 
-void CPreprocessor::RunProcessing()
+void IPreprocessor::RunProcessing()
 {
     // Placeholder
 }
 
-bool CPreprocessor::RunFullCycle()
+bool IPreprocessor::RunFullCycle()
 {
     if (!LoadTokens())
         return false;
@@ -73,7 +73,7 @@ bool CPreprocessor::RunFullCycle()
     return true;
 }
 
-void CPreprocessor::DebugPrint() const
+void IPreprocessor::DebugPrint() const
 {
     Warning("DebugPrint()");
     for (const FToken& token : m_tokens)
@@ -82,39 +82,39 @@ void CPreprocessor::DebugPrint() const
     }
 }
 
-const std::list<FToken>& CPreprocessor::GetTokens() const
+const std::list<FToken>& IPreprocessor::GetTokens() const
 {
     return m_tokens;
 }
 
-std::list<FToken> CPreprocessor::ExtractTokens()
+std::list<FToken> IPreprocessor::ExtractTokens()
 {
 	return std::exchange(m_tokens, {});
 }
 
-void CPreprocessor::Reset()
+void IPreprocessor::Reset()
 {
     m_inputFilePath = "";
     m_outputFilePath = "";
 	m_tokens.clear();
 }
 
-void CPreprocessor::Fatal(const std::string& message) const
+void IPreprocessor::Fatal(const std::string& message) const
 {
     FatalBase(UNotifyFrom::PREPROCESSOR, message);
 }
 
-void CPreprocessor::Error(const std::string& message) const
+void IPreprocessor::Error(const std::string& message) const
 {
     ErrorBase(UNotifyFrom::PREPROCESSOR, message);
 }
 
-void CPreprocessor::Warning(const std::string& message) const
+void IPreprocessor::Warning(const std::string& message) const
 {
     WarningBase(UNotifyFrom::PREPROCESSOR, message);
 }
 
-void CPreprocessor::Success(const std::string& message) const
+void IPreprocessor::Success(const std::string& message) const
 {
     SuccessBase(UNotifyFrom::PREPROCESSOR, message);
 }
