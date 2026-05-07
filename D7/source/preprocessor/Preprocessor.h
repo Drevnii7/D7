@@ -4,7 +4,6 @@
 #include "../lexer/Token.h"
 
 #include <vector>
-#include <span>
 #include <forward_list>
 #include <list>
 

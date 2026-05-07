@@ -189,6 +189,18 @@ struct FToken
         file.close();
     }
 
+    
+
+#if IS_CPP_20 == 0
+    template<typename T, typename = void>
+    struct has_reserve : std::false_type {};
+
+    template<typename T>
+    struct has_reserve<T, std::void_t<decltype(std::declval<T>().reserve(std::declval<size_t>()))>>
+        : std::true_type {
+    };
+#endif
+
     // call throw std::runtime_error on fail
     template <typename Container>
     static Container Deserialize(const std::string& filename)
@@ -209,9 +221,19 @@ struct FToken
 
         Container tokens;
 
-        if constexpr (requires { tokens.reserve(count); }) {
+    #if IS_CPP_20 == 1
+        if constexpr (requires { tokens.reserve(count); }) 
+        {
             tokens.reserve(count);
         }
+    #else
+        // Check container contains function reserve()
+        // If false, not call
+        if constexpr (has_reserve<Container>::value)
+        {
+            tokens.reserve(count);
+        }
+    #endif
 
         for (size_t i = 0; i < count; ++i)
         {

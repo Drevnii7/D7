@@ -179,7 +179,23 @@ const std::unordered_set<UTokenType> gl_tokensSeparator
 
 std::string FToken::Debug() const 
 {
-    std::string result = "Lexeme: \"";
+    std::string result;
+    result += std::to_string(Line + 1);
+    result += ":";
+    result += std::to_string(Row + 1);
+    result += "   ";
+    result += internal::TokenTypeToString(Type);
+
+
+    result += "   \"";
+    result += Lexeme;
+    result += "\"";
+
+    
+
+    return result;
+
+    /*std::string result = "Lexeme: \"";
     result += Lexeme;
     result += "\", type: \"";
     result += internal::TokenTypeToString(Type);
@@ -187,7 +203,7 @@ std::string FToken::Debug() const
     result += std::to_string(Line+1);
     result += ", Row: ";
     result += std::to_string(Row+1);
-    return result;
+    return result;*/
 }
 
 constexpr bool FToken::internal::is_string(std::string_view lexeme)

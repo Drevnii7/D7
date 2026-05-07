@@ -1,10 +1,18 @@
 #pragma once
 
 #include "../service/BaseService.h"
+#include "../BaseTypes.h"
 #include "Token.h"
 
 #include <vector>
-#include <span>
+
+#if IS_CPP_20 == 1
+	#include <span>
+	#define HAS_STD_SPAN 1
+#else
+	#define HAS_STD_SPAN 0
+#endif
+
 
 class CLexer : public CBaseService
 {
@@ -43,7 +51,12 @@ public: // CLexer
 	void SetCode(std::vector<std::string>&& code);
 	void SetCode(const std::string& code);
 
-	std::span<FToken> GetTokens();
+	#if HAS_STD_SPAN == 1
+		std::span<FToken> GetTokens();
+	#else
+		const std::vector<FToken>& GetTokens();
+	#endif
+	
 	std::vector<FToken> ExtractTokens();
 
 protected:

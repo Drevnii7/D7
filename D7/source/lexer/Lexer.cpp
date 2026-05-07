@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-#define LEXEME_DEFAULT_RESERVE 256
+inline constexpr size_t LEXEME_DEFAULT_RESERVE = 256;
 
 bool CLexer::LoadCode(const std::string& filePath)
 {
@@ -92,7 +92,7 @@ void CLexer::RunProcessing()
     m_tokens.clear();
     std::string lexeme;
     lexeme.reserve(LEXEME_DEFAULT_RESERVE);
-    bool inBlockComment = false;
+    uint8_t inBlockComment = 0;
 
     auto FlushLexeme = [&](size_t line, size_t rowEnd) 
     {
@@ -114,25 +114,25 @@ void CLexer::RunProcessing()
             char c = lineStr[i];
 
             // Comments
-            if (inBlockComment)
+            if (inBlockComment > 0)
             {
                 if (c == '*' && i + 1 < len && lineStr[i + 1] == '/')
                 {
-                    inBlockComment = false;
+                    inBlockComment--;
                     ++i;
                 }
                 continue;
             }
             if (inLineComment) continue;
 
-            if (!inLineComment && !inBlockComment)
+            if (!inLineComment && inBlockComment == 0)
             {
                 // Comments
                 if (i + 1 < len)
                 {
                     std::string_view two(&lineStr[i], 2);
                     if (two == "//") { FlushLexeme(lineIdx, i); inLineComment = true; ++i; continue; }
-                    if (two == "/*") { FlushLexeme(lineIdx, i); inBlockComment = true; ++i; continue; }
+                    if (two == "/*") { FlushLexeme(lineIdx, i); inBlockComment++; ++i; continue; }
                 }
             }
 
@@ -218,10 +218,19 @@ void CLexer::DebugPrint() const
     }
 }
 
-std::span<FToken> CLexer::GetTokens()
-{
-    return { m_tokens };
-}
+#if HAS_STD_SPAN == 1
+    std::span<FToken> CLexer::GetTokens()
+    {
+        return { m_tokens };
+    }
+#else
+    const std::vector<FToken>& CLexer::GetTokens()
+    {
+        return m_tokens;
+    }
+#endif
+
+
 
 std::vector<FToken> CLexer::ExtractTokens()
 {

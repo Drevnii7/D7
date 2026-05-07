@@ -1,9 +1,29 @@
-#define USE_WORLD
+/*
+	Hi! I'm invisible.
+	// comment in comment
+*/
+
+int main()
+{
+	// Hello... world?
+
+	int ReturnValue = 41;
+
+	ReturnValue++;
+
+	return ReturnValue /* WORLD (or not?) */; 
+}
+
+
+
+/* old code
 
 /*
 	Hi! I'm invisible.
 	// comment in comment
 */
+
+#define USE_WORLD
 
 int main()
 {
@@ -20,3 +40,5 @@ int main()
 	
 	return ReturnValue /* WORLD (or not?) */; 
 }
+
+*/
