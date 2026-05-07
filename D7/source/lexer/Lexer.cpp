@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#define LEXEME_DEFAULT_RESERVE 256
+
 bool CLexer::LoadCode(const std::string& filePath)
 {
     Reset();
@@ -89,6 +91,7 @@ void CLexer::RunProcessing()
 
     m_tokens.clear();
     std::string lexeme;
+    lexeme.reserve(LEXEME_DEFAULT_RESERVE);
     bool inBlockComment = false;
 
     auto FlushLexeme = [&](size_t line, size_t rowEnd) 
@@ -96,7 +99,7 @@ void CLexer::RunProcessing()
         if (!lexeme.empty())
         {
             m_tokens.emplace_back(lexeme, line, rowEnd - lexeme.size());
-            lexeme.clear();
+            lexeme.clear(); // lexeme.reserve(...); not reset!
         }
     };
 

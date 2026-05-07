@@ -52,6 +52,11 @@ public: // CPreprocessor
 
 protected:
 
+	/*
+		The preprocessor runs in multiple passes. I once wrote a macro so tangled 
+		that it took the poor preprocessor 23 steps to expand it. Shifting the entire 
+		code 23 times would have killed the machine, but std::list saves the day.
+	*/
 	std::list<FToken> m_tokens;
 };
 

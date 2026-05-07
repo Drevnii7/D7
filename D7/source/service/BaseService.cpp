@@ -25,10 +25,10 @@ bool CBaseService::Main(int argc, char* argv[])
         }
     }
 
-    bool succesRunFullCycle = false;
+    bool successRunFullCycle = false;
     try
     {
-        succesRunFullCycle = RunFullCycle();
+        successRunFullCycle = RunFullCycle();
     }
     catch (const std::exception& e)
     {
@@ -41,5 +41,5 @@ bool CBaseService::Main(int argc, char* argv[])
         DebugPrint();
     }
 
-    return succesRunFullCycle;
+    return successRunFullCycle;
 }
