@@ -14,7 +14,7 @@ public:
 	virtual void RunProcessing() = 0;
 	virtual bool RunFullCycle() = 0;
 
-	virtual void DebugPrint() const = 0;
+	virtual void DebugPrint() const {};
 
 	virtual void Reset() = 0;
 
