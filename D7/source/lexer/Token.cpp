@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-const std::unordered_map<std::string_view, UTokenType> m_stringToTokenType
+const std::unordered_map<std::string_view, UTokenType> gl_stringToTokenType
 {
     // { "", UTokenType::IDENTIFIER }, // NONE BASE LEXEME
 
@@ -105,13 +105,13 @@ const std::unordered_map<std::string_view, UTokenType> m_stringToTokenType
 
 };
 
-const std::unordered_map<UTokenType, std::string_view> m_tokenTypeToString = []
+const std::unordered_map<UTokenType, std::string_view> gl_tokenTypeToString = []
 {
     std::unordered_map<UTokenType, std::string_view> result;
-    for (const auto& Pair : m_stringToTokenType)
+    for (const auto& Pair : gl_stringToTokenType)
         result[Pair.second] = Pair.first;
 
-    result.reserve(m_stringToTokenType.size() + 8);
+    result.reserve(gl_stringToTokenType.size() + 8);
 
     /* 1 */ result.emplace(UTokenType::IDENTIFIER,             "IDENTIFIER" );
     /* 2 */ result.emplace(UTokenType::INTEGER_CONST,          "INTEGER_CONST" );
@@ -126,7 +126,7 @@ const std::unordered_map<UTokenType, std::string_view> m_tokenTypeToString = []
 }();
 
 
-const std::unordered_set<UTokenType> m_tokensSeparator
+const std::unordered_set<UTokenType> gl_tokensSeparator
 {
     // relationship operators
     UTokenType::LESS,          // <
@@ -265,14 +265,14 @@ bool FToken::internal::is_separator(std::string_view tokenType)
 
 bool FToken::internal::is_separatorType(UTokenType tokenType)
 {
-    return m_tokensSeparator.find(tokenType) != m_tokensSeparator.end();
+    return gl_tokensSeparator.find(tokenType) != gl_tokensSeparator.end();
 }
 
 
 std::string_view FToken::internal::TokenTypeToString(UTokenType tokenType)
 {
-    auto it = m_tokenTypeToString.find(tokenType);
-    if (it != m_tokenTypeToString.end())
+    auto it = gl_tokenTypeToString.find(tokenType);
+    if (it != gl_tokenTypeToString.end())
         return it->second; // Find
 
     // Not find
@@ -297,8 +297,8 @@ UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)
     if (is_preprocessorDirective(lexeme))
         return UTokenType::PREPROCESSOR_DIRECTIVE;
 
-    auto it = m_stringToTokenType.find(lexeme);
-    if (it != m_stringToTokenType.end())
+    auto it = gl_stringToTokenType.find(lexeme);
+    if (it != gl_stringToTokenType.end())
         return it->second; // Find
 
     return UTokenType::IDENTIFIER;

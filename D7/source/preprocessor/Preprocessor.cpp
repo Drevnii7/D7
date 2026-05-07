@@ -3,11 +3,11 @@
 #include <fstream>
 #include <iostream>
 
-bool CPreprocessor::args(int argc, char* argv[])
+bool CPreprocessor::main(int argc, char* argv[])
 {
     if (argc < 3)
     {
-        std::cout << "[0] input file, [1] output file, [2>=]  -dp/--debugPrint \n";
+        std::cout << "[1] input file, [2] output file, [3+]  -dp/--debugPrint \n";
         return false;
     }
 
@@ -28,9 +28,17 @@ bool CPreprocessor::args(int argc, char* argv[])
         }
     }
 
-    LoadTokens(m_inputPath);
-    Run();
-    SaveTokens(m_outputPath);
+    try
+    {
+        LoadTokens(m_inputPath);
+        Run();
+        SaveTokens(m_outputPath);
+    }
+    catch (const std::exception& e)
+    {
+        PreprocessorError(std::string("Critical error during processing: ") + e.what());
+        return false;
+    }
 
     if (m_enableDebugPrint)
     {

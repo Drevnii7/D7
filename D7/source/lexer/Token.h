@@ -130,7 +130,6 @@ enum class UTokenType : uint8_t
     ACCESS_OPERATOR, // ::
 };
 
-#pragma pack(push, 1)   
 struct FToken
 {
     std::string Lexeme = "";
@@ -235,4 +234,3 @@ struct FToken
     friend std::ostream& operator<<(std::ostream& os, const FToken& token);
     friend std::istream& operator>>(std::istream& is, FToken& token);
 };
-#pragma pack(pop)

@@ -12,9 +12,9 @@ class CPreprocessor
 public:
 
 	CPreprocessor() = default;
-	CPreprocessor(int argc, char* argv[]) { args(argc, argv); }
+	CPreprocessor(int argc, char* argv[]) { main(argc, argv); }
 
-	bool args(int argc, char* argv[]);
+	virtual bool main(int argc, char* argv[]);
 
 	void LoadTokens(const std::string& filePath);
 	void SaveTokens(const std::string& filePath);
@@ -28,7 +28,7 @@ public:
 	virtual void Run();
 
 	// std::cout all tokens
-	void DebugPrint() const;
+	virtual void DebugPrint() const;
 
 	const std::list<FToken>& GetTokens() const;
 	std::list<FToken> ExtractTokens();
