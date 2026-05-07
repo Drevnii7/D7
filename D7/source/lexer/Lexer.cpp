@@ -5,35 +5,22 @@
 
 bool CLexer::Main(int argc, char* argv[])
 {
-    std::vector<std::string> l_args; 
-    l_args.reserve(argc);
-
-    for (int i = 0; i < argc; ++i)
+    if (argc < 3)
     {
-        l_args.emplace_back(argv[i]);
-    }
-
-    return Main(l_args);
-}
-
-bool CLexer::Main(const std::vector<std::string>& args)
-{
-    if (args.size() < 3)
-    {
-        std::cout << "[1] input file, [2] output file, [3+]  -dp/--debugPrint \n";
+        LexerWarning("[1] input file, [2] output file, [3+]  -dp/--debugPrint");
         return false;
     }
 
-    std::string l_inputPath = args[0];
-    std::string l_outputPath = args[1];
-    bool l_enableDebugPrint = false;
+    std::string m_inputPath = argv[1];
+    std::string m_outputPath = argv[2];
+    bool m_enableDebugPrint = false;
 
-    for (size_t i = 3; i < args.size(); ++i)
+    for (int i = 3; i < argc; ++i)
     {
-        std::string arg = args[i];
+        std::string arg = argv[i];
         if (arg == "-dp" || arg == "--debugPrint")
         {
-            l_enableDebugPrint = true;
+            m_enableDebugPrint = true;
         }
         else
         {
@@ -43,17 +30,17 @@ bool CLexer::Main(const std::vector<std::string>& args)
 
     try
     {
-        LoadCode(l_inputPath);
+        LoadCode(m_inputPath);
         Run();
-        SaveTokens(l_outputPath);
+        SaveTokens(m_outputPath);
     }
     catch (const std::exception& e)
     {
-        LexerError(std::string("Critical error during processing: ") + e.what());
+        LexerWarning(std::string("Stop. Critical error during processing: ") + e.what());
         return false;
     }
 
-    if (l_enableDebugPrint)
+    if (m_enableDebugPrint)
     {
         DebugPrint();
     }

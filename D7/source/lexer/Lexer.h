@@ -1,20 +1,27 @@
 #pragma once
 
+#include "../service/BaseService.h"
 #include "Token.h"
 
 #include <vector>
 #include <span>
 
-class CLexer
+class CLexer : public CBaseService
 {
-public:
+public: // CBaseService
 
-	CLexer() = default;
-	CLexer(int argc, char* argv[]) { Main(argc, argv); }
-	CLexer(const std::vector<std::string>& args) { Main(args); }
+	virtual bool Main(int argc, char* argv[]) override;
 
-	virtual bool Main(int argc, char* argv[]);
-	virtual bool Main(const std::vector<std::string>& args);
+	// Start preprocessing
+	virtual void Run() override;
+
+	// std::cout all tokens
+	virtual void DebugPrint() const override;
+
+	// Reset state
+	virtual void Reset() override;
+
+public: // CLexer
 
 	void LoadCode(const std::string& filePath);
 	void SaveTokens(const std::string& filePath);
@@ -24,17 +31,8 @@ public:
 	void SetCode(std::vector<std::string>&& code);
 	void SetCode(const std::string& code);
 
-	// Start lexical analyse
-	void Run();
-
-	// std::cout all tokens
-	void DebugPrint() const;
-
 	std::span<FToken> GetTokens();
 	std::vector<FToken> ExtractTokens();
-
-	// Reset state
-	void Reset();
 
 private:
 	std::string m_filePath = "";

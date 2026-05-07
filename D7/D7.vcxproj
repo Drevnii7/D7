@@ -23,6 +23,7 @@
     <ClInclude Include="source\notify\Notify.h" />
     <ClInclude Include="source\lexer\Lexer.h" />
     <ClInclude Include="source\lexer\Token.h" />
+    <ClInclude Include="source\service\BaseService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp" />

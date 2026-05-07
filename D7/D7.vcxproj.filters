@@ -30,6 +30,9 @@
     <ClInclude Include="source\preprocessor\Preprocessor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\service\BaseService.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\lexer\Lexer.cpp">
