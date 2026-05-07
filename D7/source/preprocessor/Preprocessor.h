@@ -12,9 +12,9 @@ class CPreprocessor
 public:
 
 	CPreprocessor() = default;
-	CPreprocessor(int argc, char* argv[]) { main(argc, argv); }
+	CPreprocessor(int argc, char* argv[]) { Main(argc, argv); }
 
-	virtual bool main(int argc, char* argv[]);
+	virtual bool Main(int argc, char* argv[]);
 
 	void LoadTokens(const std::string& filePath);
 	void SaveTokens(const std::string& filePath);

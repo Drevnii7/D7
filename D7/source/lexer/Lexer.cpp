@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-bool CLexer::main(int argc, char* argv[])
+bool CLexer::Main(int argc, char* argv[])
 {
     if (argc < 3)
     {

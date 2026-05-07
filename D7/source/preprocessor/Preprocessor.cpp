@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-bool CPreprocessor::main(int argc, char* argv[])
+bool CPreprocessor::Main(int argc, char* argv[])
 {
     if (argc < 3)
     {

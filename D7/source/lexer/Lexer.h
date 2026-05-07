@@ -10,9 +10,9 @@ class CLexer
 public:
 
 	CLexer() = default;
-	CLexer(int argc, char* argv[]) { main(argc, argv); }
+	CLexer(int argc, char* argv[]) { Main(argc, argv); }
 
-	bool main(int argc, char* argv[]);
+	bool Main(int argc, char* argv[]);
 
 	void LoadCode(const std::string& filePath);
 	void SaveTokens(const std::string& filePath);
