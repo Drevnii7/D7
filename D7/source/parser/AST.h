@@ -2,6 +2,8 @@
 
 #include "../lexer/Token.h"
 #include <vector>
+#include <iomanip>
+#include <sstream>
 
 enum class UNodeType : uint8_t
 {
@@ -48,12 +50,19 @@ struct FASTNode
 
     std::string Dump(int indent = 0) const
     {
-        std::string res = "[" + std::string(internal::NodeTypeToString(Type)) + "] " + Token.Dump() + "\n";
+        std::string pad(indent * 4, ' ');
+        std::string line = pad + "[" + std::string(internal::NodeTypeToString(Type)) + "] ";
+        if (Type != UNodeType::Block)
+        {
+            line += Token.IsValid() ? Token.Dump() : "INVALID";
+        }
+        line += '\n';
+
         for (const auto& child : ChildNodes)
         {
-            res += child->Dump(indent + 1);
+            line += child->Dump(indent + 1);
         }
-        return res;
+        return line;
     }
 
     struct internal

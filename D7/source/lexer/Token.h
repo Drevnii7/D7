@@ -156,7 +156,7 @@ struct FToken
 
     std::string Dump() const;
 
-    bool IsValid()
+    bool IsValid() const
     {
         return Type != UTokenType::NONE;
     }

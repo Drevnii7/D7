@@ -160,7 +160,7 @@ const std::unordered_set<UTokenType> gl_tokensSeparator
 std::string FToken::Dump() const
 {
     std::ostringstream result;
-    std::string position = std::to_string(Line + 1) + ":" + std::to_string(Row + 1);
+    std::string position = std::to_string(Line) + ":" + std::to_string(Row);
 
     result << std::left
         << std::setw(10) << position

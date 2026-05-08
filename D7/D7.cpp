@@ -27,7 +27,7 @@ int main()
     Preprocessor->RunProcessing();
     Preprocessor->DebugPrint();
     Preprocessor->SaveTokens(File_TokensAfterPreprocessor);
-
+    
     CParser* Parser = new CParser();
     Parser->LoadTokens(File_TokensAfterPreprocessor);
     Parser->RunProcessing();
