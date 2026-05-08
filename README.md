@@ -8,7 +8,7 @@
 - - [x] Base test preprocessor
 - - [ ] Full lang preprocessor
 - [ ] Parser
-- - [ ] AST
+- - [x] AST
 - - [ ] Parse tokens to AST
 - [ ] Semantic Analyzer
 - - [ ] Symbol Table
