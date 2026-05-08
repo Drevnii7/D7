@@ -17,7 +17,7 @@ void CStandartPreprocessor::Reset()
 
 int CStandartPreprocessor::FindNextPreprocessorDirective()
 {
-	size_t index = -1;
+    int index = -1;
 
 	for (const FToken& token : m_tokens)
 	{
@@ -54,7 +54,7 @@ void CStandartPreprocessor::DirectiveCollectDefine()
         {
             if (defineValue.Lexeme != collectDefine->second.Lexeme || defineValue.Type != collectDefine->second.Type)
             {
-                Fatal("Already determined define: \"" + defineValue.Debug() + "\" defined in \"" + collectDefine->second.Debug());
+                Fatal("Already determined define: \"" + defineValue.Dump() + "\" defined in \"" + collectDefine->second.Dump());
             }
         }
 

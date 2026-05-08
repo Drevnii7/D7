@@ -151,12 +151,12 @@ struct FToken
     std::string Lexeme = "";
     UTokenType Type = UTokenType::UNDEFINED;
 
-    int32_t Line = 0;
-    int32_t Row = 0;
+    size_t Line = 0;
+    size_t Row = 0;
     FTokenModifiers Modifiers;
 
     FToken() = default;
-    explicit FToken(std::string lexeme, int32_t line, int32_t row)
+    explicit FToken(std::string lexeme, size_t line, size_t row)
     {
         Lexeme = lexeme;
         Type = internal::StringToTokenType(lexeme);
@@ -164,7 +164,7 @@ struct FToken
         Row = row;
     }
 
-    std::string Debug() const;
+    std::string Dump() const;
 
     bool IsValid()
     {

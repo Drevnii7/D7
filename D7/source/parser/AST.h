@@ -1,0 +1,56 @@
+#pragma once
+
+#include "../lexer/Token.h"
+#include <vector>
+
+enum class UNodeType : uint8_t
+{
+    None         = 0, // Invalid
+
+    Block        = 1, // {}
+    Literal      = 2, // int, float, sting, char
+    Identifier   = 3, // main, std::cout, 
+    VarDecl      = 4, // type name = value;
+    FunctionDecl = 5, // type name() { ... }
+    ReturnStmt   = 6, // return value;
+    BinaryExpr   = 7, // a + b; x = 41
+    UnaryExpr    = 8, // ++x; !flag, x--
+};
+
+struct FASTNode
+{
+    UNodeType Type = UNodeType::None;
+	FToken Token;
+	std::vector<std::unique_ptr<FASTNode>> ChildNodes;
+
+    FASTNode() = default;
+
+    bool IsValid() const
+    {
+        return Type != UNodeType::None;
+    }
+
+    void AddChild(std::unique_ptr<FASTNode> child)
+    {
+        if (child)
+        {
+            ChildNodes.push_back(std::move(child));
+        }
+    }
+
+    std::string Dump(int indent = 0) const
+    {
+        std::string res = "[" + std::string(internal::NodeTypeToString(Type)) + "] " + Token.Dump() + "\n";
+        for (const auto& child : ChildNodes)
+        {
+            res += child->Dump(indent + 1);
+        }
+        return res;
+    }
+
+    struct internal
+    {
+        static std::string_view NodeTypeToString(UNodeType nodeType);
+        static UNodeType StringToNodeType(std::string_view string);
+    };
+};

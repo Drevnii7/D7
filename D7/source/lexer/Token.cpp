@@ -177,19 +177,19 @@ const std::unordered_set<UTokenType> gl_tokensSeparator
     UTokenType::ACCESS_OPERATOR, // ::
 };
 
-std::string FToken::Debug() const 
+std::string FToken::Dump() const 
 {
     std::string result;
     result += std::to_string(Line + 1);
     result += ":";
     result += std::to_string(Row + 1);
     result += "   ";
-    result += internal::TokenTypeToString(Type);
-
-
-    result += "   \"";
     result += Lexeme;
-    result += "\"";
+
+
+    result += "   (";
+    result += internal::TokenTypeToString(Type);
+    result += ")";
 
     
 
@@ -293,7 +293,7 @@ std::string_view FToken::internal::TokenTypeToString(UTokenType tokenType)
 
     // Not find
     static std::string invalid = "INVALID";
-    return "invalid";
+    return invalid;
 }
 
 UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)

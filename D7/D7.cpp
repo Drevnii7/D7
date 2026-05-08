@@ -1,9 +1,13 @@
 ﻿#include <iostream>
+
 #include "source/lexer/Token.h"
 #include "source/lexer/Lexer.h"
+
 #include "source/preprocessor/IPreprocessor.h"
 #include "source/preprocessor/StandartPreprocessor.h"
 
+#include "source/parser/AST.h"
+#include "source/parser/Parser.h"
 int main()
 {
     std::string File_SourceCode = "test_code.d7";

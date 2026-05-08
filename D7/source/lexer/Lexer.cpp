@@ -252,7 +252,7 @@ void CLexer::DebugPrint() const
     Warning("DebugPrint()");
     for (const FToken& token : m_tokens)
     {
-        std::cout << token.Debug() << '\n';
+        std::cout << token.Dump() << '\n';
     }
 }
 
