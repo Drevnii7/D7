@@ -38,6 +38,7 @@ public: // CPreprocessor
 
 	[[nodiscard]] bool LoadTokens(const std::string& filePath = "");
 	[[nodiscard]] bool SaveTokens(const std::string& filePath = "");
+	[[nodiscard]] bool SaveTokensAsCode(const std::string& filePath = "");
 
 	// Set tokens raw
 	void SetTokens(const std::vector<FToken>& tokens);

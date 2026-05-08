@@ -35,7 +35,6 @@ void CParser::Reset()
 	m_rootNode.Type = UNodeType::None;
 	m_rootNode.Token.Lexeme = "";
 	m_rootNode.Token.Type = UTokenType::NONE;
-	m_tokens.clear();
 }
 
 bool CParser::LoadTokens(const std::string& filePath)

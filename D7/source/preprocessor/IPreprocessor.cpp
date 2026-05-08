@@ -3,6 +3,19 @@
 #include <fstream>
 #include <iostream>
 
+bool IPreprocessor::RunFullCycle()
+{
+    if (!LoadTokens())
+        return false;
+
+    RunProcessing();
+
+    if (!SaveTokens())
+        return false;
+
+    return true;
+}
+
 bool IPreprocessor::LoadTokens(const std::string& filePath)
 {
     if (!filePath.empty()) { m_inputFilePath = filePath; }
@@ -17,6 +30,7 @@ bool IPreprocessor::LoadTokens(const std::string& filePath)
         return false;
     }
 
+    Success("LoadTokens: " + filePath);
     return true;
 }
 
@@ -34,6 +48,25 @@ bool IPreprocessor::SaveTokens(const std::string& filePath)
         return false;
     }
 
+    Success("SaveTokens: " + filePath);
+    return true;
+}
+
+bool IPreprocessor::SaveTokensAsCode(const std::string& filePath)
+{
+    if (!filePath.empty()) { m_outputFilePath = filePath; }
+
+    try
+    {
+        FToken::SerializeAsCode<std::list<FToken>>(m_tokens, filePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokensAsCode: " + std::string(error.what()));
+        return false;
+    }
+
+    Success("SaveTokensAsCode: " + filePath);
     return true;
 }
 
@@ -53,19 +86,6 @@ void IPreprocessor::SetTokens(std::list<FToken>&& tokens)
 {
     m_inputFilePath = "IPreprocessor::SetTokens()";
     m_tokens = std::move(tokens);
-}
-
-bool IPreprocessor::RunFullCycle()
-{
-    if (!LoadTokens())
-        return false;
-    
-    RunProcessing();
-
-    if (!SaveTokens())
-        return false;
-
-    return true;
 }
 
 void IPreprocessor::DebugPrint() const

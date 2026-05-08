@@ -16,37 +16,36 @@ int main()
 	return ReturnValue /* WORLD (or not?) */; 
 }
 
-
-
-/* old code
-
-/*
-	Hi! I'm invisible.
-	// comment in comment
-*/
-
-#using USE_WORLD
-
-int main()
-{
-	// Hello... world?
-
-	dx::string Str = "Hello, world!\n";
-	int ReturnValue = 41;
-
-	#ifdef USE_WORLD
-		ReturnValue++;
-	#else
-		ReturnValue--;
-	#endif
-	
-	return ReturnValue /* WORLD (or not?) */; 
-}
-
-*/
-
-
 float GetPI()
 {
 	return PI; 
 }
+
+
+
+/* old code
+	/*
+		Hi! I'm invisible.
+		/*
+			/* // comment in comment  in comment in comment in comment */
+		*/
+	*/
+
+	#using USE_WORLD
+
+	int main()
+	{
+		// Hello... world?
+
+		dx::string Str = "Hello, world!\n";
+		int ReturnValue = 41;
+
+		#ifdef USE_WORLD
+			ReturnValue++;
+		#else
+			ReturnValue--;
+		#endif
+	
+		return ReturnValue /* WORLD (or not?) */; 
+	}
+*/

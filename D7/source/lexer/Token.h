@@ -200,6 +200,92 @@ struct FToken
         file.close();
     }
 
+    template <typename Container>
+    static void SerializeAsCode(const Container& tokens, const std::string& filename)
+    {
+        std::ofstream file(filename);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open file for writing: " + filename);
+        }
+
+        int indentLevel = 0;
+        const int indentSpaces = 4;
+
+        for (auto it = tokens.begin(); it != tokens.end(); ++it)
+        {
+            const auto& token = *it;
+            auto next = std::next(it);
+
+            if (token.Type == UTokenType::RBRA)
+            {
+                indentLevel--;
+                file << std::string(indentLevel * indentSpaces, ' ') << token.Lexeme << '\n';
+                if (next != tokens.end() && next->Type != UTokenType::RBRA)
+                {
+                    file << '\n';
+                }
+                continue;
+            }
+
+            if (token.Type == UTokenType::LBRA)
+            {
+                file << '\n' << token.Lexeme << '\n';
+                indentLevel++;
+                continue;
+            }
+
+            if (token.Type == UTokenType::SEMICOLON)
+            {
+                file << token.Lexeme << '\n';
+                continue;
+            }
+
+            static bool needIndent = true;
+            if (needIndent)
+            {
+                file << std::string(indentLevel * indentSpaces, ' ');
+                needIndent = false;
+            }
+
+            file << token.Lexeme;
+
+            bool putSpace = true;
+            if (next != tokens.end())
+            {
+                UTokenType nt = next->Type;
+
+                if (nt == UTokenType::SEMICOLON || nt == UTokenType::COMMA ||
+                    nt == UTokenType::RPAR || nt == UTokenType::RBRA ||
+                    nt == UTokenType::INC || nt == UTokenType::DEC ||
+                    token.Type == UTokenType::LPAR || token.Type == UTokenType::INC ||
+                    token.Type == UTokenType::DEC)
+                {
+                    putSpace = false;
+                }
+            }
+
+            if (putSpace && next != tokens.end())
+            {
+                file << ' ';
+            }
+
+            if (next != tokens.end())
+            {
+                UTokenType nt = next->Type;
+                if (nt == UTokenType::SEMICOLON || nt == UTokenType::LBRA || nt == UTokenType::RBRA)
+                {
+                    needIndent = true;
+                }
+            }
+            else
+            {
+                needIndent = true;
+            }
+        }
+
+        file.close();
+    }
     
 
 #if IS_CPP_20 == 0
