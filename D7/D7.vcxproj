@@ -20,19 +20,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\BaseTypes.h" />
-    <ClInclude Include="source\preprocessor\Preprocessor.h" />
+    <ClInclude Include="source\preprocessor\IPreprocessor.h" />
     <ClInclude Include="source\notify\Notify.h" />
     <ClInclude Include="source\lexer\Lexer.h" />
     <ClInclude Include="source\lexer\Token.h" />
-    <ClInclude Include="source\service\BaseService.h" />
+    <ClInclude Include="source\service\IBaseService.h" />
+    <ClInclude Include="source\preprocessor\StandartPreprocessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp" />
-    <ClCompile Include="source\preprocessor\Preprocessor.cpp" />
+    <ClCompile Include="source\preprocessor\IPreprocessor.cpp" />
     <ClCompile Include="source\notify\Notify.cpp" />
     <ClCompile Include="source\lexer\Lexer.cpp" />
     <ClCompile Include="source\lexer\Token.cpp" />
-    <ClCompile Include="source\service\BaseService.cpp" />
+    <ClCompile Include="source\service\IBaseService.cpp" />
+    <ClCompile Include="source\preprocessor\StandartPreprocessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />

@@ -1,7 +1,8 @@
 ﻿#include <iostream>
 #include "source/lexer/Token.h"
 #include "source/lexer/Lexer.h"
-#include "source/preprocessor/Preprocessor.h"
+#include "source/preprocessor/IPreprocessor.h"
+#include "source/preprocessor/StandartPreprocessor.h"
 
 int main()
 {
@@ -14,7 +15,7 @@ int main()
     Lexer->DebugPrint();
     Lexer->SaveTokens(File_TokensAfterLexer);
 
-    IPreprocessor* Preprocessor = new IPreprocessor();
+    CStandartPreprocessor* Preprocessor = new CStandartPreprocessor();
     Preprocessor->LoadTokens(File_TokensAfterLexer);
     Preprocessor->RunProcessing();
     Preprocessor->DebugPrint();

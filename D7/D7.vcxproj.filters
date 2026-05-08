@@ -27,13 +27,16 @@
     <ClInclude Include="source\notify\Notify.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\preprocessor\Preprocessor.h">
+    <ClInclude Include="source\preprocessor\IPreprocessor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\service\BaseService.h">
+    <ClInclude Include="source\service\IBaseService.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\BaseTypes.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\preprocessor\StandartPreprocessor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,10 +53,13 @@
     <ClCompile Include="source\notify\Notify.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\preprocessor\Preprocessor.cpp">
+    <ClCompile Include="source\preprocessor\IPreprocessor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\service\BaseService.cpp">
+    <ClCompile Include="source\service\IBaseService.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\preprocessor\StandartPreprocessor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

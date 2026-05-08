@@ -1,4 +1,4 @@
-#include "BaseService.h"
+#include "IBaseService.h"
 
 bool IBaseService::Main(int argc, char* argv[])
 {

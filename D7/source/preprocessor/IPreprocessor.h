@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../service/BaseService.h"
+#include "../service/IBaseService.h"
 #include "../lexer/Token.h"
 
 #include <vector>
@@ -14,7 +14,7 @@ public: // CBaseService
 	// virtual bool Main(int argc, char* argv[]);
 
 	// Start preprocessing
-	virtual void RunProcessing() override {};
+	virtual void RunProcessing() override = 0;
 
 	virtual bool RunFullCycle() override;
 

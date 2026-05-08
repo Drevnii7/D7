@@ -130,6 +130,22 @@ enum class UTokenType : uint8_t
     ACCESS_OPERATOR, // ::
 };
 
+// All modifiers are based on the source code.
+struct FTokenModifiers
+{
+    // Such tokens did not originally exist
+    bool IsTokenGenerate = false;
+
+    // If modified this token's value
+    bool IsTokenValueChanged = false;
+
+    // If modified this token's type
+    bool IsTokenTypeChanged = false;
+
+    // True if this token was copied/inserted from another file
+    bool IsTokenCopyFromAnywhere = false;
+};
+
 struct FToken
 {
     std::string Lexeme = "";
@@ -137,6 +153,7 @@ struct FToken
 
     int32_t Line = 0;
     int32_t Row = 0;
+    FTokenModifiers Modifiers;
 
     FToken() = default;
     explicit FToken(std::string lexeme, int32_t line, int32_t row)
@@ -148,6 +165,11 @@ struct FToken
     }
 
     std::string Debug() const;
+
+    bool IsValid()
+    {
+        return Type != UTokenType::UNDEFINED;;
+    }
 
     struct internal
     {

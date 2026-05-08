@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../service/BaseService.h"
+#include "../service/IBaseService.h"
 #include "../BaseTypes.h"
 #include "Token.h"
 
