@@ -2,78 +2,53 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <iomanip>
+#include <sstream>
 
 const std::unordered_map<std::string_view, UTokenType> gl_stringToTokenType
 {
-    // { "", UTokenType::IDENTIFIER }, // NONE BASE LEXEME
+    { "::", UTokenType::NAMESPACE },
+    { "#",  UTokenType::DIRECTIVE },
+    { "__", UTokenType::MACRO },
+    { "##", UTokenType::MACRO_S },
 
-    // { "", UTokenType::INTEGER_CONST }, // NONE BASE LEXEME
-    // { "", UTokenType::DOUBLE_CONST }, // NONE BASE LEXEME
-    // { "", UTokenType::STRING_CONST }, // NONE BASE LEXEME
-    // { "", UTokenType::CHAR_CONST }, // NONE BASE LEXEME
-
-    // boolean constant
-    { "true", UTokenType::TRUE },
-    { "false", UTokenType::FALSE },
-
-    { "const", UTokenType::CONST },
-
-    // types
-    // { "", UTokenType::UNDEFINED }, // NONE BASE LEXEME
-
-    { "int", UTokenType::INT },
-    { "double", UTokenType::DOUBLE },
-    { "bool", UTokenType::BOOL },
-    { "char", UTokenType::CHAR },
-    { "void", UTokenType::VOID },
-    { "auto", UTokenType::AUTO },
-
-    // cycles
-    { "do", UTokenType::DO_WHILE },
-    { "while", UTokenType::WHILE },
-    { "for", UTokenType::FOR },
-
-    // cycles addition
-    { "break", UTokenType::BREAK },
-    { "continue", UTokenType::CONTINUE },
-
-    { "switch", UTokenType::SWITCH },
-    { "case", UTokenType::CASE },
-    { "default", UTokenType::DEFAULT },
-
-    // conditions
-    { "if", UTokenType::IF },
-    { "else", UTokenType::ELSE },
-
-    // relationship operators
-    { "<", UTokenType::LESS },
-    { ">", UTokenType::GREATER },
-    { "<=", UTokenType::LESS_EQUAL },
-    { ">=", UTokenType::GREATER_EQUAL },
-
-    // equal operators
-    { "==", UTokenType::EQUAL },
-    { "!=", UTokenType::NOT_EQUAL },
+    // math
+    { "+",  UTokenType::ADD },
+    { "-",  UTokenType::SUB },
+    { "*",  UTokenType::MUL },
+    { "/",  UTokenType::DIV },
+    { "%",  UTokenType::MOD },
+    { "**", UTokenType::POW },
+    { "++", UTokenType::INC },
+    { "--", UTokenType::DEC },
 
     // logical operators
     { "&&", UTokenType::AND },
     { "||", UTokenType::OR },
-    { "!",  UTokenType::EXCLAMATION },
+    { "!",  UTokenType::NOT },
 
-    // math operators
-    { "+", UTokenType::PLUS },
-    { "-", UTokenType::MINUS },
-    { "*", UTokenType::STAR },
-    { "/", UTokenType::SLASH },
-    { "++", UTokenType::INC },
-    { "--", UTokenType::DEC },
+    // equal operators
+    { "==", UTokenType::EQUAL },
+    { "!=", UTokenType::NOT_EQUAL },
+    { "<",  UTokenType::LESS },
+    { ">",  UTokenType::GREATER },
+    { "<=", UTokenType::LESS_EQUAL },
+    { ">=", UTokenType::GREATER_EQUAL },
 
     // assign
     { "=", UTokenType::ASSIGN },
-    { "+=", UTokenType::ADD_ASSIGN },
-    { "-=", UTokenType::SUB_ASSIGN },
-    { "*=", UTokenType::MUL_ASSIGN },
-    { "/=", UTokenType::DIV_ASSIGN },
+    { "+=", UTokenType::ASSIGN_ADD },
+    { "-=", UTokenType::ASSIGN_SUB },
+    { "*=", UTokenType::ASSIGN_MUL },
+    { "/=", UTokenType::ASSIGN_DIV },
+    { "%=", UTokenType::ASSIGN_MOD },
+
+    // symbols
+    { ";", UTokenType::SEMICOLON },
+    { ",", UTokenType::COMMA },
+    { ".", UTokenType::POINT },
+    { "?", UTokenType::QUESTION },
+    { "&", UTokenType::AMPERSAND },
 
     // brackets
     { "{", UTokenType::LBRA },
@@ -83,26 +58,25 @@ const std::unordered_map<std::string_view, UTokenType> gl_stringToTokenType
     { "[", UTokenType::LSQR },
     { "]", UTokenType::RSQR },
 
-    // function
-    // { "", UTokenType::FUNCTION }, // NONE BASE LEXEME
-    { "return", UTokenType::RETURN },
-
-    // other symbols
-    { ";", UTokenType::SEMICOLON },
-    { ":", UTokenType::COLON },
-    { ",", UTokenType::COMMA },
-    { ".", UTokenType::POINT },
-    { "?", UTokenType::QUESTION },
-    { "&", UTokenType::AMPERSAND },
-
-    { "new", UTokenType::NEW },
+    // base func
+    { ":",      UTokenType::LABEL },
+    { "goto",   UTokenType::GOTO },
+    { "new",    UTokenType::NEW },
     { "delete", UTokenType::DELETE },
 
-
-    // { "", UTokenType::PREPROCESSOR_DIRECTIVE }, // NONE BASE LEXEME
-
-    { "::", UTokenType::ACCESS_OPERATOR },
-
+    // control flow
+    { "return", UTokenType::RETURN },
+    { "if", UTokenType::IF },
+    { "else", UTokenType::ELSE },
+    { "elif", UTokenType::ELIF },
+    { "do", UTokenType::DO_WHILE },
+    { "while", UTokenType::WHILE },
+    { "for", UTokenType::FOR },
+    { "break", UTokenType::BREAK },
+    { "continue", UTokenType::CONTINUE },
+    { "switch", UTokenType::SWITCH },
+    { "case", UTokenType::CASE },
+    { "default", UTokenType::DEFAULT },
 };
 
 const std::unordered_map<UTokenType, std::string_view> gl_tokenTypeToString = []
@@ -111,16 +85,14 @@ const std::unordered_map<UTokenType, std::string_view> gl_tokenTypeToString = []
     for (const auto& Pair : gl_stringToTokenType)
         result[Pair.second] = Pair.first;
 
-    result.reserve(gl_stringToTokenType.size() + 8);
+    result.reserve(gl_stringToTokenType.size() + 6);
 
-    /* 1 */ result.emplace(UTokenType::IDENTIFIER,             "IDENTIFIER" );
-    /* 2 */ result.emplace(UTokenType::INTEGER_CONST,          "INTEGER_CONST" );
-    /* 3 */ result.emplace(UTokenType::DOUBLE_CONST,           "DOUBLE_CONST" );
-    /* 4 */ result.emplace(UTokenType::STRING_CONST,           "STRING_CONST" );
-    /* 5 */ result.emplace(UTokenType::CHAR_CONST,             "CHAR_CONST" );
-    /* 6 */ result.emplace(UTokenType::UNDEFINED,              "UNDEFINED" );
-    /* 7 */ result.emplace(UTokenType::FUNCTION,               "FUNCTION" );
-    /* 8 */ result.emplace(UTokenType::PREPROCESSOR_DIRECTIVE, "PREPROCESSOR_DIRECTIVE" );
+    /* 1 */ result.emplace(UTokenType::IDENTIFIER, "IDENTIFIER" );
+    /* 2 */ result.emplace(UTokenType::INT,        "INT" );
+    /* 3 */ result.emplace(UTokenType::FLOAT,      "FLOAT" );
+    /* 4 */ result.emplace(UTokenType::STRING,     "STRING" );
+    /* 5 */ result.emplace(UTokenType::CHAR,       "CHAR" );
+    /* 6 */ result.emplace(UTokenType::BOOLEAN,    "BOOLEAN" );
 
     return result;
 }();
@@ -128,35 +100,50 @@ const std::unordered_map<UTokenType, std::string_view> gl_tokenTypeToString = []
 
 const std::unordered_set<UTokenType> gl_tokensSeparator
 {
-    // relationship operators
+    UTokenType::NONE,
+
+    UTokenType::NAMESPACE, // ::
+    UTokenType::DIRECTIVE, // #
+    UTokenType::MACRO,     // __
+    UTokenType::MACRO_S,   // ##
+
+    // math operators
+    UTokenType::ADD, // +
+    UTokenType::SUB, // -
+    UTokenType::MUL, // *
+    UTokenType::DIV, // /
+    UTokenType::MOD, // %
+    UTokenType::POW, // **
+    UTokenType::INC, // ++
+    UTokenType::DEC, // --
+
+    // logical
+    UTokenType::AND,  // &&
+    UTokenType::OR,   // ||
+    UTokenType::NOT, // !
+
+    // equal operators
+    UTokenType::EQUAL,         // ==
+    UTokenType::NOT_EQUAL,     // !=
     UTokenType::LESS,          // <
     UTokenType::GREATER,       // >
     UTokenType::LESS_EQUAL,    // <=
     UTokenType::GREATER_EQUAL, // >=
 
-    // equal operators
-    UTokenType::EQUAL,     // ==
-    UTokenType::NOT_EQUAL, // !=
-
-    // logical operators
-    UTokenType::AND,         // &&
-    UTokenType::OR,          // ||
-    UTokenType::EXCLAMATION, // !
-
-    // math operators
-    UTokenType::PLUS,  // +
-    UTokenType::MINUS, // -
-    UTokenType::STAR,  // *
-    UTokenType::SLASH, // /
-    UTokenType::INC,   // ++
-    UTokenType::DEC,   // --
-
     // assign
     UTokenType::ASSIGN,     // =
-    UTokenType::ADD_ASSIGN, // +=
-    UTokenType::SUB_ASSIGN, // -=
-    UTokenType::MUL_ASSIGN, // *=
-    UTokenType::DIV_ASSIGN, // /=
+    UTokenType::ASSIGN_ADD, // +=
+    UTokenType::ASSIGN_SUB, // -=
+    UTokenType::ASSIGN_MUL, // *=
+    UTokenType::ASSIGN_DIV, // /=
+    UTokenType::ASSIGN_MOD, // %=
+
+    // other symbols
+    UTokenType::SEMICOLON, // ;
+    UTokenType::COMMA,     // ,
+    UTokenType::POINT,     // .
+    UTokenType::QUESTION,  // ?
+    UTokenType::AMPERSAND, // &
 
     // brackets
     UTokenType::LBRA, // {
@@ -166,44 +153,21 @@ const std::unordered_set<UTokenType> gl_tokensSeparator
     UTokenType::LSQR, // [
     UTokenType::RSQR, // ]
 
-    // other symbols
-    UTokenType::SEMICOLON, // ;
-    UTokenType::COLON,     // :
-    UTokenType::COMMA,     // ,
-    UTokenType::POINT,     // .
-    UTokenType::QUESTION,  // ?
-    UTokenType::AMPERSAND, // &
-
-    UTokenType::ACCESS_OPERATOR, // ::
+    // base func
+    UTokenType::LABEL, // :
 };
 
-std::string FToken::Dump() const 
+std::string FToken::Dump() const
 {
-    std::string result;
-    result += std::to_string(Line + 1);
-    result += ":";
-    result += std::to_string(Row + 1);
-    result += "   ";
-    result += Lexeme;
+    std::ostringstream result;
+    std::string position = std::to_string(Line + 1) + ":" + std::to_string(Row + 1);
 
+    result << std::left
+        << std::setw(10) << position
+        << std::setw(20) << Lexeme
+        << internal::TokenTypeToString(Type);
 
-    result += "   (";
-    result += internal::TokenTypeToString(Type);
-    result += ")";
-
-    
-
-    return result;
-
-    /*std::string result = "Lexeme: \"";
-    result += Lexeme;
-    result += "\", type: \"";
-    result += internal::TokenTypeToString(Type);
-    result += "\", Line: ";
-    result += std::to_string(Line+1);
-    result += ", Row: ";
-    result += std::to_string(Row+1);
-    return result;*/
+    return result.str();
 }
 
 constexpr bool FToken::internal::is_string(std::string_view lexeme)
@@ -269,11 +233,6 @@ constexpr bool FToken::internal::is_double(std::string_view lexeme)
     return hasPoint && (hasDigitBeforePoint || hasDigitAfterPoint);
 }
 
-constexpr bool FToken::internal::is_preprocessorDirective(std::string_view lexeme)
-{
-    return lexeme.front() == '#';
-}
-
 bool FToken::internal::is_separator(std::string_view tokenType)
 {
     return is_separatorType(StringToTokenType(tokenType));
@@ -298,21 +257,6 @@ std::string_view FToken::internal::TokenTypeToString(UTokenType tokenType)
 
 UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)
 {
-    if (is_integer(lexeme))
-        return UTokenType::INTEGER_CONST;
-
-    if (is_double(lexeme))
-        return UTokenType::DOUBLE_CONST;
-
-    if (is_string(lexeme))
-        return UTokenType::STRING_CONST;
-
-    if (is_char(lexeme))
-        return UTokenType::CHAR_CONST;
-
-    if (is_preprocessorDirective(lexeme))
-        return UTokenType::PREPROCESSOR_DIRECTIVE;
-
     auto it = gl_stringToTokenType.find(lexeme);
     if (it != gl_stringToTokenType.end())
         return it->second; // Find

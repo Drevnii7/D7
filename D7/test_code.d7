@@ -3,7 +3,7 @@
 	// comment in comment
 */
 
-#define PI 3.14f
+#using PI 3.14f
 
 int main()
 {
@@ -25,7 +25,7 @@ int main()
 	// comment in comment
 */
 
-#define USE_WORLD
+#using USE_WORLD
 
 int main()
 {

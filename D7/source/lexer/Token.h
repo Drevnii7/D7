@@ -13,123 +13,111 @@
 #include <iostream>
 #include <fstream>
 
-enum class UTokenType : uint8_t
+enum UTokenType
 {
-    IDENTIFIER,
+    NONE       = 0, // invalid, none
+    
+    IDENTIFIER = 1, // func name, var name, var type
+    NAMESPACE  = 2, // ::
+    DIRECTIVE  = 3, // #  call preprocessor directive                #include
+    MACRO      = 4, // __ return preprocessor property how tokens    __LINE__
+    MACRO_S    = 5, // ## return preprocessor property as string     ##LINE##
 
+    // const 
+    // 100 - 199
+    GROUP_CONST = 100,
+    INT     = 101, // 12345
+    FLOAT   = 102, // 3.14f
+    STRING  = 103, // "Hello world"
+    CHAR    = 104, // ' '
+    BOOLEAN = 105, // true, false
 
-    INTEGER_CONST,
-    DOUBLE_CONST,
-    STRING_CONST,
-    CHAR_CONST,
+    // math
+    // 200 - 219
+    GROUP_MATH = 200,
+    ADD = 201, // +
+    SUB = 202, // -
+    MUL = 203, // *
+    DIV = 204, // /
+    MOD = 205, // %
+    POW = 206, // **
+    INC = 207, // ++
+    DEC = 208, // --
 
-    // boolean constant
-    TRUE,
-    FALSE,
-
-
-
-
-    CONST,
-
-
-    // types
-    UNDEFINED,
-
-    INT,
-    DOUBLE,
-    BOOL,
-    CHAR,
-    VOID,
-    AUTO,
-
-    // cycles
-    DO_WHILE,
-    WHILE,
-    FOR,
-    // cycles addition
-    BREAK,
-    CONTINUE,
-
-
-    SWITCH,
-    CASE,
-    DEFAULT,
-
-
-    // conditions
-    IF,
-    ELSE,
-
-
-    // relationship operators
-    LESS,          // <
-    GREATER,       // >
-    LESS_EQUAL,    // <=
-    GREATER_EQUAL, // >=
-
+    // logical
+    // 220 - 239
+    GROUP_LOGICAL = 220,
+    AND = 221, // &&
+    OR  = 222, // ||
+    NOT = 223, // !
 
     // equal operators
-    EQUAL,     // ==
-    NOT_EQUAL, // !=
-
-
-    // logical operators
-    AND,         // &&
-    OR,          // ||
-    EXCLAMATION, // !
-
-    // math operators
-    PLUS,  // +
-    MINUS, // -
-    STAR,  // *
-    SLASH, // /
-    INC,   // ++
-    DEC,   // --
+    // 240 - 259
+    GROUP_EQUAL = 240,
+    EQUAL         = 241, // ==
+    NOT_EQUAL     = 242, // !=
+    LESS          = 243, // <
+    GREATER       = 244, // >
+    LESS_EQUAL    = 245, // <=
+    GREATER_EQUAL = 246, // >=
 
     // assign
-    ASSIGN,     // =
-    ADD_ASSIGN, // +=
-    SUB_ASSIGN, // -=
-    MUL_ASSIGN, // *=
-    DIV_ASSIGN, // /=
+    // 260 - 278
+    GROUP_ASSIGN = 260,
+    ASSIGN     = 261, // =
+    ASSIGN_ADD = 262, // +=
+    ASSIGN_SUB = 263, // -=
+    ASSIGN_MUL = 264, // *=
+    ASSIGN_DIV = 265, // /=
+    ASSIGN_MOD = 266, // %=
+
+
+
+
+
+    // symbols
+    // 300 - 319
+    GROUP_SYMBOLS = 300,
+    SEMICOLON = 301, // ;
+    COMMA     = 303, // ,
+    POINT     = 304, // .
+    QUESTION  = 305, // ?
+    AMPERSAND = 306, // &
+
 
     // brackets
-    LBRA, // {
-    RBRA, // }
-    LPAR, // (
-    RPAR, // )
-    LSQR, // [
-    RSQR, // ]
+    // 320 - 339
+    GROUP_BRACKETS = 320,
+    LBRA = 321, // {
+    RBRA = 322, // }
+    LPAR = 323, // (
+    RPAR = 324, // )
+    LSQR = 325, // [
+    RSQR = 326, // ]
 
+    // base func
+    // 400 - 499
+    GROUP_FUNC = 400,
+    LABEL  = 401, // ":"
+    GOTO   = 402,
+    NEW    = 403,
+    DELETE = 404,
 
-   
-
-
-    // function
-    FUNCTION,
-    RETURN,
-
-
-
-
-    // other symbols
-    SEMICOLON, // ;
-    COLON,     // :
-    COMMA,     // ,
-    POINT,     // .
-    QUESTION,  // ?
-    AMPERSAND, // &
-
-
-    NEW,
-    DELETE,
-
-
-    PREPROCESSOR_DIRECTIVE,
-
-
-    ACCESS_OPERATOR, // ::
+    // control flow
+    // 500 - 599
+    GROUP_CONTROL = 500,
+    RETURN   = 501,
+    IF       = 502,
+    ELSE     = 503,
+    ELIF     = 504,
+    DO_WHILE = 505,
+    WHILE    = 506,
+    FOR      = 507,
+    BREAK    = 508,
+    CONTINUE = 509,
+    SWITCH   = 510,
+    CASE     = 511,
+    DEFAULT  = 512,
 };
 
 // All modifiers are based on the source code.
@@ -151,7 +139,7 @@ struct FTokenModifiers
 struct FToken
 {
     std::string Lexeme = "";
-    UTokenType Type = UTokenType::UNDEFINED;
+    UTokenType Type = UTokenType::NONE;
 
     size_t Line = 0;
     size_t Row = 0;
@@ -170,7 +158,7 @@ struct FToken
 
     bool IsValid()
     {
-        return Type != UTokenType::UNDEFINED;;
+        return Type != UTokenType::NONE;
     }
 
     struct internal
@@ -180,7 +168,6 @@ struct FToken
         static constexpr bool is_integer(std::string_view lexeme);
         // | 0.0 | 3.14f | 55.55 | 123. | .45 | 86.f |
         static constexpr bool is_double(std::string_view lexeme);
-        static constexpr bool is_preprocessorDirective(std::string_view lexeme);
         static bool is_separator(std::string_view tokenType);
         static bool is_separatorType(UTokenType tokenType);
 

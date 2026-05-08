@@ -18,7 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\lexer\Lexer.h">
+    <ClInclude Include="source\lexer\CLexer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\lexer\Token.h">
@@ -36,7 +36,7 @@
     <ClInclude Include="source\BaseTypes.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\preprocessor\StandartPreprocessor.h">
+    <ClInclude Include="source\preprocessor\CStandartPreprocessor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\parser\CParser.h">
@@ -47,7 +47,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\lexer\Lexer.cpp">
+    <ClCompile Include="source\lexer\CLexer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="D7.cpp">
@@ -65,7 +65,7 @@
     <ClCompile Include="source\service\IBaseService.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\preprocessor\StandartPreprocessor.cpp">
+    <ClCompile Include="source\preprocessor\CStandartPreprocessor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\parser\CParser.cpp">

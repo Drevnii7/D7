@@ -7,9 +7,12 @@ enum class UNodeType : uint8_t
 {
     None         = 0, // Invalid
 
+    // Down level
     Block        = 1, // {}
     Literal      = 2, // int, float, sting, char
     Identifier   = 3, // main, std::cout, 
+
+    // Up level
     VarDecl      = 4, // type name = value;
     FunctionDecl = 5, // type name() { ... }
     ReturnStmt   = 6, // return value;

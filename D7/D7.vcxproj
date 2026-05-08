@@ -24,10 +24,10 @@
     <ClInclude Include="source\BaseTypes.h" />
     <ClInclude Include="source\preprocessor\IPreprocessor.h" />
     <ClInclude Include="source\notify\Notify.h" />
-    <ClInclude Include="source\lexer\Lexer.h" />
+    <ClInclude Include="source\lexer\CLexer.h" />
     <ClInclude Include="source\lexer\Token.h" />
     <ClInclude Include="source\service\IBaseService.h" />
-    <ClInclude Include="source\preprocessor\StandartPreprocessor.h" />
+    <ClInclude Include="source\preprocessor\CStandartPreprocessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\parser\AST.cpp" />
@@ -35,10 +35,10 @@
     <ClCompile Include="source\parser\CParser.cpp" />
     <ClCompile Include="source\preprocessor\IPreprocessor.cpp" />
     <ClCompile Include="source\notify\Notify.cpp" />
-    <ClCompile Include="source\lexer\Lexer.cpp" />
+    <ClCompile Include="source\lexer\CLexer.cpp" />
     <ClCompile Include="source\lexer\Token.cpp" />
     <ClCompile Include="source\service\IBaseService.cpp" />
-    <ClCompile Include="source\preprocessor\StandartPreprocessor.cpp" />
+    <ClCompile Include="source\preprocessor\CStandartPreprocessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />

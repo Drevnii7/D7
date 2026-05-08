@@ -1,5 +1,14 @@
 #pragma once
 
+/*
+	Representing Code 5
+	https://craftinginterpreters.com/representing-code.html
+	Parsing Expressions 6
+	https://craftinginterpreters.com/parsing-expressions.html
+	// Создание языка программирования с использованием LLVM. Часть 2: Реализация парсера и AST
+	https://habr.com/ru/articles/120005/
+*/
+
 #include "../service/IBaseService.h"
 #include "../BaseTypes.h"
 #include "../lexer/Token.h"

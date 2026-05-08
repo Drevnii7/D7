@@ -34,7 +34,7 @@ void CParser::Reset()
 	m_rootNode.ChildNodes.clear();
 	m_rootNode.Type = UNodeType::None;
 	m_rootNode.Token.Lexeme = "";
-	m_rootNode.Token.Type = UTokenType::UNDEFINED;
+	m_rootNode.Token.Type = UTokenType::NONE;
 	m_tokens.clear();
 }
 
@@ -103,7 +103,7 @@ void CParser::SetTokens(const std::list<FToken>& tokens)
 	Reset();
 
 	m_inputFilePath = "CParser::SetTokens()";
-	//m_tokens.assign(tokens.begin(), tokens.end());
+	m_tokens.assign(tokens.begin(), tokens.end());
 }
 
 void CParser::SetTokens(std::vector<FToken>&& tokens)

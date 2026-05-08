@@ -1,10 +1,10 @@
 ﻿#include <iostream>
 
 #include "source/lexer/Token.h"
-#include "source/lexer/Lexer.h"
+#include "source/lexer/CLexer.h"
 
 #include "source/preprocessor/IPreprocessor.h"
-#include "source/preprocessor/StandartPreprocessor.h"
+#include "source/preprocessor/CStandartPreprocessor.h"
 
 #include "source/parser/AST.h"
 #include "source/parser/CParser.h"
@@ -53,4 +53,3 @@ int main(int argc, char* argv[])
     return Preprocessor->Main(argc, argv);
 }
 */
-
