@@ -3,8 +3,7 @@
 	// comment in comment
 */
 
-#define PI 3
-#define PI 3
+#define PI 3.14f
 
 int main()
 {

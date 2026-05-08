@@ -25,4 +25,3 @@ protected:
 
 	std::map<std::string, FToken> m_defines;
 };
-

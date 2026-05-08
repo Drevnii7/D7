@@ -206,6 +206,13 @@ void CLexer::RunProcessing()
                 std::string_view one(&c, 1);
                 if (FToken::internal::is_separator(one))
                 {
+                    if (c == '.' && !lexeme.empty() && std::isdigit(static_cast<unsigned char>(lexeme.back())) &&
+                        i + 1 < len && std::isdigit(static_cast<unsigned char>(lineStr[i + 1])))
+                    {
+                        lexeme += c;
+                        continue;
+                    }
+
                     FlushLexeme(lineIdx, lexemeStart, i - 1);
                     m_tokens.emplace_back(std::string(one), lineIdx, i);
                     isSep = true;
