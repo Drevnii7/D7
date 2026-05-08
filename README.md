@@ -3,13 +3,13 @@
 - [x] Lexer
 - - [x] Token
 - - [x] String <-> Token
-- [ ] Preprocessor
+- [x] Preprocessor
 - - [x] Interface
 - - [x] Base test preprocessor
 - - [ ] Full lang preprocessor
-- [ ] Parser
+- [x] Parser
 - - [x] AST
-- - [ ] Parse tokens to AST
+- - [x] Parse tokens to AST
 - [ ] Semantic Analyzer
 - - [ ] Symbol Table
 - - [ ] Type Checking
