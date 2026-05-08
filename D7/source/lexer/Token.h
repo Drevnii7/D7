@@ -6,6 +6,8 @@
 */
 #pragma once
 
+#include "../BaseTypes.h"
+
 #include <string>
 #include <string_view>
 #include <iostream>

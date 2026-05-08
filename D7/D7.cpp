@@ -7,11 +7,14 @@
 #include "source/preprocessor/StandartPreprocessor.h"
 
 #include "source/parser/AST.h"
-#include "source/parser/Parser.h"
+#include "source/parser/CParser.h"
+
 int main()
 {
     std::string File_SourceCode = "test_code.d7";
-    std::string File_TokensAfterLexer = "test_code.tokens";
+    std::string File_TokensAfterLexer = "test_code.lexer";
+    std::string File_TokensAfterPreprocessor = "test_code.tokens";
+    std::string File_ASTAfterParser = "test_code.ast";
 
     CLexer* Lexer = new CLexer();
     Lexer->LoadCode(File_SourceCode);
@@ -23,7 +26,13 @@ int main()
     Preprocessor->LoadTokens(File_TokensAfterLexer);
     Preprocessor->RunProcessing();
     Preprocessor->DebugPrint();
-    Preprocessor->SaveTokens(File_TokensAfterLexer);
+    Preprocessor->SaveTokens(File_TokensAfterPreprocessor);
+
+    CParser* Parser = new CParser();
+    Parser->LoadTokens(File_TokensAfterPreprocessor);
+    Parser->RunProcessing();
+    Parser->DebugPrint();
+    Parser->SaveAST(File_ASTAfterParser);
 }
 
 

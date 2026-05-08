@@ -39,7 +39,7 @@
     <ClInclude Include="source\preprocessor\StandartPreprocessor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\parser\Parser.h">
+    <ClInclude Include="source\parser\CParser.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\parser\AST.h">
@@ -68,7 +68,7 @@
     <ClCompile Include="source\preprocessor\StandartPreprocessor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\parser\Parser.cpp">
+    <ClCompile Include="source\parser\CParser.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\parser\AST.cpp">

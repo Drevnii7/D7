@@ -24,6 +24,11 @@ struct FASTNode
 	std::vector<std::unique_ptr<FASTNode>> ChildNodes;
 
     FASTNode() = default;
+    FASTNode(const FASTNode&) = delete;
+    FASTNode& operator=(const FASTNode&) = delete;
+
+    FASTNode(FASTNode&&) noexcept = default;
+    FASTNode& operator=(FASTNode&&) noexcept = default;
 
     bool IsValid() const
     {
@@ -53,4 +58,10 @@ struct FASTNode
         static std::string_view NodeTypeToString(UNodeType nodeType);
         static UNodeType StringToNodeType(std::string_view string);
     };
+
+    static void Serialize(FASTNode* root, const std::string& filename);
+    static FASTNode Deserialize(const std::string& filename);
+
+    friend std::ostream& operator<<(std::ostream& os, const FASTNode& node);
+    friend std::istream& operator>>(std::istream& is, FASTNode& node);
 };

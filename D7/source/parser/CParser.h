@@ -1,24 +1,29 @@
 #pragma once
 
 #include "../service/IBaseService.h"
+#include "../BaseTypes.h"
 #include "../lexer/Token.h"
+#include "AST.h"
 
-#include <vector>
-#include <forward_list>
 #include <list>
 
-class IPreprocessor : public IBaseService
+#if IS_CPP_20 == 1
+	#include <span>
+	#define HAS_STD_SPAN 1
+#else
+	#define HAS_STD_SPAN 0
+#endif
+
+class CParser : public IBaseService
 {
 public: // CBaseService
 
 	// virtual bool Main(int argc, char* argv[]);
 
-	// Start preprocessing
-	virtual void RunProcessing() override = 0;
+	virtual void RunProcessing() override;
 
 	virtual bool RunFullCycle() override;
 
-	// std::cout all tokens
 	virtual void DebugPrint() const override;
 
 	// Reset state
@@ -34,28 +39,28 @@ protected: // CBaseService
 	// std::string m_inputFilePath = "";
 	// std::string m_outputFilePath = "";
 
-public: // CPreprocessor
+public: // CParser
 
 	[[nodiscard]] bool LoadTokens(const std::string& filePath = "");
 	[[nodiscard]] bool SaveTokens(const std::string& filePath = "");
+	[[nodiscard]] bool SaveAST(const std::string& filePath = "");
 
 	// Set tokens raw
 	void SetTokens(const std::vector<FToken>& tokens);
 	void SetTokens(const std::list<FToken>& tokens);
-	void SetTokens(std::list<FToken>&& tokens);
+	void SetTokens(std::vector<FToken>&& tokens);
 
-	
 
-	const std::list<FToken>& GetTokens() const;
-	std::list<FToken> ExtractTokens();
 
-protected: // CPreprocessor
+#if HAS_STD_SPAN == 1
+	std::span<FToken> GetTokens();
+#else
+	const std::vector<FToken>& GetTokens();
+#endif
+	std::vector<FToken> ExtractTokens();
 
-	/*
-		The preprocessor runs in multiple passes. I once wrote a macro so tangled 
-		that it took the poor preprocessor 23 steps to expand it. Shifting the entire 
-		code 23 times would have killed the machine, but std::list saves the day.
-	*/
-	std::list<FToken> m_tokens;
+protected: // CParser
+
+	std::vector<FToken> m_tokens;
+	FASTNode m_rootNode;
 };
-

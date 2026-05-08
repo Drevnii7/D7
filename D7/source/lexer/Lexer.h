@@ -59,7 +59,7 @@ public: // CLexer
 	
 	std::vector<FToken> ExtractTokens();
 
-protected:
+protected: // CLexer
 
 	std::vector <std::string> m_code;
 	std::vector<FToken> m_tokens;

@@ -330,6 +330,11 @@ std::ostream& operator<<(std::ostream& os, const FToken& token)
     os.write(reinterpret_cast<const char*>(&token.Line), sizeof(token.Line));
     os.write(reinterpret_cast<const char*>(&token.Row), sizeof(token.Row));
 
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenGenerate), sizeof(token.Modifiers.IsTokenGenerate));
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenValueChanged), sizeof(token.Modifiers.IsTokenValueChanged));
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenTypeChanged), sizeof(token.Modifiers.IsTokenTypeChanged));
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenCopyFromAnywhere), sizeof(token.Modifiers.IsTokenCopyFromAnywhere));
+
     return os;
 }
 
@@ -343,6 +348,11 @@ std::istream& operator>>(std::istream& is, FToken& token)
     is.read(reinterpret_cast<char*>(&token.Type), sizeof(token.Type));
     is.read(reinterpret_cast<char*>(&token.Line), sizeof(token.Line));
     is.read(reinterpret_cast<char*>(&token.Row), sizeof(token.Row));
+
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenGenerate), sizeof(token.Modifiers.IsTokenGenerate));
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenValueChanged), sizeof(token.Modifiers.IsTokenValueChanged));
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenTypeChanged), sizeof(token.Modifiers.IsTokenTypeChanged));
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenCopyFromAnywhere), sizeof(token.Modifiers.IsTokenCopyFromAnywhere));
 
     return is;
 }
