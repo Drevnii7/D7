@@ -7,19 +7,19 @@
 
 enum class UNodeType : uint8_t
 {
-    None         = 0, // Invalid
+    None      = 0, // Invalid
 
-    // Down level
-    Block        = 1, // {}
-    Literal      = 2, // int, float, sting, char
-    Identifier   = 3, // main, std::cout, 
+    Program   = 1,
 
-    // Up level
-    VarDecl      = 4, // type name = value;
-    FunctionDecl = 5, // type name() { ... }
-    ReturnStmt   = 6, // return value;
-    BinaryExpr   = 7, // a + b; x = 41
-    UnaryExpr    = 8, // ++x; !flag, x--
+    BlockCode = 2, // {}
+    BlockMath = 3, // a + (b * c)
+    BlockArgs = 4, // (int argc, char *argv[])
+
+    Func      = 100, // func void main();
+    Variable  = 101, // var float pi = 3.14f;
+
+    Name      = 200, // name variable / function
+    Type      = 201, // type variable / type returned function
 };
 
 struct FASTNode
@@ -29,6 +29,11 @@ struct FASTNode
 	std::vector<std::unique_ptr<FASTNode>> ChildNodes;
 
     FASTNode() = default;
+    FASTNode(UNodeType lType)
+    {
+        Type = lType;
+    }
+
     FASTNode(const FASTNode&) = delete;
     FASTNode& operator=(const FASTNode&) = delete;
 
@@ -52,7 +57,7 @@ struct FASTNode
     {
         std::string pad(indent * 4, ' ');
         std::string line = pad + "[" + std::string(internal::NodeTypeToString(Type)) + "] ";
-        if (Type != UNodeType::Block)
+        if (Type != UNodeType::BlockCode && Type != UNodeType::BlockMath && Type != UNodeType::BlockArgs)
         {
             line += Token.IsValid() ? Token.Dump() : "INVALID";
         }

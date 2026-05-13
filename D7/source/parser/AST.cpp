@@ -5,14 +5,16 @@
 const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
 {
     { "None",         UNodeType::None },
-    { "Block",        UNodeType::Block },
-    { "Literal",      UNodeType::Literal },
-    { "Identifier",   UNodeType::Identifier },
-    { "VarDecl",      UNodeType::VarDecl },
-    { "FunctionDecl", UNodeType::FunctionDecl },
-    { "ReturnStmt",   UNodeType::ReturnStmt },
-    { "BinaryExpr",   UNodeType::BinaryExpr },
-    { "UnaryExpr",    UNodeType::UnaryExpr },
+
+    { "BlockCode",    UNodeType::BlockCode },
+    { "BlockMath",    UNodeType::BlockMath },
+    { "BlockArgs",    UNodeType::BlockArgs },
+
+    { "Func",         UNodeType::Func },
+    { "Variable",     UNodeType::Variable },
+
+    { "Name",         UNodeType::Name },
+    { "Type",         UNodeType::Type },
 };
 
 const std::unordered_map<UNodeType, std::string_view> gl_tokenTypeToString = []

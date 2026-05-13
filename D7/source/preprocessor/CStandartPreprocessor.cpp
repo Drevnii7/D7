@@ -58,7 +58,7 @@ void CStandartPreprocessor::DirectiveCollectUsing()
             {
                 Fatal("Already determined USING: \"" + usingValue.Dump() +
                     "\" USING in \"" + collectUsing->second.Dump());
-            }
+            } 
         }
 
         m_usings[usingName] = usingValue;

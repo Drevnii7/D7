@@ -1,22 +1,5 @@
-/*
-	Hi! I'm invisible.
-	// comment in comment
-*/
-
-#using PI 3.14f
-
-int main()
+func int32 main()
 {
-	// Hello... world?
-
-	int ReturnValue = 41;
-
-	ReturnValue++;
-
-	return ReturnValue /* WORLD (or not?) */; 
-}
-
-float GetPI()
-{
-	return PI; 
+    var ReturnVar = 42;
+    return ReturnVar;
 }

@@ -74,6 +74,9 @@
     <ClCompile Include="source\parser\AST.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\parser\CParserParsing.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />

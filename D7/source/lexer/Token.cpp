@@ -77,6 +77,12 @@ const std::unordered_map<std::string_view, UTokenType> gl_stringToTokenType
     { "switch", UTokenType::SWITCH },
     { "case", UTokenType::CASE },
     { "default", UTokenType::DEFAULT },
+
+    // define
+    { "func", UTokenType::DEF_FUNC },
+    { "var",  UTokenType::DEF_VAR },
+    { "enum", UTokenType::DEF_ENUM },
+    { "struct", UTokenType::DEF_STRUCT },
 };
 
 const std::unordered_map<UTokenType, std::string_view> gl_tokenTypeToString = []
@@ -257,6 +263,18 @@ std::string_view FToken::internal::TokenTypeToString(UTokenType tokenType)
 
 UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)
 {
+    if (is_integer(lexeme))
+        return UTokenType::INT;
+
+    if (is_double(lexeme))
+        return UTokenType::FLOAT;
+
+    if (is_string(lexeme))
+        return UTokenType::STRING;
+
+    if (is_char(lexeme))
+        return UTokenType::CHAR;
+
     auto it = gl_stringToTokenType.find(lexeme);
     if (it != gl_stringToTokenType.end())
         return it->second; // Find

@@ -118,6 +118,42 @@ enum UTokenType
     SWITCH   = 510,
     CASE     = 511,
     DEFAULT  = 512,
+
+    // define 
+    // 600 - 699
+    GROUP_DEF  = 600,
+    DEF_FUNC   = 601,
+    DEF_VAR    = 602,
+    DEF_ENUM   = 603,
+    DEF_STRUCT = 604,
+
+    // define struct
+    // 700 - 799
+    // GROUP_DEF = 700,
+    // DEF_CONSTRUCTOR = 701,
+    // DEF_DESTRUCTOR  = 702,
+    // DEF_CAST        = 703,
+
+    // define struct
+    // 800 - 899
+    // GROUP_DEF = 800,
+    // DEF_CONSTRUCTOR = 801,
+    // DEF_DESTRUCTOR  = 802,
+    // DEF_CAST        = 203,
+
+    // agrements func
+    // 900 - 999
+    // GROUP_AGREMENT_FUNC = 900,
+    // AGREMENT_FUNC_ = 901,
+    // AGREMENT_FUNC_ = 902,
+    // AGREMENT_FUNC_ = 903,
+
+    // agrements var
+    // 900 - 999
+    // GROUP_AGREMENT_VAR = 1000,
+    // AGREMENT_VAR_ = 1001,
+    // AGREMENT_VAR_ = 1002,
+    // AGREMENT_VAR_ = 1003,
 };
 
 // All modifiers are based on the source code.

@@ -30,6 +30,7 @@
     <ClInclude Include="source\preprocessor\CStandartPreprocessor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\parser\CParserParsing.cpp" />
     <ClCompile Include="source\parser\AST.cpp" />
     <ClCompile Include="D7.cpp" />
     <ClCompile Include="source\parser\CParser.cpp" />

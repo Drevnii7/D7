@@ -7,21 +7,34 @@ https://craftinginterpreters.com/parsing-expressions.html
 // Создание языка программирования с использованием LLVM. Часть 2: Реализация парсера и AST
 https://habr.com/ru/articles/120005/
 */
+
 #include "../service/IBaseService.h"
 #include "../BaseTypes.h"
 #include "../lexer/Token.h"
 #include "AST.h"
 #include <list>
 #include <vector>
+
 #if IS_CPP_20 == 1
-#include <span>
-#define HAS_STD_SPAN 1
+    #include <span>
+    #define HAS_STD_SPAN 1
 #else
-#define HAS_STD_SPAN 0
+    #define HAS_STD_SPAN 0
 #endif
+
+
+
 class CParser : public IBaseService
 {
 public: // CBaseService
+
+    enum class URetState : uint8_t
+    {
+        Fail, // Type valid, but parse fail. Critycal error
+        Yes,  // Type valid, parse valid
+        No    // Type invalid, parse fail
+    };
+
     // virtual bool Main(int argc, char* argv[]);
 
     virtual void RunProcessing() override;
@@ -32,6 +45,7 @@ public: // CBaseService
 
     // Reset state
     virtual void Reset() override;
+
 protected: // CBaseService
     virtual void Fatal(const std::string& message) const override;
     virtual void Error(const std::string& message) const override;
@@ -41,8 +55,6 @@ protected: // CBaseService
     // std::string m_inputFilePath = "";
     // std::string m_outputFilePath = "";
 public: // CParser
-    std::unique_ptr <FASTNode > parseProgram();
-
 
     [[nodiscard]] bool LoadTokens(const std::string& filePath = " ");
     [[nodiscard]] bool SaveTokens(const std::string& filePath = " ");
@@ -58,72 +70,27 @@ public: // CParser
     const std::vector<FToken>& GetTokens();
 #endif
     std::vector<FToken> ExtractTokens();
+
 protected: // CParser
     std::vector<FToken> m_tokens;
-    int m_current = 0;
     FASTNode m_rootNode;
 
-    const FToken* peek() const
-    {
-        return isAtEnd() ? nullptr : &m_tokens[m_current];
-    }
 
-    const FToken* previous() const
-    {
-        return m_current == 0 ? nullptr : &m_tokens[m_current - 1];
-    }
+    void TryParseAs_Program();
 
-    const FToken* advance()
-    {
-        return isAtEnd() ? nullptr : &m_tokens[m_current++];
-    }
+    // Height level
+    URetState TryParseAs_Func(int& current, std::unique_ptr<FASTNode>& Node);
+    URetState TryParseAs_Var(int& current, std::unique_ptr<FASTNode>& Node);
 
-    bool isAtEnd() const
-    {
-        return m_current >= m_tokens.size();
-    }
+    // Medium level
 
-    bool check(UTokenType type) const
-    {
-        return !isAtEnd() && peek()->Type == type;
-    }
+    bool ParseAs_BlockArgs(int& current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_BlockCode(int& current, std::unique_ptr<FASTNode>& Node);
 
-    bool match(UTokenType type)
-    {
-        if (check(type))
-        {
-            advance();
-            return true;
-        }
-        return false;
-    }
+    // Low level
 
-    const FToken& consume(UTokenType type, const std::string& message);
+    bool ParseAs_Name(int& current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_Type(int& current, std::unique_ptr<FASTNode>& Node);
 
-private:
-    std::string GetErrorPos() const;
-    bool isTypeKeyword(const FToken& tok) const;
-    bool isDeclarationStart() const;
 
-    std::unique_ptr<FASTNode> parseDeclaration();
-    std::unique_ptr<FASTNode> parseVarDecl(const FToken& typeTok, const FToken& nameTok);
-    std::unique_ptr<FASTNode> parseFuncDecl(const FToken& typeTok, const FToken& nameTok);
-
-    std::unique_ptr<FASTNode> parseStatement();
-    std::unique_ptr<FASTNode> parseBlock();
-    std::unique_ptr<FASTNode> parseReturnStmt();
-    std::unique_ptr<FASTNode> parseIfStmt();
-    std::unique_ptr<FASTNode> parseWhileStmt();
-    std::unique_ptr<FASTNode> parseForStmt();
-
-    std::unique_ptr<FASTNode> parseExpression();
-    std::unique_ptr<FASTNode> parseAssignment();
-    std::unique_ptr<FASTNode> parseLogicalOr();
-    std::unique_ptr<FASTNode> parseLogicalAnd();
-    std::unique_ptr<FASTNode> parseEquality();
-    std::unique_ptr<FASTNode> parseComparison();
-    std::unique_ptr<FASTNode> parseTerm();
-    std::unique_ptr<FASTNode> parseFactor();
-    std::unique_ptr<FASTNode> parseUnary();
-    std::unique_ptr<FASTNode> parsePrimary();
 };

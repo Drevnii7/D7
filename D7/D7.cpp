@@ -26,30 +26,11 @@ int main()
     Preprocessor->LoadTokens(File_TokensAfterLexer);
     Preprocessor->RunProcessing();
     Preprocessor->DebugPrint();
-    Preprocessor->SaveTokens(File_TokensAfterPreprocessor);
-    
+    Preprocessor->SaveTokensAsCode(File_TokensAfterPreprocessor);
+
     CParser* Parser = new CParser();
-    Parser->LoadTokens(File_TokensAfterPreprocessor);
+    Parser->LoadTokens(File_TokensAfterLexer);
     Parser->RunProcessing();
     Parser->DebugPrint();
-    Parser->SaveAST(File_ASTAfterParser);
+    Parser->SaveAST(File_TokensAfterPreprocessor);
 }
-
-
-
-/*
-int main(int argc, char* argv[])
-{
-    CLexer* Lexer = new CLexer();
-    return Lexer->Main(argc, argv);
-}
-*/
-
-
-/*
-int main(int argc, char* argv[])
-{
-    IPreprocessor* Preprocessor = new IPreprocessor();
-    return Preprocessor->Main(argc, argv);
-}
-*/
