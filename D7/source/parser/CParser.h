@@ -75,22 +75,35 @@ protected: // CParser
     std::vector<FToken> m_tokens;
     FASTNode m_rootNode;
 
-
     void TryParseAs_Program();
 
     // Height level
-    URetState TryParseAs_Func(int& current, std::unique_ptr<FASTNode>& Node);
-    URetState TryParseAs_Var(int& current, std::unique_ptr<FASTNode>& Node);
+
+    URetState TryParseAs_Func(int& l_current, std::unique_ptr<FASTNode>& Node);
+    URetState TryParseAs_Var(int& l_current, std::unique_ptr<FASTNode>& Node);
 
     // Medium level
 
-    bool ParseAs_BlockArgs(int& current, std::unique_ptr<FASTNode>& Node);
-    bool ParseAs_BlockCode(int& current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_BlockArgs(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_BlockMath(int& l_current, std::unique_ptr<FASTNode>& Node);
 
     // Low level
 
-    bool ParseAs_Name(int& current, std::unique_ptr<FASTNode>& Node);
-    bool ParseAs_Type(int& current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_Name(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_Type(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_Arg(int& l_current, std::unique_ptr<FASTNode>& Node);
 
 
+    // Raw level.
+
+    // Сверить тип токена
+    bool PeekToken(int& l_current, UTokenType TokenType);
+    // Сверить тип токена, и если false вызвать Fatal
+    bool PeekTokenThrow(int& l_current, UTokenType TokenType, std::string_view failMessage);
+    
+    // Сверить тип токена, и если m_current++
+    bool ConsumeToken(int& l_current, UTokenType TokenType);
+    // Сверить тип токена, и если m_current++. Если false вызвать Fatal
+    bool ConsumeTokenThrow(int& l_current, UTokenType TokenType, std::string_view failMessage);
 };

@@ -17,6 +17,7 @@ enum class UNodeType : uint8_t
 
     Func      = 100, // func void main();
     Variable  = 101, // var float pi = 3.14f;
+    Setter    = 102, // pi = 3.14f;
 
     Name      = 200, // name variable / function
     Type      = 201, // type variable / type returned function

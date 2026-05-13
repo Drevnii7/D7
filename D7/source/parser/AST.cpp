@@ -12,6 +12,7 @@ const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
 
     { "Func",         UNodeType::Func },
     { "Variable",     UNodeType::Variable },
+    { "Setter",     UNodeType::Setter },
 
     { "Name",         UNodeType::Name },
     { "Type",         UNodeType::Type },

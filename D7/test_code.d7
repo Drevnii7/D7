@@ -1,5 +1,9 @@
+var bool Start = false;
+var float GlobalPi;
+
+func bool random();
 func int32 main()
 {
-    var ReturnVar = 42;
-    return ReturnVar;
+    var int32 ReturnVar = 42;
+    return(ReturnVar);
 }
