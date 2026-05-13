@@ -21,6 +21,7 @@ enum class UNodeType : uint8_t
 
     Name      = 200, // name variable / function
     Type      = 201, // type variable / type returned function
+    Math      = 202, // (8 * 5) + (4 / 2)
 };
 
 struct FASTNode

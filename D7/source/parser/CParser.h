@@ -93,7 +93,8 @@ protected: // CParser
     bool ParseAs_Name(int& l_current, std::unique_ptr<FASTNode>& Node);
     bool ParseAs_Type(int& l_current, std::unique_ptr<FASTNode>& Node);
     bool ParseAs_Arg(int& l_current, std::unique_ptr<FASTNode>& Node);
-
+    bool ParseAs_MathShuntingYard(int from, int to, std::vector<FToken>& TokensOutput);
+    bool MSY_To_BlockMath(std::vector<FToken>&& Tokens, std::unique_ptr<FASTNode>& Node);
 
     // Raw level.
 

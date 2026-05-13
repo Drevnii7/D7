@@ -16,6 +16,7 @@ const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
 
     { "Name",         UNodeType::Name },
     { "Type",         UNodeType::Type },
+    { "Math",         UNodeType::Math },
 };
 
 const std::unordered_map<UNodeType, std::string_view> gl_tokenTypeToString = []

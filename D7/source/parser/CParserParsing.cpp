@@ -1,7 +1,7 @@
 #include "CParser.h"
 #include "../Notify/Notify.h"
 #include <cctype>
-
+#include <stack>
 
 // Global static func
 // Global var
@@ -214,12 +214,17 @@ bool CParser::ParseAs_BlockMath(int& l_current, std::unique_ptr<FASTNode>& Node)
 
 	Node = std::make_unique<FASTNode>(UNodeType::BlockMath);
 
+	int indexFrom = l_current;
+	
+	while (!PeekToken(l_current, UTokenType::SEMICOLON /* ; */)) l_current++;
 
-	while (!PeekToken(l_current, UTokenType::SEMICOLON /* ; */))
-	{
-		std::cout << m_tokens[l_current].Dump() << "\n";
-		l_current++;
-	}
+	std::vector<FToken> Tokens;
+	if (!ParseAs_MathShuntingYard(indexFrom, l_current, Tokens))
+		return false;
+
+	if (!MSY_To_BlockMath(std::move(Tokens), Node))
+		return false;
+
 	l_current++;
 
 	return true;
@@ -253,6 +258,148 @@ bool CParser::ParseAs_Type(int& l_current, std::unique_ptr<FASTNode>& Node)
 
 bool CParser::ParseAs_Arg(int& l_current, std::unique_ptr<FASTNode>& Node)
 {
+	return true;
+}
+
+bool IsOperator(const FToken& Token)
+{
+	return
+		Token.Type == UTokenType::ADD ||
+		Token.Type == UTokenType::SUB ||
+		Token.Type == UTokenType::MUL ||
+		Token.Type == UTokenType::DIV ||
+		Token.Type == UTokenType::MOD;
+}
+bool IsValue(const FToken& Token)
+{
+	return
+		Token.Type == UTokenType::INT ||
+		Token.Type == UTokenType::FLOAT ||
+		Token.Type == UTokenType::STRING ||
+		Token.Type == UTokenType::CHAR ||
+		Token.Type == UTokenType::BOOLEAN ||
+		Token.Type == UTokenType::IDENTIFIER;
+}
+int GetIntensity(const FToken& Token)
+{
+	switch (Token.Type)
+	{
+	case UTokenType::ADD: return 2;
+	case UTokenType::SUB: return 2;
+	case UTokenType::MUL: return 3;
+	case UTokenType::DIV: return 3;
+	case UTokenType::MOD: return 3;
+	default: return 0;
+	}
+}
+
+bool CParser::ParseAs_MathShuntingYard(int from, int to, std::vector<FToken>& TokensOutput)
+{
+	TokensOutput.empty();
+	std::stack<FToken> TokensStack;
+
+	for(int i = from; i < to; i++)
+	{
+		FToken& Token = m_tokens[i];
+
+		Token.Dump();
+
+		if (IsValue(Token))
+		{
+			TokensOutput.emplace_back(Token);
+		}
+		else if (IsOperator(Token))
+		{
+			while (!TokensStack.empty() && IsOperator(TokensStack.top()) &&
+				GetIntensity(TokensStack.top()) >= GetIntensity(Token))
+			{
+				TokensOutput.push_back(TokensStack.top());
+				TokensStack.pop();
+			}
+
+			TokensStack.push(Token);
+		}
+		else if (Token.Type == UTokenType::LPAR /* ( */)
+		{
+			TokensStack.push(Token);
+		}
+		else if (Token.Type == UTokenType::RPAR /* ) */)
+		{
+			while (!TokensStack.empty() && TokensStack.top().Type != UTokenType::LPAR /* ( */)
+			{
+				TokensOutput.push_back(TokensStack.top());
+				TokensStack.pop();
+			}
+			if (TokensStack.empty()) return false;
+			TokensStack.pop();
+		}
+		else
+		{
+			// ERR
+			return false;
+		}
+	}
+
+	while (!TokensStack.empty())
+	{
+		TokensOutput.push_back(TokensStack.top());
+		TokensStack.pop();
+	}
+
+	std::cout << "Dump after ParseAs_MathShuntingYard\n";
+	for (const FToken& t : TokensOutput)
+	{
+		std::cout << t.Dump() << '\n';
+	}
+	return true;
+}
+
+bool CParser::MSY_To_BlockMath(std::vector<FToken>&& Tokens, std::unique_ptr<FASTNode>& Node)
+{
+	std::stack<std::unique_ptr<FASTNode>> st;
+
+	for (const FToken& token : Tokens)
+	{
+		if (IsValue(token))
+		{
+			auto leaf = std::make_unique<FASTNode>(UNodeType::Math);
+			leaf->Token = token;
+			st.push(std::move(leaf));
+		}
+		else if (IsOperator(token)) 
+		{
+			if (st.size() < 2)
+			{
+				Error("MSY_To_BlockMath: Not enough operands for operator " + token.Lexeme);
+				return false;
+			}
+
+			auto right = std::move(st.top()); st.pop();
+			auto left = std::move(st.top()); st.pop();
+
+			auto opNode = std::make_unique<FASTNode>(UNodeType::Math);
+			opNode->Token = token;
+			opNode->AddChild(std::move(left));
+			opNode->AddChild(std::move(right));
+
+			st.push(std::move(opNode));
+		}
+		else
+		{
+			Error("MSY_To_BlockMath: Unexpected token type in RPN: " + token.Lexeme);
+			return false;
+		}
+	}
+
+	if (st.size() != 1)
+	{
+		Error("MSY_To_BlockMath: Invalid RPN, stack size = " + std::to_string(st.size()));
+		return false;
+	}
+
+	Node = std::make_unique<FASTNode>(UNodeType::BlockMath);
+	Node->AddChild(std::move(st.top()));
+
 	return true;
 }
 

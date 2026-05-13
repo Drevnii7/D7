@@ -176,6 +176,11 @@ std::string FToken::Dump() const
     return result.str();
 }
 
+constexpr bool FToken::internal::is_boolean(std::string_view lexeme)
+{
+    return lexeme == "false" || lexeme == "true";
+}
+
 constexpr bool FToken::internal::is_string(std::string_view lexeme)
 {
     return lexeme.size() >= 2 && lexeme.front() == '"' && lexeme.back() == '"';
@@ -194,6 +199,8 @@ constexpr bool FToken::internal::is_integer(std::string_view lexeme)
 
     if (lexeme.front() == '-' || lexeme.front() == '+')
         indexBegin++;
+
+    if (indexBegin >= lexeme.size()) return false;
 
     for (size_t i = indexBegin; i < lexeme.size(); ++i)
         if (lexeme[i] < '0' || lexeme[i] > '9')
@@ -214,6 +221,8 @@ constexpr bool FToken::internal::is_double(std::string_view lexeme)
 
     if (lexeme.front() == '+' || lexeme.front() == '-')
         indexBegin++;
+
+    if (indexBegin >= lexeme.size()) return false;
 
     if (indexEnd > indexBegin && (lexeme.back() == 'f' || lexeme.back() == 'F'))
         indexEnd--;
@@ -263,6 +272,9 @@ std::string_view FToken::internal::TokenTypeToString(UTokenType tokenType)
 
 UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)
 {
+    if (is_boolean(lexeme))
+        return UTokenType::BOOLEAN;
+
     if (is_integer(lexeme))
         return UTokenType::INT;
 

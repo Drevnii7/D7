@@ -199,6 +199,7 @@ struct FToken
 
     struct internal
     {
+        static constexpr bool is_boolean(std::string_view lexeme);
         static constexpr bool is_string(std::string_view lexeme);
         static constexpr bool is_char(std::string_view lexeme);
         static constexpr bool is_integer(std::string_view lexeme);
