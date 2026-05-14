@@ -13,8 +13,10 @@ void CParser::TryParseAs_Program()
 	while (l_current < m_tokens.size())
 	{
 		ParsedNode = nullptr;
+		int l_currentSave = l_current;
 
 		{
+			l_current = l_currentSave;
 			CParser::URetState StateRet = TryParseAs_Func(l_current, ParsedNode);
 
 			if (StateRet == CParser::URetState::Yes)
@@ -30,6 +32,7 @@ void CParser::TryParseAs_Program()
 		}
 
 		{
+			l_current = l_currentSave;
 			CParser::URetState StateRet = TryParseAs_Var(l_current, ParsedNode);
 
 			if (StateRet == CParser::URetState::Yes)
@@ -157,6 +160,35 @@ CParser::URetState CParser::TryParseAs_Var(int& l_current, std::unique_ptr<FASTN
 	return CParser::URetState::Fail;
 }
 
+CParser::URetState CParser::TryParseAs_Return(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	m_tokens; // For debug
+
+	/* func */
+	if (!ConsumeToken(l_current, UTokenType::RETURN))
+		return CParser::URetState::No; // This not return
+
+	int indexFrom = l_current;
+
+	while (!PeekToken(l_current, UTokenType::SEMICOLON /* ; */)) l_current++;
+
+	std::vector<FToken> Tokens;
+	if (!ParseAs_MathShuntingYard(indexFrom, l_current, Tokens))
+		return CParser::URetState::Fail;
+
+	Node = std::make_unique<FASTNode>(UNodeType::Return);
+	std::unique_ptr<FASTNode> ParsedNode = nullptr;
+
+	if (!MSY_To_BlockMath(std::move(Tokens), ParsedNode))
+		return CParser::URetState::Fail;
+
+	Node->AddChild(std::move(ParsedNode));
+		
+	l_current++; // Skip ;
+
+	return CParser::URetState::Yes;
+}
+
 // Medium level
 
 bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
@@ -168,11 +200,33 @@ bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
 
 	std::unique_ptr<FASTNode> ParsedNode = nullptr;
 
+	int CountBra = 1;
 	while (l_current < m_tokens.size())
 	{
 		ParsedNode = nullptr;
+		int l_currentSave = l_current;
+
+		if (PeekToken(l_current, UTokenType::LBRA /* { */))
+		{
+			CountBra++;
+			l_current++;
+			continue;
+		}
+
+		if (PeekToken(l_current, UTokenType::RBRA /* } */))
+		{
+			CountBra--;
+			l_current++;
+			continue;
+		}
+
+		if (CountBra == 0)
+		{
+			break;
+		}
 
 		{
+			l_current = l_currentSave;
 			CParser::URetState StateRet = TryParseAs_Var(l_current, ParsedNode);
 
 			if (StateRet == CParser::URetState::Yes)
@@ -186,11 +240,28 @@ bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
 				return false;
 			}
 		}
+		
+		{
+			l_current = l_currentSave;
+			CParser::URetState StateRet = TryParseAs_Return(l_current, ParsedNode);
+
+			if (StateRet == CParser::URetState::Yes)
+			{
+				Node->AddChild(std::move(ParsedNode));
+				continue;
+			}
+			else if (StateRet == CParser::URetState::Fail)
+			{
+				Error(std::string("ParseAs_BlockCode:TryParseAs_Return"));
+				return false;
+			}
+		}
+
+		Error(std::string("ParseAs_BlockCode: Unkown what: ") + m_tokens[l_current].Dump());
+
 
 		break;
 	}
-
-	while (!ConsumeToken(l_current, UTokenType::RBRA /* } */));
 
 	return true;
 }
@@ -225,7 +296,7 @@ bool CParser::ParseAs_BlockMath(int& l_current, std::unique_ptr<FASTNode>& Node)
 	if (!MSY_To_BlockMath(std::move(Tokens), Node))
 		return false;
 
-	l_current++;
+	l_current++; // Skip ;
 
 	return true;
 }

@@ -82,6 +82,8 @@ protected: // CParser
     URetState TryParseAs_Func(int& l_current, std::unique_ptr<FASTNode>& Node);
     URetState TryParseAs_Var(int& l_current, std::unique_ptr<FASTNode>& Node);
 
+    URetState TryParseAs_Return(int& l_current, std::unique_ptr<FASTNode>& Node);
+
     // Medium level
 
     bool ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node);
