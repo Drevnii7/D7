@@ -16,7 +16,7 @@
 - - - [ ] Varibale
 - - - [ ] Block math
 - - - - [ ] Shunting yard
-- - - - - [x] For set variable
+- - - - - [ ] For set variable
 - - - - - [ ] For comparison
 - - - [ ] Block code
 - - - - [ ] Varibale define
