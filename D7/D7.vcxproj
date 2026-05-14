@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\codegenerator\CodeGenerator.h" />
     <ClInclude Include="source\parser\AST.h" />
     <ClInclude Include="source\parser\CParser.h" />
     <ClInclude Include="source\BaseTypes.h" />
@@ -30,6 +31,7 @@
     <ClInclude Include="source\preprocessor\CStandartPreprocessor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\codegenerator\CodeGenerator.cpp" />
     <ClCompile Include="source\parser\CParserParsing.cpp" />
     <ClCompile Include="source\parser\AST.cpp" />
     <ClCompile Include="D7.cpp" />

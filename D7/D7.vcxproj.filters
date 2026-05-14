@@ -45,6 +45,9 @@
     <ClInclude Include="source\parser\AST.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\codegenerator\CodeGenerator.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\lexer\CLexer.cpp">
@@ -75,6 +78,9 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\parser\CParserParsing.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\codegenerator\CodeGenerator.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

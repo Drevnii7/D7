@@ -38,12 +38,6 @@ struct FASTNode
         Type = lType;
     }
 
-    FASTNode(const FASTNode&) = delete;
-    FASTNode& operator=(const FASTNode&) = delete;
-
-    FASTNode(FASTNode&&) noexcept = default;
-    FASTNode& operator=(FASTNode&&) noexcept = default;
-
     bool IsValid() const
     {
         return Type != UNodeType::None;
@@ -62,10 +56,9 @@ struct FASTNode
         std::string pad(indent * 4, ' ');
         std::string line = pad + "[" + std::string(internal::NodeTypeToString(Type)) + "] ";
 
-        if ((Type != UNodeType::BlockCode && Type != UNodeType::BlockMath && Type != UNodeType::BlockArgs && 
-            Type != UNodeType::Func && Type != UNodeType::Variable && Type != UNodeType::None) || Token.IsValid())
+        if (Token.IsValid())
         {
-            line += Token.IsValid() ? Token.Dump() : "INVALID";
+            line += Token.Dump();
         }
 
         line += '\n';

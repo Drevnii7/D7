@@ -1,7 +1,3 @@
-var bool Start = false;
-var float GlobalPi;
-
-func bool random();
 func int32 main()
 {
     var int32 ReturnVar = (2 + 3) * (4 - 1) + 12 / 4 - 5;

@@ -5,6 +5,7 @@
 const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
 {
     { "None",         UNodeType::None },
+    { "Program",         UNodeType::Program },
 
     { "BlockCode",    UNodeType::BlockCode },
     { "BlockMath",    UNodeType::BlockMath },
