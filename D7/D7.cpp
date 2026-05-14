@@ -9,28 +9,41 @@
 #include "source/parser/AST.h"
 #include "source/parser/CParser.h"
 
+#include "source/codegenerator/CodeGenerator.h"
+
 int main()
 {
     std::string File_SourceCode = "test_code.d7";
-    std::string File_TokensAfterLexer = "test_code.lexer";
-    std::string File_TokensAfterPreprocessor = "test_code.tokens";
-    std::string File_ASTAfterParser = "test_code.ast";
 
-    CLexer* Lexer = new CLexer();
-    Lexer->LoadCode(File_SourceCode);
-    Lexer->RunProcessing();
-    Lexer->DebugPrint();
-    Lexer->SaveTokens(File_TokensAfterLexer);
+    std::string File_AfterLexer = "test_code.lexer";
+    std::string File_AfterPreprocessor = "test_code.tokens";
+    std::string File_AfterParser = "test_code.ast";
 
-    CStandartPreprocessor* Preprocessor = new CStandartPreprocessor();
-    Preprocessor->LoadTokens(File_TokensAfterLexer);
-    Preprocessor->RunProcessing();
-    Preprocessor->DebugPrint();
-    Preprocessor->SaveTokensAsCode(File_TokensAfterPreprocessor);
+    std::string File_Out = "test_code.exe";
 
-    CParser* Parser = new CParser();
-    Parser->LoadTokens(File_TokensAfterLexer);
-    Parser->RunProcessing();
-    Parser->DebugPrint();
-    Parser->SaveAST(File_TokensAfterPreprocessor);
+    CLexer Lexer;
+    Lexer.LoadCode(File_SourceCode);
+    Lexer.RunProcessing();
+    Lexer.DebugPrint();
+    Lexer.SaveTokens(File_AfterLexer);
+
+    CStandartPreprocessor Preprocessor;
+    Preprocessor.LoadTokens(File_AfterLexer);
+    Preprocessor.RunProcessing();
+    Preprocessor.DebugPrint();
+    Preprocessor.SaveTokensAsCode(File_AfterPreprocessor);
+
+    CParser Parser;
+    Parser.LoadTokens(File_AfterPreprocessor);
+    Parser.RunProcessing();
+    Parser.DebugPrint();
+    Parser.SaveAST(File_AfterParser);
+
+    /*
+    ICodeGenerator CodeGenerator;
+    CodeGenerator.LoadAST(File_AfterParser);
+    CodeGenerator.RunProcessing();
+    CodeGenerator.DebugPrint();
+    CodeGenerator.SaveProgram(File_Out);
+    */
 }

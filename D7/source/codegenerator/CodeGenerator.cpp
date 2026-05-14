@@ -3,12 +3,20 @@
 
 bool ICodeGenerator::LoadAST(const std::string& filePath)
 {
-	return false;
-}
+	if (!filePath.empty()) { m_inputFilePath = filePath; }
 
-bool ICodeGenerator::SaveProgram(const std::string& filePath)
-{
-	return false;
+	try
+	{
+		m_rootNode = FASTNode::Deserialize(m_inputFilePath);
+		Success("LoadAST: " + m_inputFilePath);
+	}
+	catch (const std::runtime_error& error)
+	{
+		Error("LoadAST: " + std::string(error.what()));
+		return false;
+	}
+
+	return true;
 }
 
 void ICodeGenerator::SetAST(const FASTNode&& AST)

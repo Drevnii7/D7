@@ -30,7 +30,7 @@ bool IPreprocessor::LoadTokens(const std::string& filePath)
         return false;
     }
 
-    Success("LoadTokens: " + filePath);
+    Success("LoadTokens: " + m_inputFilePath);
     return true;
 }
 
@@ -40,7 +40,7 @@ bool IPreprocessor::SaveTokens(const std::string& filePath)
 
     try
     {
-        FToken::Serialize<std::list<FToken>>(m_tokens, filePath);
+        FToken::Serialize<std::list<FToken>>(m_tokens, m_inputFilePath);
     }
     catch (const std::runtime_error& error)
     {
@@ -48,7 +48,7 @@ bool IPreprocessor::SaveTokens(const std::string& filePath)
         return false;
     }
 
-    Success("SaveTokens: " + filePath);
+    Success("SaveTokens: " + m_inputFilePath);
     return true;
 }
 
@@ -58,7 +58,7 @@ bool IPreprocessor::SaveTokensAsCode(const std::string& filePath)
 
     try
     {
-        FToken::SerializeAsCode<std::list<FToken>>(m_tokens, filePath);
+        FToken::SerializeAsCode<std::list<FToken>>(m_tokens, m_inputFilePath);
     }
     catch (const std::runtime_error& error)
     {
@@ -66,7 +66,7 @@ bool IPreprocessor::SaveTokensAsCode(const std::string& filePath)
         return false;
     }
 
-    Success("SaveTokensAsCode: " + filePath);
+    Success("SaveTokensAsCode: " + m_inputFilePath);
     return true;
 }
 

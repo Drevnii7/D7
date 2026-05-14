@@ -30,7 +30,7 @@ protected: // CBaseService
 public: // ICodeGenerator
 
 	[[nodiscard]] bool LoadAST(const std::string& filePath = "");
-	[[nodiscard]] bool SaveProgram(const std::string& filePath = "");
+	[[nodiscard]] virtual bool SaveProgram(const std::string& filePath = "") = 0;
 
 	// Set tokens raw
 	void SetAST(const FASTNode&& AST);

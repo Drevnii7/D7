@@ -1,12 +1,12 @@
 /*======================================================================
   Объединенный файл, созданный merge_script.py
-  Содержит 19 файлов
-  Дата создания: 1778698224.749171
+  Содержит 21 файлов
+  Дата создания: 1778756617.5509784
 ====================================================================== */
 
 
 /*======================================================================*/
-/* Файл 1/19: D7\source\BaseTypes.h */
+/* Файл 1/21: D7\source\BaseTypes.h */
 /*======================================================================*/
 
 #pragma once
@@ -20,7 +20,55 @@
 
 
 /*======================================================================*/
-/* Файл 2/19: D7\source\lexer\CLexer.h */
+/* Файл 2/21: D7\source\codegenerator\CodeGenerator.h */
+/*======================================================================*/
+
+#pragma once
+#include "../service/IBaseService.h"
+#include "../parser/AST.h"
+
+class ICodeGenerator : public IBaseService
+{
+public: // CBaseService
+
+	// virtual bool Main(int argc, char* argv[]);
+
+	virtual void RunProcessing() override = 0;
+
+	virtual bool RunFullCycle() override;
+
+	virtual void DebugPrint() const override = 0;
+
+	// Reset state
+	virtual void Reset() override = 0;
+
+protected: // CBaseService
+
+	virtual void Fatal(const std::string& message) const override;
+	virtual void Error(const std::string& message) const override;
+	virtual void Warning(const std::string& message) const override;
+	virtual void Success(const std::string& message) const override;
+
+	// std::string m_inputFilePath = "";
+	// std::string m_outputFilePath = "";
+
+public: // ICodeGenerator
+
+	[[nodiscard]] bool LoadAST(const std::string& filePath = "");
+	[[nodiscard]] virtual bool SaveProgram(const std::string& filePath = "") = 0;
+
+	// Set tokens raw
+	void SetAST(const FASTNode&& AST);
+
+protected: // ICodeGenerator
+	FASTNode m_rootNode;
+};
+
+
+
+
+/*======================================================================*/
+/* Файл 3/21: D7\source\lexer\CLexer.h */
 /*======================================================================*/
 
 #pragma once
@@ -93,7 +141,7 @@ protected: // CLexer
 
 
 /*======================================================================*/
-/* Файл 3/19: D7\source\lexer\Token.h */
+/* Файл 4/21: D7\source\lexer\Token.h */
 /*======================================================================*/
 
 /*
@@ -492,7 +540,7 @@ struct FToken
 
 
 /*======================================================================*/
-/* Файл 4/19: D7\source\notify\Notify.h */
+/* Файл 5/21: D7\source\notify\Notify.h */
 /*======================================================================*/
 
 #pragma once
@@ -538,7 +586,7 @@ void SuccessBase(UNotifyFrom succesType, const std::string& message);
 
 
 /*======================================================================*/
-/* Файл 5/19: D7\source\parser\AST.h */
+/* Файл 6/21: D7\source\parser\AST.h */
 /*======================================================================*/
 
 #pragma once
@@ -565,6 +613,8 @@ enum class UNodeType : uint8_t
     Name      = 200, // name variable / function
     Type      = 201, // type variable / type returned function
     Math      = 202, // (8 * 5) + (4 / 2)
+
+    Return    = 300 // return 42;
 };
 
 struct FASTNode
@@ -578,12 +628,6 @@ struct FASTNode
     {
         Type = lType;
     }
-
-    FASTNode(const FASTNode&) = delete;
-    FASTNode& operator=(const FASTNode&) = delete;
-
-    FASTNode(FASTNode&&) noexcept = default;
-    FASTNode& operator=(FASTNode&&) noexcept = default;
 
     bool IsValid() const
     {
@@ -602,10 +646,12 @@ struct FASTNode
     {
         std::string pad(indent * 4, ' ');
         std::string line = pad + "[" + std::string(internal::NodeTypeToString(Type)) + "] ";
-        if (Type != UNodeType::BlockCode && Type != UNodeType::BlockMath && Type != UNodeType::BlockArgs)
+
+        if (Token.IsValid())
         {
-            line += Token.IsValid() ? Token.Dump() : "INVALID";
+            line += Token.Dump();
         }
+
         line += '\n';
 
         for (const auto& child : ChildNodes)
@@ -631,7 +677,7 @@ struct FASTNode
 
 
 /*======================================================================*/
-/* Файл 6/19: D7\source\parser\CParser.h */
+/* Файл 7/21: D7\source\parser\CParser.h */
 /*======================================================================*/
 
 #pragma once
@@ -718,6 +764,8 @@ protected: // CParser
     URetState TryParseAs_Func(int& l_current, std::unique_ptr<FASTNode>& Node);
     URetState TryParseAs_Var(int& l_current, std::unique_ptr<FASTNode>& Node);
 
+    URetState TryParseAs_Return(int& l_current, std::unique_ptr<FASTNode>& Node);
+
     // Medium level
 
     bool ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node);
@@ -748,7 +796,7 @@ protected: // CParser
 
 
 /*======================================================================*/
-/* Файл 7/19: D7\source\preprocessor\CStandartPreprocessor.h */
+/* Файл 8/21: D7\source\preprocessor\CStandartPreprocessor.h */
 /*======================================================================*/
 
 #pragma once
@@ -833,7 +881,7 @@ protected:
 
 
 /*======================================================================*/
-/* Файл 8/19: D7\source\preprocessor\IPreprocessor.h */
+/* Файл 9/21: D7\source\preprocessor\IPreprocessor.h */
 /*======================================================================*/
 
 #pragma once
@@ -902,7 +950,7 @@ protected: // CPreprocessor
 
 
 /*======================================================================*/
-/* Файл 9/19: D7\source\service\IBaseService.h */
+/* Файл 10/21: D7\source\service\IBaseService.h */
 /*======================================================================*/
 
 #pragma once
@@ -939,7 +987,7 @@ protected:
 
 
 /*======================================================================*/
-/* Файл 10/19: D7\D7.cpp */
+/* Файл 11/21: D7\D7.cpp */
 /*======================================================================*/
 
 ﻿#include <iostream>
@@ -953,36 +1001,114 @@ protected:
 #include "source/parser/AST.h"
 #include "source/parser/CParser.h"
 
+#include "source/codegenerator/CodeGenerator.h"
+
 int main()
 {
     std::string File_SourceCode = "test_code.d7";
-    std::string File_TokensAfterLexer = "test_code.lexer";
-    std::string File_TokensAfterPreprocessor = "test_code.tokens";
-    std::string File_ASTAfterParser = "test_code.ast";
 
-    CLexer* Lexer = new CLexer();
-    Lexer->LoadCode(File_SourceCode);
-    Lexer->RunProcessing();
-    Lexer->DebugPrint();
-    Lexer->SaveTokens(File_TokensAfterLexer);
+    std::string File_AfterLexer = "test_code.lexer";
+    std::string File_AfterPreprocessor = "test_code.tokens";
+    std::string File_AfterParser = "test_code.ast";
 
-    CStandartPreprocessor* Preprocessor = new CStandartPreprocessor();
-    Preprocessor->LoadTokens(File_TokensAfterLexer);
-    Preprocessor->RunProcessing();
-    Preprocessor->DebugPrint();
-    Preprocessor->SaveTokensAsCode(File_TokensAfterPreprocessor);
+    std::string File_Out = "test_code.exe";
 
-    CParser* Parser = new CParser();
-    Parser->LoadTokens(File_TokensAfterLexer);
-    Parser->RunProcessing();
-    Parser->DebugPrint();
-    Parser->SaveAST(File_TokensAfterPreprocessor);
+    CLexer Lexer;
+    Lexer.LoadCode(File_SourceCode);
+    Lexer.RunProcessing();
+    Lexer.DebugPrint();
+    Lexer.SaveTokens(File_AfterLexer);
+
+    CStandartPreprocessor Preprocessor;
+    Preprocessor.LoadTokens(File_AfterLexer);
+    Preprocessor.RunProcessing();
+    Preprocessor.DebugPrint();
+    Preprocessor.SaveTokensAsCode(File_AfterPreprocessor);
+
+    CParser Parser;
+    Parser.LoadTokens(File_AfterPreprocessor);
+    Parser.RunProcessing();
+    Parser.DebugPrint();
+    Parser.SaveAST(File_AfterParser);
+
+    /*
+    ICodeGenerator CodeGenerator;
+    CodeGenerator.LoadAST(File_AfterParser);
+    CodeGenerator.RunProcessing();
+    CodeGenerator.DebugPrint();
+    CodeGenerator.SaveProgram(File_Out);
+    */
 }
 
 
 
 /*======================================================================*/
-/* Файл 11/19: D7\source\lexer\CLexer.cpp */
+/* Файл 12/21: D7\source\codegenerator\CodeGenerator.cpp */
+/*======================================================================*/
+
+#include "CodeGenerator.h"
+#include "../notify/Notify.h"
+
+bool ICodeGenerator::LoadAST(const std::string& filePath)
+{
+	if (!filePath.empty()) { m_inputFilePath = filePath; }
+
+	try
+	{
+		m_rootNode = FASTNode::Deserialize(m_inputFilePath);
+		Success("LoadAST: " + m_inputFilePath);
+	}
+	catch (const std::runtime_error& error)
+	{
+		Error("LoadAST: " + std::string(error.what()));
+		return false;
+	}
+
+	return true;
+}
+
+void ICodeGenerator::SetAST(const FASTNode&& AST)
+{
+	m_rootNode = std::move(AST);
+}
+
+bool ICodeGenerator::RunFullCycle()
+{
+	if (!LoadAST())
+		return false;
+
+	RunProcessing();
+
+	if (!SaveProgram())
+		return false;
+
+	return true;
+}
+
+void ICodeGenerator::Fatal(const std::string& message) const
+{
+	FatalBase(UNotifyFrom::CODE_GENERATION, message);
+}
+
+void ICodeGenerator::Error(const std::string& message) const
+{
+	ErrorBase(UNotifyFrom::CODE_GENERATION, message);
+}
+
+void ICodeGenerator::Warning(const std::string& message) const
+{
+	WarningBase(UNotifyFrom::CODE_GENERATION, message);
+}
+
+void ICodeGenerator::Success(const std::string& message) const
+{
+	SuccessBase(UNotifyFrom::CODE_GENERATION, message);
+}
+
+
+
+/*======================================================================*/
+/* Файл 13/21: D7\source\lexer\CLexer.cpp */
 /*======================================================================*/
 
 #include "CLexer.h"
@@ -1293,7 +1419,7 @@ void CLexer::Success(const std::string& message) const
 
 
 /*======================================================================*/
-/* Файл 12/19: D7\source\lexer\Token.cpp */
+/* Файл 14/21: D7\source\lexer\Token.cpp */
 /*======================================================================*/
 
 #include "Token.h"
@@ -1632,7 +1758,7 @@ std::istream& operator>>(std::istream& is, FToken& token)
 
 
 /*======================================================================*/
-/* Файл 13/19: D7\source\notify\Notify.cpp */
+/* Файл 15/21: D7\source\notify\Notify.cpp */
 /*======================================================================*/
 
 #include "Notify.h"
@@ -1796,7 +1922,7 @@ void SuccessBase(UNotifyFrom succesType, const std::string& message)
 
 
 /*======================================================================*/
-/* Файл 14/19: D7\source\parser\AST.cpp */
+/* Файл 16/21: D7\source\parser\AST.cpp */
 /*======================================================================*/
 
 #include "AST.h"
@@ -1806,6 +1932,7 @@ void SuccessBase(UNotifyFrom succesType, const std::string& message)
 const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
 {
     { "None",         UNodeType::None },
+    { "Program",         UNodeType::Program },
 
     { "BlockCode",    UNodeType::BlockCode },
     { "BlockMath",    UNodeType::BlockMath },
@@ -1818,6 +1945,8 @@ const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
     { "Name",         UNodeType::Name },
     { "Type",         UNodeType::Type },
     { "Math",         UNodeType::Math },
+
+    { "Return",         UNodeType::Return },
 };
 
 const std::unordered_map<UNodeType, std::string_view> gl_tokenTypeToString = []
@@ -1935,7 +2064,7 @@ FASTNode FASTNode::Deserialize(const std::string& filename)
 
 
 /*======================================================================*/
-/* Файл 15/19: D7\source\parser\CParser.cpp */
+/* Файл 17/21: D7\source\parser\CParser.cpp */
 /*======================================================================*/
 
 #include "CParser.h"
@@ -2062,7 +2191,7 @@ void CParser::Success(const std::string& message) const { SuccessBase(UNotifyFro
 
 
 /*======================================================================*/
-/* Файл 16/19: D7\source\parser\CParserParsing.cpp */
+/* Файл 18/21: D7\source\parser\CParserParsing.cpp */
 /*======================================================================*/
 
 #include "CParser.h"
@@ -2080,8 +2209,10 @@ void CParser::TryParseAs_Program()
 	while (l_current < m_tokens.size())
 	{
 		ParsedNode = nullptr;
+		int l_currentSave = l_current;
 
 		{
+			l_current = l_currentSave;
 			CParser::URetState StateRet = TryParseAs_Func(l_current, ParsedNode);
 
 			if (StateRet == CParser::URetState::Yes)
@@ -2097,6 +2228,7 @@ void CParser::TryParseAs_Program()
 		}
 
 		{
+			l_current = l_currentSave;
 			CParser::URetState StateRet = TryParseAs_Var(l_current, ParsedNode);
 
 			if (StateRet == CParser::URetState::Yes)
@@ -2224,6 +2356,35 @@ CParser::URetState CParser::TryParseAs_Var(int& l_current, std::unique_ptr<FASTN
 	return CParser::URetState::Fail;
 }
 
+CParser::URetState CParser::TryParseAs_Return(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	m_tokens; // For debug
+
+	/* func */
+	if (!ConsumeToken(l_current, UTokenType::RETURN))
+		return CParser::URetState::No; // This not return
+
+	int indexFrom = l_current;
+
+	while (!PeekToken(l_current, UTokenType::SEMICOLON /* ; */)) l_current++;
+
+	std::vector<FToken> Tokens;
+	if (!ParseAs_MathShuntingYard(indexFrom, l_current, Tokens))
+		return CParser::URetState::Fail;
+
+	Node = std::make_unique<FASTNode>(UNodeType::Return);
+	std::unique_ptr<FASTNode> ParsedNode = nullptr;
+
+	if (!MSY_To_BlockMath(std::move(Tokens), ParsedNode))
+		return CParser::URetState::Fail;
+
+	Node->AddChild(std::move(ParsedNode));
+		
+	l_current++; // Skip ;
+
+	return CParser::URetState::Yes;
+}
+
 // Medium level
 
 bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
@@ -2235,11 +2396,33 @@ bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
 
 	std::unique_ptr<FASTNode> ParsedNode = nullptr;
 
+	int CountBra = 1;
 	while (l_current < m_tokens.size())
 	{
 		ParsedNode = nullptr;
+		int l_currentSave = l_current;
+
+		if (PeekToken(l_current, UTokenType::LBRA /* { */))
+		{
+			CountBra++;
+			l_current++;
+			continue;
+		}
+
+		if (PeekToken(l_current, UTokenType::RBRA /* } */))
+		{
+			CountBra--;
+			l_current++;
+			continue;
+		}
+
+		if (CountBra == 0)
+		{
+			break;
+		}
 
 		{
+			l_current = l_currentSave;
 			CParser::URetState StateRet = TryParseAs_Var(l_current, ParsedNode);
 
 			if (StateRet == CParser::URetState::Yes)
@@ -2253,11 +2436,28 @@ bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
 				return false;
 			}
 		}
+		
+		{
+			l_current = l_currentSave;
+			CParser::URetState StateRet = TryParseAs_Return(l_current, ParsedNode);
+
+			if (StateRet == CParser::URetState::Yes)
+			{
+				Node->AddChild(std::move(ParsedNode));
+				continue;
+			}
+			else if (StateRet == CParser::URetState::Fail)
+			{
+				Error(std::string("ParseAs_BlockCode:TryParseAs_Return"));
+				return false;
+			}
+		}
+
+		Error(std::string("ParseAs_BlockCode: Unkown what: ") + m_tokens[l_current].Dump());
+
 
 		break;
 	}
-
-	while (!ConsumeToken(l_current, UTokenType::RBRA /* } */));
 
 	return true;
 }
@@ -2292,7 +2492,7 @@ bool CParser::ParseAs_BlockMath(int& l_current, std::unique_ptr<FASTNode>& Node)
 	if (!MSY_To_BlockMath(std::move(Tokens), Node))
 		return false;
 
-	l_current++;
+	l_current++; // Skip ;
 
 	return true;
 }
@@ -2514,7 +2714,7 @@ bool CParser::ConsumeTokenThrow(int& l_current, UTokenType TokenType, std::strin
 
 
 /*======================================================================*/
-/* Файл 17/19: D7\source\preprocessor\CStandartPreprocessor.cpp */
+/* Файл 19/21: D7\source\preprocessor\CStandartPreprocessor.cpp */
 /*======================================================================*/
 
 #include "CStandartPreprocessor.h"
@@ -2604,7 +2804,7 @@ void CStandartPreprocessor::DirectiveApplyUsing()
 
 
 /*======================================================================*/
-/* Файл 18/19: D7\source\preprocessor\IPreprocessor.cpp */
+/* Файл 20/21: D7\source\preprocessor\IPreprocessor.cpp */
 /*======================================================================*/
 
 #include "IPreprocessor.h"
@@ -2639,7 +2839,7 @@ bool IPreprocessor::LoadTokens(const std::string& filePath)
         return false;
     }
 
-    Success("LoadTokens: " + filePath);
+    Success("LoadTokens: " + m_inputFilePath);
     return true;
 }
 
@@ -2649,7 +2849,7 @@ bool IPreprocessor::SaveTokens(const std::string& filePath)
 
     try
     {
-        FToken::Serialize<std::list<FToken>>(m_tokens, filePath);
+        FToken::Serialize<std::list<FToken>>(m_tokens, m_inputFilePath);
     }
     catch (const std::runtime_error& error)
     {
@@ -2657,7 +2857,7 @@ bool IPreprocessor::SaveTokens(const std::string& filePath)
         return false;
     }
 
-    Success("SaveTokens: " + filePath);
+    Success("SaveTokens: " + m_inputFilePath);
     return true;
 }
 
@@ -2667,7 +2867,7 @@ bool IPreprocessor::SaveTokensAsCode(const std::string& filePath)
 
     try
     {
-        FToken::SerializeAsCode<std::list<FToken>>(m_tokens, filePath);
+        FToken::SerializeAsCode<std::list<FToken>>(m_tokens, m_inputFilePath);
     }
     catch (const std::runtime_error& error)
     {
@@ -2675,7 +2875,7 @@ bool IPreprocessor::SaveTokensAsCode(const std::string& filePath)
         return false;
     }
 
-    Success("SaveTokensAsCode: " + filePath);
+    Success("SaveTokensAsCode: " + m_inputFilePath);
     return true;
 }
 
@@ -2746,7 +2946,7 @@ void IPreprocessor::Success(const std::string& message) const
 
 
 /*======================================================================*/
-/* Файл 19/19: D7\source\service\IBaseService.cpp */
+/* Файл 21/21: D7\source\service\IBaseService.cpp */
 /*======================================================================*/
 
 #include "IBaseService.h"
