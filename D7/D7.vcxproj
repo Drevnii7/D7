@@ -25,7 +25,10 @@
     <None Include="test_code.d7" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\lexer\ETokenType.hpp" />
+    <ClInclude Include="source\lexer\FToken.hpp" />
     <ClInclude Include="source\utils\assert.hpp" />
+    <ClInclude Include="source\utils\expected.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -18,69 +18,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\lexer\CLexer.h">
+    <ClInclude Include="source\utils\assert.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\lexer\Token.h">
+    <ClInclude Include="source\utils\expected.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\notify\Notify.h">
+    <ClInclude Include="source\lexer\ETokenType.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\preprocessor\IPreprocessor.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\service\IBaseService.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\BaseTypes.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\preprocessor\CStandartPreprocessor.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\parser\CParser.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\parser\AST.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\codegenerator\CodeGenerator.h">
+    <ClInclude Include="source\lexer\FToken.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\lexer\CLexer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="D7.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\lexer\Token.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\notify\Notify.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\preprocessor\IPreprocessor.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\service\IBaseService.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\preprocessor\CStandartPreprocessor.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\parser\CParser.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\parser\AST.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\parser\CParserParsing.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\codegenerator\CodeGenerator.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
