@@ -53,11 +53,8 @@ namespace d7
 			// Copy constructor
 			expected(const expected& Other)
 				: Status(Other.Status)
+				, FatalMessagePtr(Other.FatalMessagePtr ? std::make_unique<std::string>(*Other.FatalMessagePtr) : nullptr)
 			{
-				if (Other.FatalMessagePtr)
-				{
-					FatalMessagePtr = std::make_unique<std::string>(*Other.FatalMessagePtr);
-				}
 			}
 
 			// Move constructor
@@ -68,7 +65,7 @@ namespace d7
 				Other.Status = EStatus::Fail;
 			}
 
-			// Destructor: default is fine, unique_ptr handles cleanup
+			// Destructor
 			~expected() = default;
 
 			// Copy assignment

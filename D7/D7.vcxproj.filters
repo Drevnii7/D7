@@ -30,9 +30,18 @@
     <ClInclude Include="source\lexer\FToken.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\tests\Test_ETokenType.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\lexer\FToken.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\lexer\ETokenType.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

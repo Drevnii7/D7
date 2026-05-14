@@ -63,3 +63,21 @@ namespace d7
 
 // Args: message, token dump
 #define unreachable(...) assert(false, __VA_ARGS__)
+
+#define assertFlow(expr, ...) \
+    do { \
+        if (!(expr)) { \
+            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, __VA_ARGS__); \
+        } \
+    } while(0)
+
+
+// Args: expression, message, token dump
+// Especially for testing
+#define assertTest(expr, ...) \
+    do { \
+        if (!(expr)) { \
+            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, __VA_ARGS__); \
+            l_fails++; \
+        } \
+    } while(0)

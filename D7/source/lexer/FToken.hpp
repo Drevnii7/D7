@@ -4,8 +4,11 @@
 
 #include "ETokenType.hpp"
 
-struct Token
+namespace d7
 {
-	std::string Lexeme = "";
-	ETokenType Type = ETokenType::None;
-};
+	struct Token
+	{
+		std::string lexeme = "";
+		d7::ETokenType type = d7::ETokenType::NONE;
+	};
+}
