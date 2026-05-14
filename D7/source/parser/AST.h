@@ -59,10 +59,13 @@ struct FASTNode
     {
         std::string pad(indent * 4, ' ');
         std::string line = pad + "[" + std::string(internal::NodeTypeToString(Type)) + "] ";
-        if (Type != UNodeType::BlockCode && Type != UNodeType::BlockMath && Type != UNodeType::BlockArgs)
+
+        if ((Type != UNodeType::BlockCode && Type != UNodeType::BlockMath && Type != UNodeType::BlockArgs && 
+            Type != UNodeType::Func && Type != UNodeType::Variable && Type != UNodeType::None) || Token.IsValid())
         {
             line += Token.IsValid() ? Token.Dump() : "INVALID";
         }
+
         line += '\n';
 
         for (const auto& child : ChildNodes)

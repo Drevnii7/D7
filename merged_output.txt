@@ -1,0 +1,2798 @@
+/*======================================================================
+  Объединенный файл, созданный merge_script.py
+  Содержит 19 файлов
+  Дата создания: 1778698224.749171
+====================================================================== */
+
+
+/*======================================================================*/
+/* Файл 1/19: D7\source\BaseTypes.h */
+/*======================================================================*/
+
+#pragma once
+
+#if __cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L) || (defined(_HAS_CXX20) && _HAS_CXX20 == 1)
+	#define IS_CPP_20 1
+#else
+	#define IS_CPP_20 0
+#endif
+
+
+
+/*======================================================================*/
+/* Файл 2/19: D7\source\lexer\CLexer.h */
+/*======================================================================*/
+
+#pragma once
+
+#include "../service/IBaseService.h"
+#include "../BaseTypes.h"
+#include "Token.h"
+
+#include <vector>
+
+#if IS_CPP_20 == 1
+	#include <span>
+	#define HAS_STD_SPAN 1
+#else
+	#define HAS_STD_SPAN 0
+#endif
+
+
+class CLexer : public IBaseService
+{
+public: // CBaseService
+
+	// virtual bool Main(int argc, char* argv[]);
+
+	// Start preprocessing
+	virtual void RunProcessing() override;
+
+	virtual bool RunFullCycle() override;
+
+	// std::cout all tokens
+	virtual void DebugPrint() const override;
+
+	// Reset state
+	virtual void Reset() override;
+
+protected: // CBaseService
+
+	virtual void Fatal(const std::string& message) const override;
+	virtual void Error(const std::string& message) const override;
+	virtual void Warning(const std::string& message) const override;
+	virtual void Success(const std::string& message) const override;
+
+	// std::string m_inputFilePath = "";
+	// std::string m_outputFilePath = "";
+
+public: // CLexer
+
+	[[nodiscard]] bool LoadCode(const std::string& filePath = "");
+	[[nodiscard]] bool SaveTokens(const std::string& filePath = "");
+
+	// Set code raw
+	void SetCode(const std::vector<std::string>& code);
+	void SetCode(std::vector<std::string>&& code);
+	void SetCode(const std::string& code);
+
+	#if HAS_STD_SPAN == 1
+		std::span<FToken> GetTokens();
+	#else
+		const std::vector<FToken>& GetTokens();
+	#endif
+	
+	std::vector<FToken> ExtractTokens();
+
+protected: // CLexer
+
+	std::vector <std::string> m_code;
+	std::vector<FToken> m_tokens;
+};
+
+
+
+/*======================================================================*/
+/* Файл 3/19: D7\source\lexer\Token.h */
+/*======================================================================*/
+
+/*
+    The inspiration is "i582"
+    His code was taken as a basis, but it was fine-tuned to suit my vision.
+
+    https://github.com/i582/cpp-asm-compiler/blob/master/src/lexer/token/token.h
+*/
+#pragma once
+
+#include "../BaseTypes.h"
+
+#include <string>
+#include <string_view>
+#include <iostream>
+#include <fstream>
+
+enum UTokenType
+{
+    NONE       = 0, // invalid, none
+    
+    IDENTIFIER = 1, // func name, var name, var type
+    NAMESPACE  = 2, // ::
+    DIRECTIVE  = 3, // #  call preprocessor directive                #include
+    MACRO      = 4, // __ return preprocessor property how tokens    __LINE__
+    MACRO_S    = 5, // ## return preprocessor property as string     ##LINE##
+
+    // const 
+    // 100 - 199
+    GROUP_CONST = 100,
+    INT     = 101, // 12345
+    FLOAT   = 102, // 3.14f
+    STRING  = 103, // "Hello world"
+    CHAR    = 104, // ' '
+    BOOLEAN = 105, // true, false
+
+    // math
+    // 200 - 219
+    GROUP_MATH = 200,
+    ADD = 201, // +
+    SUB = 202, // -
+    MUL = 203, // *
+    DIV = 204, // /
+    MOD = 205, // %
+    POW = 206, // **
+    INC = 207, // ++
+    DEC = 208, // --
+
+    // logical
+    // 220 - 239
+    GROUP_LOGICAL = 220,
+    AND = 221, // &&
+    OR  = 222, // ||
+    NOT = 223, // !
+
+    // equal operators
+    // 240 - 259
+    GROUP_EQUAL = 240,
+    EQUAL         = 241, // ==
+    NOT_EQUAL     = 242, // !=
+    LESS          = 243, // <
+    GREATER       = 244, // >
+    LESS_EQUAL    = 245, // <=
+    GREATER_EQUAL = 246, // >=
+
+    // assign
+    // 260 - 278
+    GROUP_ASSIGN = 260,
+    ASSIGN     = 261, // =
+    ASSIGN_ADD = 262, // +=
+    ASSIGN_SUB = 263, // -=
+    ASSIGN_MUL = 264, // *=
+    ASSIGN_DIV = 265, // /=
+    ASSIGN_MOD = 266, // %=
+
+
+
+
+
+    // symbols
+    // 300 - 319
+    GROUP_SYMBOLS = 300,
+    SEMICOLON = 301, // ;
+    COMMA     = 303, // ,
+    POINT     = 304, // .
+    QUESTION  = 305, // ?
+    AMPERSAND = 306, // &
+
+
+    // brackets
+    // 320 - 339
+    GROUP_BRACKETS = 320,
+    LBRA = 321, // {
+    RBRA = 322, // }
+    LPAR = 323, // (
+    RPAR = 324, // )
+    LSQR = 325, // [
+    RSQR = 326, // ]
+
+    // base func
+    // 400 - 499
+    GROUP_FUNC = 400,
+    LABEL  = 401, // ":"
+    GOTO   = 402,
+    NEW    = 403,
+    DELETE = 404,
+
+    // control flow
+    // 500 - 599
+    GROUP_CONTROL = 500,
+    RETURN   = 501,
+    IF       = 502,
+    ELSE     = 503,
+    ELIF     = 504,
+    DO_WHILE = 505,
+    WHILE    = 506,
+    FOR      = 507,
+    BREAK    = 508,
+    CONTINUE = 509,
+    SWITCH   = 510,
+    CASE     = 511,
+    DEFAULT  = 512,
+
+    // define 
+    // 600 - 699
+    GROUP_DEF  = 600,
+    DEF_FUNC   = 601,
+    DEF_VAR    = 602,
+    DEF_ENUM   = 603,
+    DEF_STRUCT = 604,
+
+    // define struct
+    // 700 - 799
+    // GROUP_DEF = 700,
+    // DEF_CONSTRUCTOR = 701,
+    // DEF_DESTRUCTOR  = 702,
+    // DEF_CAST        = 703,
+
+    // define struct
+    // 800 - 899
+    // GROUP_DEF = 800,
+    // DEF_CONSTRUCTOR = 801,
+    // DEF_DESTRUCTOR  = 802,
+    // DEF_CAST        = 203,
+
+    // agrements func
+    // 900 - 999
+    // GROUP_AGREMENT_FUNC = 900,
+    // AGREMENT_FUNC_ = 901,
+    // AGREMENT_FUNC_ = 902,
+    // AGREMENT_FUNC_ = 903,
+
+    // agrements var
+    // 900 - 999
+    // GROUP_AGREMENT_VAR = 1000,
+    // AGREMENT_VAR_ = 1001,
+    // AGREMENT_VAR_ = 1002,
+    // AGREMENT_VAR_ = 1003,
+};
+
+// All modifiers are based on the source code.
+struct FTokenModifiers
+{
+    // Such tokens did not originally exist
+    bool IsTokenGenerate = false;
+
+    // If modified this token's value
+    bool IsTokenValueChanged = false;
+
+    // If modified this token's type
+    bool IsTokenTypeChanged = false;
+
+    // True if this token was copied/inserted from another file
+    bool IsTokenCopyFromAnywhere = false;
+};
+
+struct FToken
+{
+    std::string Lexeme = "";
+    UTokenType Type = UTokenType::NONE;
+
+    size_t Line = 0;
+    size_t Row = 0;
+    FTokenModifiers Modifiers;
+
+    FToken() = default;
+    explicit FToken(std::string lexeme, size_t line, size_t row)
+    {
+        Lexeme = lexeme;
+        Type = internal::StringToTokenType(lexeme);
+        Line = line;
+        Row = row;
+    }
+
+    std::string Dump() const;
+
+    bool IsValid() const
+    {
+        return Type != UTokenType::NONE;
+    }
+
+    struct internal
+    {
+        static constexpr bool is_boolean(std::string_view lexeme);
+        static constexpr bool is_string(std::string_view lexeme);
+        static constexpr bool is_char(std::string_view lexeme);
+        static constexpr bool is_integer(std::string_view lexeme);
+        // | 0.0 | 3.14f | 55.55 | 123. | .45 | 86.f |
+        static constexpr bool is_double(std::string_view lexeme);
+        static bool is_separator(std::string_view tokenType);
+        static bool is_separatorType(UTokenType tokenType);
+
+        static std::string_view TokenTypeToString(UTokenType tokenType);
+        static UTokenType StringToTokenType(std::string_view lexeme);
+    };  
+
+    // call throw std::runtime_error on fail
+    template <typename Container>
+    static void Serialize(const Container& tokens, const std::string& filename)
+    {
+        std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open file for writing: " + filename);
+        }
+
+        size_t count = tokens.size();
+        file.write(reinterpret_cast<const char*>(&count), sizeof(count));
+
+        for (const auto& token : tokens)
+        {
+            file << token;
+            if (!file.good())
+            {
+                throw std::runtime_error("Error writing token to file: " + filename);
+            }
+        }
+
+        file.close();
+    }
+
+    template <typename Container>
+    static void SerializeAsCode(const Container& tokens, const std::string& filename)
+    {
+        std::ofstream file(filename);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open file for writing: " + filename);
+        }
+
+        int indentLevel = 0;
+        const int indentSpaces = 4;
+
+        for (auto it = tokens.begin(); it != tokens.end(); ++it)
+        {
+            const auto& token = *it;
+            auto next = std::next(it);
+
+            if (token.Type == UTokenType::RBRA)
+            {
+                indentLevel--;
+                file << std::string(indentLevel * indentSpaces, ' ') << token.Lexeme << '\n';
+                if (next != tokens.end() && next->Type != UTokenType::RBRA)
+                {
+                    file << '\n';
+                }
+                continue;
+            }
+
+            if (token.Type == UTokenType::LBRA)
+            {
+                file << '\n' << token.Lexeme << '\n';
+                indentLevel++;
+                continue;
+            }
+
+            if (token.Type == UTokenType::SEMICOLON)
+            {
+                file << token.Lexeme << '\n';
+                continue;
+            }
+
+            static bool needIndent = true;
+            if (needIndent)
+            {
+                file << std::string(indentLevel * indentSpaces, ' ');
+                needIndent = false;
+            }
+
+            file << token.Lexeme;
+
+            bool putSpace = true;
+            if (next != tokens.end())
+            {
+                UTokenType nt = next->Type;
+
+                if (nt == UTokenType::SEMICOLON || nt == UTokenType::COMMA ||
+                    nt == UTokenType::RPAR || nt == UTokenType::RBRA ||
+                    nt == UTokenType::INC || nt == UTokenType::DEC ||
+                    token.Type == UTokenType::LPAR || token.Type == UTokenType::INC ||
+                    token.Type == UTokenType::DEC)
+                {
+                    putSpace = false;
+                }
+            }
+
+            if (putSpace && next != tokens.end())
+            {
+                file << ' ';
+            }
+
+            if (next != tokens.end())
+            {
+                UTokenType nt = next->Type;
+                if (nt == UTokenType::SEMICOLON || nt == UTokenType::LBRA || nt == UTokenType::RBRA)
+                {
+                    needIndent = true;
+                }
+            }
+            else
+            {
+                needIndent = true;
+            }
+        }
+
+        file.close();
+    }
+    
+
+#if IS_CPP_20 == 0
+    template<typename T, typename = void>
+    struct has_reserve : std::false_type {};
+
+    template<typename T>
+    struct has_reserve<T, std::void_t<decltype(std::declval<T>().reserve(std::declval<size_t>()))>>
+        : std::true_type {
+    };
+#endif
+
+    // call throw std::runtime_error on fail
+    template <typename Container>
+    static Container Deserialize(const std::string& filename)
+    {
+        std::ifstream file(filename, std::ios::binary);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open file for reading: " + filename);
+        }
+
+        size_t count = 0;
+        file.read(reinterpret_cast<char*>(&count), sizeof(count));
+
+        if (!file.good())
+        {
+            throw std::runtime_error("Error reading count from file: " + filename);
+        }
+
+        Container tokens;
+
+    #if IS_CPP_20 == 1
+        if constexpr (requires { tokens.reserve(count); }) 
+        {
+            tokens.reserve(count);
+        }
+    #else
+        // Check container contains function reserve()
+        // If false, not call
+        if constexpr (has_reserve<Container>::value)
+        {
+            tokens.reserve(count);
+        }
+    #endif
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            FToken token;
+            file >> token;
+
+            if (!file.good())
+            {
+                throw std::runtime_error("Error reading token at index " + std::to_string(i) + " from file: " + filename);
+            }
+
+            tokens.emplace_back(std::move(token));
+        }
+
+        file.close();
+        return tokens;
+    }
+    
+
+    friend std::ostream& operator<<(std::ostream& os, const FToken& token);
+    friend std::istream& operator>>(std::istream& is, FToken& token);
+};
+
+
+
+/*======================================================================*/
+/* Файл 4/19: D7\source\notify\Notify.h */
+/*======================================================================*/
+
+#pragma once
+#include <string>
+
+enum class UNotifyFrom
+{
+    LEXER,
+    PREPROCESSOR,
+    PARSER,
+    SEMANTIC,
+    CODE_GENERATION
+};
+
+void FatalBase(UNotifyFrom fatalType, const std::string& message);
+
+//#define ParserFatal(message) FatalBase(UNotifyFrom::PARSER, message)
+//#define SemanticFatal(message) FatalBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationFatal(message) FatalBase(UNotifyFrom::CODE_GENERATION, message)
+
+
+void ErrorBase(UNotifyFrom errorType, const std::string& message);
+
+//#define ParserError(message) ErrorBase(UNotifyFrom::PARSER, message)
+//#define SemanticError(message) ErrorBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationError(message) ErrorBase(UNotifyFrom::CODE_GENERATION, message)
+
+
+void WarningBase(UNotifyFrom warningType, const std::string& message);
+
+//#define ParserWarning(message) WarningBase(UNotifyFrom::PARSER, message)
+//#define SemanticWarning(message) WarningBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationWarning(message) WarningBase(UNotifyFrom::CODE_GENERATION, message)
+
+
+
+void SuccessBase(UNotifyFrom succesType, const std::string& message);
+
+//#define ParserSuccess(message) SuccessBase(UNotifyFrom::PARSER, message)
+//#define SemanticSuccess(message) SuccessBase(UNotifyFrom::SEMANTIC, message)
+//#define CodeGenerationSuccess(message) SuccessBase(UNotifyFrom::CODE_GENERATION, message)
+
+
+
+/*======================================================================*/
+/* Файл 5/19: D7\source\parser\AST.h */
+/*======================================================================*/
+
+#pragma once
+
+#include "../lexer/Token.h"
+#include <vector>
+#include <iomanip>
+#include <sstream>
+
+enum class UNodeType : uint8_t
+{
+    None      = 0, // Invalid
+
+    Program   = 1,
+
+    BlockCode = 2, // {}
+    BlockMath = 3, // a + (b * c)
+    BlockArgs = 4, // (int argc, char *argv[])
+
+    Func      = 100, // func void main();
+    Variable  = 101, // var float pi = 3.14f;
+    Setter    = 102, // pi = 3.14f;
+
+    Name      = 200, // name variable / function
+    Type      = 201, // type variable / type returned function
+    Math      = 202, // (8 * 5) + (4 / 2)
+};
+
+struct FASTNode
+{
+    UNodeType Type = UNodeType::None;
+	FToken Token;
+	std::vector<std::unique_ptr<FASTNode>> ChildNodes;
+
+    FASTNode() = default;
+    FASTNode(UNodeType lType)
+    {
+        Type = lType;
+    }
+
+    FASTNode(const FASTNode&) = delete;
+    FASTNode& operator=(const FASTNode&) = delete;
+
+    FASTNode(FASTNode&&) noexcept = default;
+    FASTNode& operator=(FASTNode&&) noexcept = default;
+
+    bool IsValid() const
+    {
+        return Type != UNodeType::None;
+    }
+
+    void AddChild(std::unique_ptr<FASTNode> child)
+    {
+        if (child)
+        {
+            ChildNodes.push_back(std::move(child));
+        }
+    }
+
+    std::string Dump(int indent = 0) const
+    {
+        std::string pad(indent * 4, ' ');
+        std::string line = pad + "[" + std::string(internal::NodeTypeToString(Type)) + "] ";
+        if (Type != UNodeType::BlockCode && Type != UNodeType::BlockMath && Type != UNodeType::BlockArgs)
+        {
+            line += Token.IsValid() ? Token.Dump() : "INVALID";
+        }
+        line += '\n';
+
+        for (const auto& child : ChildNodes)
+        {
+            line += child->Dump(indent + 1);
+        }
+        return line;
+    }
+
+    struct internal
+    {
+        static std::string_view NodeTypeToString(UNodeType nodeType);
+        static UNodeType StringToNodeType(std::string_view string);
+    };
+
+    static void Serialize(FASTNode* root, const std::string& filename);
+    static FASTNode Deserialize(const std::string& filename);
+
+    friend std::ostream& operator<<(std::ostream& os, const FASTNode& node);
+    friend std::istream& operator>>(std::istream& is, FASTNode& node);
+};
+
+
+
+/*======================================================================*/
+/* Файл 6/19: D7\source\parser\CParser.h */
+/*======================================================================*/
+
+#pragma once
+/*
+Representing Code 5
+https://craftinginterpreters.com/representing-code.html
+Parsing Expressions 6
+https://craftinginterpreters.com/parsing-expressions.html
+// Ñîçäàíèå ÿçûêà ïðîãðàììèðîâàíèÿ ñ èñïîëüçîâàíèåì LLVM. ×àñòü 2: Ðåàëèçàöèÿ ïàðñåðà è AST
+https://habr.com/ru/articles/120005/
+*/
+
+#include "../service/IBaseService.h"
+#include "../BaseTypes.h"
+#include "../lexer/Token.h"
+#include "AST.h"
+#include <list>
+#include <vector>
+
+#if IS_CPP_20 == 1
+    #include <span>
+    #define HAS_STD_SPAN 1
+#else
+    #define HAS_STD_SPAN 0
+#endif
+
+
+
+class CParser : public IBaseService
+{
+public: // CBaseService
+
+    enum class URetState : uint8_t
+    {
+        Fail, // Type valid, but parse fail. Critycal error
+        Yes,  // Type valid, parse valid
+        No    // Type invalid, parse fail
+    };
+
+    // virtual bool Main(int argc, char* argv[]);
+
+    virtual void RunProcessing() override;
+
+    virtual bool RunFullCycle() override;
+
+    virtual void DebugPrint() const override;
+
+    // Reset state
+    virtual void Reset() override;
+
+protected: // CBaseService
+    virtual void Fatal(const std::string& message) const override;
+    virtual void Error(const std::string& message) const override;
+    virtual void Warning(const std::string& message) const override;
+    virtual void Success(const std::string& message) const override;
+
+    // std::string m_inputFilePath = "";
+    // std::string m_outputFilePath = "";
+public: // CParser
+
+    [[nodiscard]] bool LoadTokens(const std::string& filePath = " ");
+    [[nodiscard]] bool SaveTokens(const std::string& filePath = " ");
+    [[nodiscard]] bool SaveAST(const std::string& filePath = " ");
+
+    // Set tokens raw
+    void SetTokens(const std::vector <FToken >& tokens);
+    void SetTokens(const std::list <FToken >& tokens);
+    void SetTokens(std::vector <FToken >&& tokens);
+#if HAS_STD_SPAN == 1
+    std::span<FToken> GetTokens();
+#else
+    const std::vector<FToken>& GetTokens();
+#endif
+    std::vector<FToken> ExtractTokens();
+
+protected: // CParser
+    std::vector<FToken> m_tokens;
+    FASTNode m_rootNode;
+
+    void TryParseAs_Program();
+
+    // Height level
+
+    URetState TryParseAs_Func(int& l_current, std::unique_ptr<FASTNode>& Node);
+    URetState TryParseAs_Var(int& l_current, std::unique_ptr<FASTNode>& Node);
+
+    // Medium level
+
+    bool ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_BlockArgs(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_BlockMath(int& l_current, std::unique_ptr<FASTNode>& Node);
+
+    // Low level
+
+    bool ParseAs_Name(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_Type(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_Arg(int& l_current, std::unique_ptr<FASTNode>& Node);
+    bool ParseAs_MathShuntingYard(int from, int to, std::vector<FToken>& TokensOutput);
+    bool MSY_To_BlockMath(std::vector<FToken>&& Tokens, std::unique_ptr<FASTNode>& Node);
+
+    // Raw level.
+
+    // Ñâåðèòü òèï òîêåíà
+    bool PeekToken(int& l_current, UTokenType TokenType);
+    // Ñâåðèòü òèï òîêåíà, è åñëè false âûçâàòü Fatal
+    bool PeekTokenThrow(int& l_current, UTokenType TokenType, std::string_view failMessage);
+    
+    // Ñâåðèòü òèï òîêåíà, è åñëè m_current++
+    bool ConsumeToken(int& l_current, UTokenType TokenType);
+    // Ñâåðèòü òèï òîêåíà, è åñëè m_current++. Åñëè false âûçâàòü Fatal
+    bool ConsumeTokenThrow(int& l_current, UTokenType TokenType, std::string_view failMessage);
+};
+
+
+
+/*======================================================================*/
+/* Файл 7/19: D7\source\preprocessor\CStandartPreprocessor.h */
+/*======================================================================*/
+
+#pragma once
+
+#include "IPreprocessor.h"
+#include <map>
+
+class CStandartPreprocessor : public IPreprocessor
+{
+public: // CBaseService
+
+	virtual void RunProcessing() override;
+
+	virtual void Reset() override;
+
+protected: // IPreprocessor
+
+	// std::list<FToken> m_tokens;
+
+public:
+
+	int FindNextPreprocessorDirective();
+
+	void DirectiveCollectUsing();
+	void DirectiveApplyUsing();
+protected:
+
+	std::map<std::string, FToken> m_usings;
+};
+
+#if 0 // Standart DIRECTIVE and MACRO
+
+	// preprocessor func
+	// 600 - 699
+	GROUP_PREPROCESSOR_FUNC = 600,
+	M_USING   = 601,
+	M_DEFINE  = 602,
+	M_IFDEF   = 603,
+	M_IFNDEF  = 604,
+	M_IF      = 605,
+	M_ELSE    = 606,
+	M_ELIF    = 607,
+	M_ENDIF   = 608,
+	M_INCLUDE = 609,
+
+	// preprocessor property
+	// 700 - 799
+	GROUP_PREPROCESSOR_PROPERTY = 700,
+
+	MP_POS = 701, // (str) 120:0
+	MP_LINE = 702, // (int) 120
+	MP_COLUMN = 703, // (int) 0
+
+	MP_FILE = 710, // (str) C:/Users/Drevnii7/main.cpp
+	MP_FILE_PATH = 711, // (str) C:/Users/Drevnii7/
+	MP_FILE_NAME = 712, // (str) main.cpp
+
+	MP_DATE = 720, // (str) 08.05.2026
+	MP_DATE_YEAR = 721, // (int) 2026
+	MP_DATE_MONTH = 722, // (int) 5
+	MP_DATE_DAY = 723, // (int) 8
+
+	MP_TIME = 730, // (str) 16:08:02
+	MP_TIME_HOUR = 731, // (int) 16
+	MP_TIME_MINUTE = 732, // (int) 8
+	MP_TIME_SECOND = 733, // (int) 26
+
+	MP_FUNC = 740, // (tokens) void main(int argc, char *argv[])
+	MP_FUNC_RETURN = 741, // (tokens) void
+	MP_FUNC_NAME = 742, // (tokens) main
+	MP_FUNC_ARGS = 743, // (tokens) int argc, char *argv[]
+	MP_FUNC_ARGS_TYPES = 744, // (tokens) int, char *
+	MP_FUNC_ARGS_NAMES = 745, // (tokens) argc, argv
+	MP_FUNC_ARGS_COUNT = 746, // (int) 2
+	MP_FUNC_DEFINE_LINE = 747, // (int) function declaration position
+	MP_FUNC_LINE = 748, // (int) position relative to the function declaration
+
+	MP_TOKEN_TYPE = 760, // (token type) get IDENTIFIER type (static reflection)
+	MP_TOKEN_NAME = 761, // (str) get IDENTIFIER name (static reflection)
+#endif
+
+
+
+/*======================================================================*/
+/* Файл 8/19: D7\source\preprocessor\IPreprocessor.h */
+/*======================================================================*/
+
+#pragma once
+
+#include "../service/IBaseService.h"
+#include "../lexer/Token.h"
+
+#include <vector>
+#include <forward_list>
+#include <list>
+
+class IPreprocessor : public IBaseService
+{
+public: // CBaseService
+
+	// virtual bool Main(int argc, char* argv[]);
+
+	// Start preprocessing
+	virtual void RunProcessing() override = 0;
+
+	virtual bool RunFullCycle() override;
+
+	// std::cout all tokens
+	virtual void DebugPrint() const override;
+
+	// Reset state
+	virtual void Reset() override;
+
+protected: // CBaseService
+
+	virtual void Fatal(const std::string& message) const override;
+	virtual void Error(const std::string& message) const override;
+	virtual void Warning(const std::string& message) const override;
+	virtual void Success(const std::string& message) const override;
+
+	// std::string m_inputFilePath = "";
+	// std::string m_outputFilePath = "";
+
+public: // CPreprocessor
+
+	[[nodiscard]] bool LoadTokens(const std::string& filePath = "");
+	[[nodiscard]] bool SaveTokens(const std::string& filePath = "");
+	[[nodiscard]] bool SaveTokensAsCode(const std::string& filePath = "");
+
+	// Set tokens raw
+	void SetTokens(const std::vector<FToken>& tokens);
+	void SetTokens(const std::list<FToken>& tokens);
+	void SetTokens(std::list<FToken>&& tokens);
+
+	
+
+	const std::list<FToken>& GetTokens() const;
+	std::list<FToken> ExtractTokens();
+
+protected: // CPreprocessor
+
+	/*
+		The preprocessor runs in multiple passes. I once wrote a macro so tangled 
+		that it took the poor preprocessor 23 steps to expand it. Shifting the entire 
+		code 23 times would have killed the machine, but std::list saves the day.
+	*/
+	std::list<FToken> m_tokens;
+};
+
+
+
+
+/*======================================================================*/
+/* Файл 9/19: D7\source\service\IBaseService.h */
+/*======================================================================*/
+
+#pragma once
+#include <string>
+
+class IBaseService
+{
+public:
+
+	IBaseService() = default;
+	virtual ~IBaseService() = default;
+
+	// Example work as a tool with command line arguments
+	virtual bool Main(int argc, char* argv[]);
+
+	virtual void RunProcessing() = 0;
+	virtual bool RunFullCycle() = 0;
+
+	virtual void DebugPrint() const {};
+
+	virtual void Reset() = 0;
+
+protected:
+
+	virtual void Fatal(const std::string& message) const = 0;
+	virtual void Error(const std::string& message) const = 0;
+	virtual void Warning(const std::string& message) const = 0;
+	virtual void Success(const std::string& message) const = 0;
+
+	std::string m_inputFilePath = "";
+	std::string m_outputFilePath = "";
+};
+
+
+
+/*======================================================================*/
+/* Файл 10/19: D7\D7.cpp */
+/*======================================================================*/
+
+﻿#include <iostream>
+
+#include "source/lexer/Token.h"
+#include "source/lexer/CLexer.h"
+
+#include "source/preprocessor/IPreprocessor.h"
+#include "source/preprocessor/CStandartPreprocessor.h"
+
+#include "source/parser/AST.h"
+#include "source/parser/CParser.h"
+
+int main()
+{
+    std::string File_SourceCode = "test_code.d7";
+    std::string File_TokensAfterLexer = "test_code.lexer";
+    std::string File_TokensAfterPreprocessor = "test_code.tokens";
+    std::string File_ASTAfterParser = "test_code.ast";
+
+    CLexer* Lexer = new CLexer();
+    Lexer->LoadCode(File_SourceCode);
+    Lexer->RunProcessing();
+    Lexer->DebugPrint();
+    Lexer->SaveTokens(File_TokensAfterLexer);
+
+    CStandartPreprocessor* Preprocessor = new CStandartPreprocessor();
+    Preprocessor->LoadTokens(File_TokensAfterLexer);
+    Preprocessor->RunProcessing();
+    Preprocessor->DebugPrint();
+    Preprocessor->SaveTokensAsCode(File_TokensAfterPreprocessor);
+
+    CParser* Parser = new CParser();
+    Parser->LoadTokens(File_TokensAfterLexer);
+    Parser->RunProcessing();
+    Parser->DebugPrint();
+    Parser->SaveAST(File_TokensAfterPreprocessor);
+}
+
+
+
+/*======================================================================*/
+/* Файл 11/19: D7\source\lexer\CLexer.cpp */
+/*======================================================================*/
+
+#include "CLexer.h"
+#include "../Notify/Notify.h"
+#include <fstream>
+#include <iostream>
+
+inline constexpr size_t LEXEME_DEFAULT_RESERVE = 256;
+
+bool CLexer::LoadCode(const std::string& filePath)
+{
+    Reset();
+    if (!filePath.empty()) { m_inputFilePath = filePath; }
+
+    std::ifstream openedFile(m_inputFilePath, std::ios::binary);
+
+    if (!openedFile.is_open())
+    {
+        Error("Fail open file: \"" + m_inputFilePath + "\"");
+        return false;
+    }
+
+    Success("Succes open file: \"" + m_inputFilePath + "\"");
+
+    std::string line;
+    while (std::getline(openedFile, line))
+    {
+        m_code.push_back(line);
+    }
+
+    return true;
+}
+
+bool CLexer::SaveTokens(const std::string& filePath)
+{
+    if (!filePath.empty()) { m_outputFilePath = filePath; }
+
+    try
+    {
+        FToken::Serialize<std::vector<FToken>>(m_tokens, m_outputFilePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokens: " + std::string(error.what()));
+        return false;
+    }
+
+    return true;
+}
+
+void CLexer::SetCode(const std::vector<std::string>& code)
+{
+	Reset();
+
+    m_inputFilePath = "CLexer::SetCode()";
+	m_code = code;
+}
+
+void CLexer::SetCode(std::vector<std::string>&& code)
+{
+    Reset();
+
+    m_inputFilePath = "CLexer::SetCode()";
+    m_code = std::move(code);
+}
+
+void CLexer::SetCode(const std::string& code)
+{
+    m_code.clear();
+
+    size_t start = 0;
+    size_t end = code.find('\n');
+
+    while (end != std::string::npos) {
+        m_code.push_back(code.substr(start, end - start));
+        start = end + 1;
+        end = code.find('\n', start);
+    }
+
+    if (start < code.length()) 
+    {
+        m_code.push_back(code.substr(start));
+    }
+}
+
+void CLexer::RunProcessing()
+{
+    if (m_code.empty())
+    {
+        Warning("Empty code");
+        return;
+    }
+
+    m_tokens.clear();
+    std::string lexeme;
+    lexeme.reserve(LEXEME_DEFAULT_RESERVE);
+    uint8_t inBlockComment = 0;
+
+    auto FlushLexeme = [&](size_t line, size_t startPos, size_t endPos)
+        {
+            if (!lexeme.empty())
+            {
+                m_tokens.emplace_back(lexeme, line, startPos);
+                lexeme.clear();
+            }
+        };
+
+    for (size_t lineIdx = 0; lineIdx < m_code.size(); ++lineIdx)
+    {
+        const std::string& lineStr = m_code[lineIdx];
+        size_t len = lineStr.size();
+        bool inLineComment = false;
+        size_t lexemeStart = 0;
+
+        for (size_t i = 0; i < len; ++i)
+        {
+            char c = lineStr[i];
+
+            // Comments
+            if (inBlockComment > 0)
+            {
+                if (c == '/' && i + 1 < len && lineStr[i + 1] == '*') {
+                    inBlockComment++;
+                    ++i;
+                }
+                else if (c == '*' && i + 1 < len && lineStr[i + 1] == '/') {
+                    if (inBlockComment > 0) inBlockComment--;
+                    ++i;
+                }
+                continue;
+            }
+            if (inLineComment) continue;
+
+            if (!inLineComment && inBlockComment == 0)
+            {
+                if (i + 1 < len)
+                {
+                    std::string_view two(&lineStr[i], 2);
+                    if (two == "//") {
+                        FlushLexeme(lineIdx, lexemeStart, i - 1);
+                        inLineComment = true;
+                        ++i;
+                        continue;
+                    }
+                    if (two == "/*") {
+                        FlushLexeme(lineIdx, lexemeStart, i - 1);
+                        inBlockComment++;
+                        ++i;
+                        continue;
+                    }
+                }
+            }
+
+            // Strings and chars
+            if (c == '"' || c == '\'')
+            {
+                FlushLexeme(lineIdx, lexemeStart, i - 1);
+                lexemeStart = i;
+                std::string literal(1, c);
+                ++i;
+                while (i < len)
+                {
+                    char ch = lineStr[i];
+                    literal += ch;
+                    if (ch == '\\') {
+                        if (i + 1 < len) {
+                            literal += lineStr[i + 1];
+                            ++i;
+                        }
+                    }
+                    else if (ch == c) {
+                        ++i;
+                        break;
+                    }
+                    ++i;
+                }
+                m_tokens.emplace_back(std::move(literal), lineIdx, lexemeStart);
+                lexemeStart = i;
+                continue;
+            }
+
+            // Spaces
+            if (std::isspace(static_cast<unsigned char>(c)))
+            {
+                FlushLexeme(lineIdx, lexemeStart, i - 1);
+                lexemeStart = i + 1;
+                continue;
+            }
+
+            // Check 2-symbol separator
+            bool isSep = false;
+            if (i + 1 < len)
+            {
+                std::string_view two(&lineStr[i], 2);
+                if (FToken::internal::is_separator(two))
+                {
+                    FlushLexeme(lineIdx, lexemeStart, i - 1);
+                    m_tokens.emplace_back(std::string(two), lineIdx, i);
+                    ++i;
+                    isSep = true;
+                    lexemeStart = i + 1;
+                }
+            }
+
+            // Check 1-symbol separator
+            if (!isSep)
+            {
+                std::string_view one(&c, 1);
+                if (FToken::internal::is_separator(one))
+                {
+                    if (c == '.' && !lexeme.empty() && std::isdigit(static_cast<unsigned char>(lexeme.back())) &&
+                        i + 1 < len && std::isdigit(static_cast<unsigned char>(lineStr[i + 1])))
+                    {
+                        lexeme += c;
+                        continue;
+                    }
+
+                    FlushLexeme(lineIdx, lexemeStart, i - 1);
+                    m_tokens.emplace_back(std::string(one), lineIdx, i);
+                    isSep = true;
+                    lexemeStart = i + 1;
+                }
+            }
+
+            if (isSep) continue;
+
+            if (lexeme.empty())
+            {
+                lexemeStart = i;
+            }
+            lexeme += c;
+        }
+
+        FlushLexeme(lineIdx, lexemeStart, len - 1);
+        lexemeStart = len;
+    }
+}
+
+bool CLexer::RunFullCycle()
+{
+    if (!LoadCode())
+        return false;
+
+    RunProcessing();
+
+    if (!SaveTokens())
+        return false;
+
+    return true;
+}
+
+void CLexer::DebugPrint() const
+{
+    Warning("DebugPrint()");
+    for (const FToken& token : m_tokens)
+    {
+        std::cout << token.Dump() << '\n';
+    }
+}
+
+#if HAS_STD_SPAN == 1
+    std::span<FToken> CLexer::GetTokens()
+    {
+        return { m_tokens };
+    }
+#else
+    const std::vector<FToken>& CLexer::GetTokens()
+    {
+        return m_tokens;
+    }
+#endif
+
+
+
+std::vector<FToken> CLexer::ExtractTokens()
+{
+    return std::exchange(m_tokens, {});
+}
+
+void CLexer::Reset()
+{
+    m_inputFilePath = "";
+    m_outputFilePath = "";
+	m_code.clear();
+	m_tokens.clear();
+}
+
+void CLexer::Fatal(const std::string& message) const
+{
+    FatalBase(UNotifyFrom::LEXER, message);
+}
+
+void CLexer::Error(const std::string& message) const
+{
+    ErrorBase(UNotifyFrom::LEXER, message);
+}
+
+void CLexer::Warning(const std::string& message) const
+{
+    WarningBase(UNotifyFrom::LEXER, message);
+}
+
+void CLexer::Success(const std::string& message) const
+{
+    SuccessBase(UNotifyFrom::LEXER, message);
+}
+
+
+
+/*======================================================================*/
+/* Файл 12/19: D7\source\lexer\Token.cpp */
+/*======================================================================*/
+
+#include "Token.h"
+
+#include <unordered_map>
+#include <unordered_set>
+#include <iomanip>
+#include <sstream>
+
+const std::unordered_map<std::string_view, UTokenType> gl_stringToTokenType
+{
+    { "::", UTokenType::NAMESPACE },
+    { "#",  UTokenType::DIRECTIVE },
+    { "__", UTokenType::MACRO },
+    { "##", UTokenType::MACRO_S },
+
+    // math
+    { "+",  UTokenType::ADD },
+    { "-",  UTokenType::SUB },
+    { "*",  UTokenType::MUL },
+    { "/",  UTokenType::DIV },
+    { "%",  UTokenType::MOD },
+    { "**", UTokenType::POW },
+    { "++", UTokenType::INC },
+    { "--", UTokenType::DEC },
+
+    // logical operators
+    { "&&", UTokenType::AND },
+    { "||", UTokenType::OR },
+    { "!",  UTokenType::NOT },
+
+    // equal operators
+    { "==", UTokenType::EQUAL },
+    { "!=", UTokenType::NOT_EQUAL },
+    { "<",  UTokenType::LESS },
+    { ">",  UTokenType::GREATER },
+    { "<=", UTokenType::LESS_EQUAL },
+    { ">=", UTokenType::GREATER_EQUAL },
+
+    // assign
+    { "=", UTokenType::ASSIGN },
+    { "+=", UTokenType::ASSIGN_ADD },
+    { "-=", UTokenType::ASSIGN_SUB },
+    { "*=", UTokenType::ASSIGN_MUL },
+    { "/=", UTokenType::ASSIGN_DIV },
+    { "%=", UTokenType::ASSIGN_MOD },
+
+    // symbols
+    { ";", UTokenType::SEMICOLON },
+    { ",", UTokenType::COMMA },
+    { ".", UTokenType::POINT },
+    { "?", UTokenType::QUESTION },
+    { "&", UTokenType::AMPERSAND },
+
+    // brackets
+    { "{", UTokenType::LBRA },
+    { "}", UTokenType::RBRA },
+    { "(", UTokenType::LPAR },
+    { ")", UTokenType::RPAR },
+    { "[", UTokenType::LSQR },
+    { "]", UTokenType::RSQR },
+
+    // base func
+    { ":",      UTokenType::LABEL },
+    { "goto",   UTokenType::GOTO },
+    { "new",    UTokenType::NEW },
+    { "delete", UTokenType::DELETE },
+
+    // control flow
+    { "return", UTokenType::RETURN },
+    { "if", UTokenType::IF },
+    { "else", UTokenType::ELSE },
+    { "elif", UTokenType::ELIF },
+    { "do", UTokenType::DO_WHILE },
+    { "while", UTokenType::WHILE },
+    { "for", UTokenType::FOR },
+    { "break", UTokenType::BREAK },
+    { "continue", UTokenType::CONTINUE },
+    { "switch", UTokenType::SWITCH },
+    { "case", UTokenType::CASE },
+    { "default", UTokenType::DEFAULT },
+
+    // define
+    { "func", UTokenType::DEF_FUNC },
+    { "var",  UTokenType::DEF_VAR },
+    { "enum", UTokenType::DEF_ENUM },
+    { "struct", UTokenType::DEF_STRUCT },
+};
+
+const std::unordered_map<UTokenType, std::string_view> gl_tokenTypeToString = []
+{
+    std::unordered_map<UTokenType, std::string_view> result;
+    for (const auto& Pair : gl_stringToTokenType)
+        result[Pair.second] = Pair.first;
+
+    result.reserve(gl_stringToTokenType.size() + 6);
+
+    /* 1 */ result.emplace(UTokenType::IDENTIFIER, "IDENTIFIER" );
+    /* 2 */ result.emplace(UTokenType::INT,        "INT" );
+    /* 3 */ result.emplace(UTokenType::FLOAT,      "FLOAT" );
+    /* 4 */ result.emplace(UTokenType::STRING,     "STRING" );
+    /* 5 */ result.emplace(UTokenType::CHAR,       "CHAR" );
+    /* 6 */ result.emplace(UTokenType::BOOLEAN,    "BOOLEAN" );
+
+    return result;
+}();
+
+
+const std::unordered_set<UTokenType> gl_tokensSeparator
+{
+    UTokenType::NONE,
+
+    UTokenType::NAMESPACE, // ::
+    UTokenType::DIRECTIVE, // #
+    UTokenType::MACRO,     // __
+    UTokenType::MACRO_S,   // ##
+
+    // math operators
+    UTokenType::ADD, // +
+    UTokenType::SUB, // -
+    UTokenType::MUL, // *
+    UTokenType::DIV, // /
+    UTokenType::MOD, // %
+    UTokenType::POW, // **
+    UTokenType::INC, // ++
+    UTokenType::DEC, // --
+
+    // logical
+    UTokenType::AND,  // &&
+    UTokenType::OR,   // ||
+    UTokenType::NOT, // !
+
+    // equal operators
+    UTokenType::EQUAL,         // ==
+    UTokenType::NOT_EQUAL,     // !=
+    UTokenType::LESS,          // <
+    UTokenType::GREATER,       // >
+    UTokenType::LESS_EQUAL,    // <=
+    UTokenType::GREATER_EQUAL, // >=
+
+    // assign
+    UTokenType::ASSIGN,     // =
+    UTokenType::ASSIGN_ADD, // +=
+    UTokenType::ASSIGN_SUB, // -=
+    UTokenType::ASSIGN_MUL, // *=
+    UTokenType::ASSIGN_DIV, // /=
+    UTokenType::ASSIGN_MOD, // %=
+
+    // other symbols
+    UTokenType::SEMICOLON, // ;
+    UTokenType::COMMA,     // ,
+    UTokenType::POINT,     // .
+    UTokenType::QUESTION,  // ?
+    UTokenType::AMPERSAND, // &
+
+    // brackets
+    UTokenType::LBRA, // {
+    UTokenType::RBRA, // }
+    UTokenType::LPAR, // (
+    UTokenType::RPAR, // )
+    UTokenType::LSQR, // [
+    UTokenType::RSQR, // ]
+
+    // base func
+    UTokenType::LABEL, // :
+};
+
+std::string FToken::Dump() const
+{
+    std::ostringstream result;
+    std::string position = std::to_string(Line) + ":" + std::to_string(Row);
+
+    result << std::left
+        << std::setw(10) << position
+        << std::setw(20) << Lexeme
+        << internal::TokenTypeToString(Type);
+
+    return result.str();
+}
+
+constexpr bool FToken::internal::is_boolean(std::string_view lexeme)
+{
+    return lexeme == "false" || lexeme == "true";
+}
+
+constexpr bool FToken::internal::is_string(std::string_view lexeme)
+{
+    return lexeme.size() >= 2 && lexeme.front() == '"' && lexeme.back() == '"';
+}
+
+constexpr bool FToken::internal::is_char(std::string_view lexeme)
+{
+    return lexeme.size() >= 2 && lexeme.front() == '\'' && lexeme.back() == '\'';
+}
+
+constexpr bool FToken::internal::is_integer(std::string_view lexeme)
+{
+    if (lexeme.empty()) return false;
+
+    size_t indexBegin = 0;
+
+    if (lexeme.front() == '-' || lexeme.front() == '+')
+        indexBegin++;
+
+    if (indexBegin >= lexeme.size()) return false;
+
+    for (size_t i = indexBegin; i < lexeme.size(); ++i)
+        if (lexeme[i] < '0' || lexeme[i] > '9')
+            return false;
+    return true;
+}
+
+constexpr bool FToken::internal::is_double(std::string_view lexeme)
+{
+    if (lexeme.empty()) return false;
+
+    bool hasDigitBeforePoint = false;
+    bool hasPoint = false;
+    bool hasDigitAfterPoint = false;
+
+    size_t indexBegin = 0;
+    size_t indexEnd = lexeme.size();
+
+    if (lexeme.front() == '+' || lexeme.front() == '-')
+        indexBegin++;
+
+    if (indexBegin >= lexeme.size()) return false;
+
+    if (indexEnd > indexBegin && (lexeme.back() == 'f' || lexeme.back() == 'F'))
+        indexEnd--;
+
+    for (size_t i = indexBegin; i < indexEnd; ++i)
+    {
+        char c = lexeme[i];
+        if (c >= '0' && c <= '9')
+        {
+            if (!hasPoint) hasDigitBeforePoint = true;
+            else hasDigitAfterPoint = true;
+        }
+        else if (c == '.' && !hasPoint)
+        {
+            hasPoint = true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return hasPoint && (hasDigitBeforePoint || hasDigitAfterPoint);
+}
+
+bool FToken::internal::is_separator(std::string_view tokenType)
+{
+    return is_separatorType(StringToTokenType(tokenType));
+}
+
+bool FToken::internal::is_separatorType(UTokenType tokenType)
+{
+    return gl_tokensSeparator.find(tokenType) != gl_tokensSeparator.end();
+}
+
+
+std::string_view FToken::internal::TokenTypeToString(UTokenType tokenType)
+{
+    auto it = gl_tokenTypeToString.find(tokenType);
+    if (it != gl_tokenTypeToString.end())
+        return it->second; // Find
+
+    // Not find
+    static std::string invalid = "INVALID";
+    return invalid;
+}
+
+UTokenType FToken::internal::StringToTokenType(std::string_view lexeme)
+{
+    if (is_boolean(lexeme))
+        return UTokenType::BOOLEAN;
+
+    if (is_integer(lexeme))
+        return UTokenType::INT;
+
+    if (is_double(lexeme))
+        return UTokenType::FLOAT;
+
+    if (is_string(lexeme))
+        return UTokenType::STRING;
+
+    if (is_char(lexeme))
+        return UTokenType::CHAR;
+
+    auto it = gl_stringToTokenType.find(lexeme);
+    if (it != gl_stringToTokenType.end())
+        return it->second; // Find
+
+    return UTokenType::IDENTIFIER;
+}
+
+std::ostream& operator<<(std::ostream& os, const FToken& token)
+{
+    size_t len = token.Lexeme.size();
+    os.write(reinterpret_cast<const char*>(&len), sizeof(len));
+    os.write(token.Lexeme.c_str(), len);
+
+    os.write(reinterpret_cast<const char*>(&token.Type), sizeof(token.Type));
+    os.write(reinterpret_cast<const char*>(&token.Line), sizeof(token.Line));
+    os.write(reinterpret_cast<const char*>(&token.Row), sizeof(token.Row));
+
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenGenerate), sizeof(token.Modifiers.IsTokenGenerate));
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenValueChanged), sizeof(token.Modifiers.IsTokenValueChanged));
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenTypeChanged), sizeof(token.Modifiers.IsTokenTypeChanged));
+    os.write(reinterpret_cast<const char*>(&token.Modifiers.IsTokenCopyFromAnywhere), sizeof(token.Modifiers.IsTokenCopyFromAnywhere));
+
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, FToken& token)
+{
+    size_t len;
+    is.read(reinterpret_cast<char*>(&len), sizeof(len));
+    token.Lexeme.resize(len);
+    is.read(&token.Lexeme[0], len);
+
+    is.read(reinterpret_cast<char*>(&token.Type), sizeof(token.Type));
+    is.read(reinterpret_cast<char*>(&token.Line), sizeof(token.Line));
+    is.read(reinterpret_cast<char*>(&token.Row), sizeof(token.Row));
+
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenGenerate), sizeof(token.Modifiers.IsTokenGenerate));
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenValueChanged), sizeof(token.Modifiers.IsTokenValueChanged));
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenTypeChanged), sizeof(token.Modifiers.IsTokenTypeChanged));
+    is.read(reinterpret_cast<char*>(&token.Modifiers.IsTokenCopyFromAnywhere), sizeof(token.Modifiers.IsTokenCopyFromAnywhere));
+
+    return is;
+}
+
+
+
+/*======================================================================*/
+/* Файл 13/19: D7\source\notify\Notify.cpp */
+/*======================================================================*/
+
+#include "Notify.h"
+#include <iostream>
+
+
+void FatalBase(UNotifyFrom fatalType, const std::string& message)
+{
+    std::string fatalMessage;
+
+    switch (fatalType)
+    {
+    case UNotifyFrom::LEXER:
+    {
+        fatalMessage = "Lexical FATAL! ";
+        break;
+    }
+    case UNotifyFrom::PREPROCESSOR:
+    {
+        fatalMessage = "Preprocessing FATAL! ";
+        break;
+    }
+    case UNotifyFrom::PARSER:
+    {
+        fatalMessage = "Syntax FATAL! ";
+        break;
+    }
+    case UNotifyFrom::SEMANTIC:
+    {
+        fatalMessage = "Semantic FATAL! ";
+        break;
+    }
+    case UNotifyFrom::CODE_GENERATION:
+    {
+        fatalMessage = "Code generation FATAL! ";
+        break;
+    }
+    }
+
+    fatalMessage += message + '\n';
+
+    std::cout << fatalMessage;
+
+    throw std::logic_error(fatalMessage);
+}
+
+void ErrorBase(UNotifyFrom errorType, const std::string& message)
+{
+    std::string errorMessage;
+
+    switch (errorType)
+    {
+        case UNotifyFrom::LEXER:
+        {
+            errorMessage = "Lexical error! ";
+            break;
+        }
+        case UNotifyFrom::PREPROCESSOR:
+        {
+            errorMessage = "Preprocessing error! ";
+            break;
+        }
+        case UNotifyFrom::PARSER:
+        {
+            errorMessage = "Syntax error! ";
+            break;
+        }
+        case UNotifyFrom::SEMANTIC:
+        {
+            errorMessage = "Semantic error! ";
+            break;
+        }
+        case UNotifyFrom::CODE_GENERATION:
+        {
+            errorMessage = "Code generation error! ";
+            break;
+        }
+    }
+
+    errorMessage += message + '\n';
+
+    std::cout << errorMessage;
+}
+
+void WarningBase(UNotifyFrom warningType, const std::string& message)
+{
+    std::string warningMessage;
+
+    switch (warningType)
+    {
+        case UNotifyFrom::LEXER:
+        {
+            warningMessage = "Lexical warning. ";
+            break;
+        }
+        case UNotifyFrom::PREPROCESSOR:
+        {
+            warningMessage = "Preprocessing warning. ";
+            break;
+        }
+        case UNotifyFrom::PARSER:
+        {
+            warningMessage = "Syntax warning. ";
+            break;
+        }
+        case UNotifyFrom::SEMANTIC:
+        {
+            warningMessage = "Semantic warning. ";
+            break;
+        }
+        case UNotifyFrom::CODE_GENERATION:
+        {
+            warningMessage = "Code generation warning. ";
+            break;
+        }
+    }
+
+    warningMessage += message + '\n';
+
+    std::cout << warningMessage;
+}
+
+void SuccessBase(UNotifyFrom succesType, const std::string& message)
+{
+    std::string successMessage;
+
+    switch (succesType)
+    {
+        case UNotifyFrom::LEXER:
+        {
+            successMessage = "Lexical success. ";
+            break;
+        }
+        case UNotifyFrom::PREPROCESSOR:
+        {
+            successMessage = "Preprocessing success. ";
+            break;
+        }
+        case UNotifyFrom::PARSER:
+        {
+            successMessage = "Syntax success. ";
+            break;
+        }
+        case UNotifyFrom::SEMANTIC:
+        {
+            successMessage = "Semantic success. ";
+            break;
+        }
+        case UNotifyFrom::CODE_GENERATION:
+        {
+            successMessage = "Code generation success. ";
+            break;
+        }
+    }
+
+    successMessage += message + '\n';
+
+    std::cout << successMessage;
+}
+
+
+
+/*======================================================================*/
+/* Файл 14/19: D7\source\parser\AST.cpp */
+/*======================================================================*/
+
+#include "AST.h"
+
+#include <unordered_map>
+
+const std::unordered_map<std::string_view, UNodeType> gl_stringToTokenType
+{
+    { "None",         UNodeType::None },
+
+    { "BlockCode",    UNodeType::BlockCode },
+    { "BlockMath",    UNodeType::BlockMath },
+    { "BlockArgs",    UNodeType::BlockArgs },
+
+    { "Func",         UNodeType::Func },
+    { "Variable",     UNodeType::Variable },
+    { "Setter",     UNodeType::Setter },
+
+    { "Name",         UNodeType::Name },
+    { "Type",         UNodeType::Type },
+    { "Math",         UNodeType::Math },
+};
+
+const std::unordered_map<UNodeType, std::string_view> gl_tokenTypeToString = []
+    {
+        std::unordered_map<UNodeType, std::string_view> result;
+        for (const auto& Pair : gl_stringToTokenType)
+            result[Pair.second] = Pair.first;
+
+        return result;
+    }();
+
+std::string_view FASTNode::internal::NodeTypeToString(UNodeType nodeType)
+{
+    auto it = gl_tokenTypeToString.find(nodeType);
+    if (it != gl_tokenTypeToString.end())
+        return it->second; // Find
+
+    // Not find
+    static std::string invalid = "None";
+    return invalid;
+}
+
+UNodeType FASTNode::internal::StringToNodeType(std::string_view string)
+{
+    auto it = gl_stringToTokenType.find(string);
+    if (it != gl_stringToTokenType.end())
+        return it->second; // Find
+
+    return UNodeType::None;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const FASTNode& node)
+{
+    os.write(reinterpret_cast<const char*>(&node.Type), sizeof(node.Type));
+    if (!os.good()) throw std::runtime_error("Error writing node type");
+
+    os << node.Token;
+    if (!os.good()) throw std::runtime_error("Error writing node token");
+
+    size_t childCount = node.ChildNodes.size();
+    os.write(reinterpret_cast<const char*>(&childCount), sizeof(childCount));
+    if (!os.good()) throw std::runtime_error("Error writing child count");
+
+    for (const auto& child : node.ChildNodes)
+    {
+        if (child)
+        {
+            os << *child;
+        }
+    }
+
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, FASTNode& node)
+{
+    is.read(reinterpret_cast<char*>(&node.Type), sizeof(node.Type));
+    if (!is.good()) throw std::runtime_error("Error reading node type");
+
+    is >> node.Token;
+    if (!is.good()) throw std::runtime_error("Error reading node token");
+
+    size_t childCount = 0;
+    is.read(reinterpret_cast<char*>(&childCount), sizeof(childCount));
+    if (!is.good()) throw std::runtime_error("Error reading child count");
+
+    node.ChildNodes.clear();
+    node.ChildNodes.reserve(childCount);
+    for (size_t i = 0; i < childCount; ++i)
+    {
+        auto child = std::make_unique<FASTNode>();
+        is >> *child;
+        node.ChildNodes.push_back(std::move(child));
+    }
+
+    return is;
+}
+
+void FASTNode::Serialize(FASTNode* root, const std::string& filename)
+{
+    std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Cannot open file for writing: " + filename);
+    }
+
+    if (root)
+    {
+        file << *root;
+    }
+    else
+    {
+        throw std::runtime_error("Cannot serialize null root node");
+    }
+
+    file.close();
+}
+
+FASTNode FASTNode::Deserialize(const std::string& filename)
+{
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Cannot open file for reading: " + filename);
+    }
+
+    FASTNode root;
+    file >> root;
+
+    file.close();
+    return std::exchange(root, {});
+}
+
+
+
+/*======================================================================*/
+/* Файл 15/19: D7\source\parser\CParser.cpp */
+/*======================================================================*/
+
+#include "CParser.h"
+#include "../Notify/Notify.h"
+#include <cctype>
+
+void CParser::RunProcessing()
+{
+    if (m_tokens.empty())
+    {
+        Error("No tokens to parse");
+        return;
+    }
+
+    m_rootNode = FASTNode();
+    m_rootNode.Type = UNodeType::Program;
+
+    try
+    {
+        TryParseAs_Program();
+    }
+    catch (const std::runtime_error& e)
+    {
+        Fatal(std::string("Parse error: ") + e.what());
+    }
+}
+
+bool CParser::RunFullCycle()
+{
+    if (!LoadTokens()) return false;
+    RunProcessing();
+    if (!SaveAST()) return false;
+    return true;
+}
+
+void CParser::DebugPrint() const
+{
+    Warning("DebugPrint()");
+    std::cout << m_rootNode.Dump() << '\n';
+}
+
+void CParser::Reset()
+{
+    m_inputFilePath.clear();
+    m_outputFilePath.clear();
+    m_tokens.clear();
+    m_rootNode = FASTNode();
+}
+
+bool CParser::LoadTokens(const std::string& filePath)
+{
+    if (!filePath.empty()) m_inputFilePath = filePath;
+    try
+    {
+        m_tokens = FToken::Deserialize<std::vector<FToken>>(m_inputFilePath);
+        Success("LoadTokens: " + m_inputFilePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("LoadTokens: " + std::string(error.what()));
+        return false;
+    }
+    return true;
+}
+
+bool CParser::SaveTokens(const std::string& filePath)
+{
+    if (!filePath.empty()) m_outputFilePath = filePath;
+    try
+    {
+        FToken::Serialize<std::vector<FToken>>(m_tokens, m_outputFilePath);
+        Success("SaveTokens: " + m_outputFilePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokens: " + std::string(error.what()));
+        return false;
+    }
+    return true;
+}
+
+bool CParser::SaveAST(const std::string& filePath)
+{
+    if (!filePath.empty()) m_outputFilePath = filePath;
+    try
+    {
+        FASTNode::Serialize(&m_rootNode, m_outputFilePath);
+        Success("SaveAST: " + m_outputFilePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveAST: " + std::string(error.what()));
+        return false;
+    }
+    return true;
+}
+
+void CParser::SetTokens(const std::vector<FToken>& tokens)
+{
+    Reset();
+    m_inputFilePath = "CParser::SetTokens()";
+    m_tokens = tokens;
+}
+
+void CParser::SetTokens(const std::list<FToken>& tokens)
+{
+    Reset();
+    m_inputFilePath = "CParser::SetTokens()";
+    m_tokens.assign(tokens.begin(), tokens.end());
+}
+
+void CParser::SetTokens(std::vector<FToken>&& tokens)
+{
+    Reset();
+    m_inputFilePath = "CParser::SetTokens()";
+    m_tokens = std::move(tokens);
+}
+
+void CParser::Fatal(const std::string& message) const { FatalBase(UNotifyFrom::PARSER, message); }
+void CParser::Error(const std::string& message) const { ErrorBase(UNotifyFrom::PARSER, message); }
+void CParser::Warning(const std::string& message) const { WarningBase(UNotifyFrom::PARSER, message); }
+void CParser::Success(const std::string& message) const { SuccessBase(UNotifyFrom::PARSER, message); }
+
+
+
+/*======================================================================*/
+/* Файл 16/19: D7\source\parser\CParserParsing.cpp */
+/*======================================================================*/
+
+#include "CParser.h"
+#include "../Notify/Notify.h"
+#include <cctype>
+#include <stack>
+
+// Global static func
+// Global var
+void CParser::TryParseAs_Program()
+{
+	int l_current = 0;
+
+	std::unique_ptr<FASTNode> ParsedNode = nullptr;
+	while (l_current < m_tokens.size())
+	{
+		ParsedNode = nullptr;
+
+		{
+			CParser::URetState StateRet = TryParseAs_Func(l_current, ParsedNode);
+
+			if (StateRet == CParser::URetState::Yes)
+			{
+				m_rootNode.AddChild(std::move(ParsedNode));
+				continue;
+			}
+			else if(StateRet == CParser::URetState::Fail)
+			{
+				Error(std::string("TryParseAs_Program:TryParseAs_Func"));
+				return;
+			}
+		}
+
+		{
+			CParser::URetState StateRet = TryParseAs_Var(l_current, ParsedNode);
+
+			if (StateRet == CParser::URetState::Yes)
+			{
+				m_rootNode.AddChild(std::move(ParsedNode));
+				continue;
+			}
+			else if (StateRet == CParser::URetState::Fail)
+			{
+				Error(std::string("TryParseAs_Program:TryParseAs_Var"));
+				return;
+			}
+		}
+
+		// Error
+		// Can't parse
+		return;
+	}
+}
+
+// Height level
+
+CParser::URetState CParser::TryParseAs_Func(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	m_tokens; // For debug
+
+	/* func */
+	if (!ConsumeToken(l_current, UTokenType::DEF_FUNC))
+		return CParser::URetState::No; // This not function
+
+	/* int32 */
+	std::unique_ptr<FASTNode> Node_Type;
+	if (!ParseAs_Type(l_current, Node_Type) || Node_Type == nullptr)
+		return CParser::URetState::Fail;
+
+	/* main */
+	std::unique_ptr<FASTNode> Node_Name;
+	if (!ParseAs_Name(l_current, Node_Name) || Node_Name == nullptr)
+		return CParser::URetState::Fail;
+
+	/* (int argc, char *argv[]) */
+
+	std::unique_ptr<FASTNode> Node_Args;
+	if (!ParseAs_BlockArgs(l_current, Node_Args) || Node_Args == nullptr)
+		return CParser::URetState::Fail;
+
+	// Define only, without implementation ;
+	if (ConsumeToken(l_current, UTokenType::SEMICOLON /* ; */))
+	{
+		Node = std::make_unique<FASTNode>(UNodeType::Func);
+		Node->AddChild(std::move(Node_Type));
+		Node->AddChild(std::move(Node_Name));
+		Node->AddChild(std::move(Node_Args));
+
+		return CParser::URetState::Yes;
+	}
+	// Define with implementation {
+	else if(PeekToken(l_current, UTokenType::LBRA /* { */))
+	{
+		std::unique_ptr<FASTNode> Node_Block;
+		if (!ParseAs_BlockCode(l_current, Node_Block) || Node_Block == nullptr)
+			return CParser::URetState::Fail;
+
+		Node = std::make_unique<FASTNode>(UNodeType::Func);
+		Node->AddChild(std::move(Node_Type));
+		Node->AddChild(std::move(Node_Name));
+		Node->AddChild(std::move(Node_Args));
+		Node->AddChild(std::move(Node_Block));
+
+		return CParser::URetState::Yes;
+	}
+
+	// 26: After void main(int argc, char *argv[])  must be ';' or \"{}\". Now end on: ")"
+	Error(std::to_string(Node_Type->Token.Line) + ": After " + Node_Type->Token.Lexeme + ' ' + Node_Name->Token.Lexeme + ' ' +
+		Node_Args->Token.Lexeme + " must be ';' or \"{}\". Now end on: \"" + m_tokens[l_current].Lexeme + '\"');
+
+	return CParser::URetState::Fail;
+}
+
+CParser::URetState CParser::TryParseAs_Var(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	m_tokens; // For debug
+
+	/* func */
+	if (!ConsumeToken(l_current, UTokenType::DEF_VAR))
+		return CParser::URetState::No; // This not variable
+
+	/* int32 */
+	std::unique_ptr<FASTNode> Node_Type;
+	if (!ParseAs_Type(l_current, Node_Type) || Node_Type == nullptr)
+		return CParser::URetState::Fail;
+
+	/* main */
+	std::unique_ptr<FASTNode> Node_Name;
+	if (!ParseAs_Name(l_current, Node_Name) || Node_Name == nullptr)
+		return CParser::URetState::Fail;
+
+	// Define only, without implementation ;
+	if (ConsumeToken(l_current, UTokenType::SEMICOLON /* ; */))
+	{
+		Node = std::make_unique<FASTNode>(UNodeType::Variable);
+		Node->AddChild(std::move(Node_Type));
+		Node->AddChild(std::move(Node_Name));
+
+		return CParser::URetState::Yes;
+	}
+	// Define with implementation {
+	else if (PeekToken(l_current, UTokenType::ASSIGN /* = */))
+	{
+		std::unique_ptr<FASTNode> Node_Math;
+		if (!ParseAs_BlockMath(l_current, Node_Math) || Node_Math == nullptr)
+			return CParser::URetState::Fail;
+		
+		Node = std::make_unique<FASTNode>(UNodeType::Variable);
+		Node->AddChild(std::move(Node_Type));
+		Node->AddChild(std::move(Node_Name));
+		Node->AddChild(std::move(Node_Math));
+
+		return CParser::URetState::Yes;
+	}
+
+	// 26: After var world must be ';' or "=". Now end on: ")"
+	Error(std::to_string(Node_Type->Token.Line) + ": After " + Node_Type->Token.Lexeme + ' ' + Node_Name->Token.Lexeme + " must be ';' or \'=\'. Now end on: \"" + m_tokens[l_current].Lexeme + '\"');
+
+	return CParser::URetState::Fail;
+}
+
+// Medium level
+
+bool CParser::ParseAs_BlockCode(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	if (!ConsumeTokenThrow(l_current, UTokenType::LBRA /* { */, "ParseAs_BlockCode. Miss \'{\'"))
+		return false;
+
+	Node = std::make_unique<FASTNode>(UNodeType::BlockCode);
+
+	std::unique_ptr<FASTNode> ParsedNode = nullptr;
+
+	while (l_current < m_tokens.size())
+	{
+		ParsedNode = nullptr;
+
+		{
+			CParser::URetState StateRet = TryParseAs_Var(l_current, ParsedNode);
+
+			if (StateRet == CParser::URetState::Yes)
+			{
+				Node->AddChild(std::move(ParsedNode));
+				continue;
+			}
+			else if (StateRet == CParser::URetState::Fail)
+			{
+				Error(std::string("ParseAs_BlockCode:TryParseAs_Var"));
+				return false;
+			}
+		}
+
+		break;
+	}
+
+	while (!ConsumeToken(l_current, UTokenType::RBRA /* } */));
+
+	return true;
+}
+
+bool CParser::ParseAs_BlockArgs(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	if (!ConsumeTokenThrow(l_current, UTokenType::LPAR /* ( */, "ParseAs_BlockArgs. Miss \'(\'"))
+		return false;
+
+	Node = std::make_unique<FASTNode>(UNodeType::BlockArgs);
+
+	while (!ConsumeToken(l_current, UTokenType::RPAR /* ) */));
+
+	return true;
+}
+
+bool CParser::ParseAs_BlockMath(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	if (!ConsumeTokenThrow(l_current, UTokenType::ASSIGN /* = */, "ParseAs_BlockArgs. Miss \'=\'"))
+		return false;
+
+	Node = std::make_unique<FASTNode>(UNodeType::BlockMath);
+
+	int indexFrom = l_current;
+	
+	while (!PeekToken(l_current, UTokenType::SEMICOLON /* ; */)) l_current++;
+
+	std::vector<FToken> Tokens;
+	if (!ParseAs_MathShuntingYard(indexFrom, l_current, Tokens))
+		return false;
+
+	if (!MSY_To_BlockMath(std::move(Tokens), Node))
+		return false;
+
+	l_current++;
+
+	return true;
+}
+
+// Low level
+
+bool CParser::ParseAs_Name(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	if (!PeekTokenThrow(l_current, UTokenType::IDENTIFIER, "ParseAs_Name fail, token index: " + std::to_string(l_current) + ". Dump: " + m_tokens[l_current].Dump()))
+		return false;
+
+	Node = std::make_unique<FASTNode>(UNodeType::Name);
+	Node->Token = m_tokens[l_current];
+	l_current++;
+
+	return true;
+}
+
+bool CParser::ParseAs_Type(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	if (!PeekTokenThrow(l_current, UTokenType::IDENTIFIER, "ParseAs_Type fail, token index: " + std::to_string(l_current) + ". Dump: " + m_tokens[l_current].Dump()))
+		return false;
+
+	Node = std::make_unique<FASTNode>(UNodeType::Type);
+	Node->Token = m_tokens[l_current];
+
+	l_current++;
+	return true;
+}
+
+bool CParser::ParseAs_Arg(int& l_current, std::unique_ptr<FASTNode>& Node)
+{
+	return true;
+}
+
+bool IsOperator(const FToken& Token)
+{
+	return
+		Token.Type == UTokenType::ADD ||
+		Token.Type == UTokenType::SUB ||
+		Token.Type == UTokenType::MUL ||
+		Token.Type == UTokenType::DIV ||
+		Token.Type == UTokenType::MOD;
+}
+bool IsValue(const FToken& Token)
+{
+	return
+		Token.Type == UTokenType::INT ||
+		Token.Type == UTokenType::FLOAT ||
+		Token.Type == UTokenType::STRING ||
+		Token.Type == UTokenType::CHAR ||
+		Token.Type == UTokenType::BOOLEAN ||
+		Token.Type == UTokenType::IDENTIFIER;
+}
+int GetIntensity(const FToken& Token)
+{
+	switch (Token.Type)
+	{
+	case UTokenType::ADD: return 2;
+	case UTokenType::SUB: return 2;
+	case UTokenType::MUL: return 3;
+	case UTokenType::DIV: return 3;
+	case UTokenType::MOD: return 3;
+	default: return 0;
+	}
+}
+
+bool CParser::ParseAs_MathShuntingYard(int from, int to, std::vector<FToken>& TokensOutput)
+{
+	TokensOutput.empty();
+	std::stack<FToken> TokensStack;
+
+	for(int i = from; i < to; i++)
+	{
+		FToken& Token = m_tokens[i];
+
+		Token.Dump();
+
+		if (IsValue(Token))
+		{
+			TokensOutput.emplace_back(Token);
+		}
+		else if (IsOperator(Token))
+		{
+			while (!TokensStack.empty() && IsOperator(TokensStack.top()) &&
+				GetIntensity(TokensStack.top()) >= GetIntensity(Token))
+			{
+				TokensOutput.push_back(TokensStack.top());
+				TokensStack.pop();
+			}
+
+			TokensStack.push(Token);
+		}
+		else if (Token.Type == UTokenType::LPAR /* ( */)
+		{
+			TokensStack.push(Token);
+		}
+		else if (Token.Type == UTokenType::RPAR /* ) */)
+		{
+			while (!TokensStack.empty() && TokensStack.top().Type != UTokenType::LPAR /* ( */)
+			{
+				TokensOutput.push_back(TokensStack.top());
+				TokensStack.pop();
+			}
+			if (TokensStack.empty()) return false;
+			TokensStack.pop();
+		}
+		else
+		{
+			// ERR
+			return false;
+		}
+	}
+
+	while (!TokensStack.empty())
+	{
+		TokensOutput.push_back(TokensStack.top());
+		TokensStack.pop();
+	}
+
+	std::cout << "Dump after ParseAs_MathShuntingYard\n";
+	for (const FToken& t : TokensOutput)
+	{
+		std::cout << t.Dump() << '\n';
+	}
+	return true;
+}
+
+bool CParser::MSY_To_BlockMath(std::vector<FToken>&& Tokens, std::unique_ptr<FASTNode>& Node)
+{
+	std::stack<std::unique_ptr<FASTNode>> st;
+
+	for (const FToken& token : Tokens)
+	{
+		if (IsValue(token))
+		{
+			auto leaf = std::make_unique<FASTNode>(UNodeType::Math);
+			leaf->Token = token;
+			st.push(std::move(leaf));
+		}
+		else if (IsOperator(token)) 
+		{
+			if (st.size() < 2)
+			{
+				Error("MSY_To_BlockMath: Not enough operands for operator " + token.Lexeme);
+				return false;
+			}
+
+			auto right = std::move(st.top()); st.pop();
+			auto left = std::move(st.top()); st.pop();
+
+			auto opNode = std::make_unique<FASTNode>(UNodeType::Math);
+			opNode->Token = token;
+			opNode->AddChild(std::move(left));
+			opNode->AddChild(std::move(right));
+
+			st.push(std::move(opNode));
+		}
+		else
+		{
+			Error("MSY_To_BlockMath: Unexpected token type in RPN: " + token.Lexeme);
+			return false;
+		}
+	}
+
+	if (st.size() != 1)
+	{
+		Error("MSY_To_BlockMath: Invalid RPN, stack size = " + std::to_string(st.size()));
+		return false;
+	}
+
+	Node = std::make_unique<FASTNode>(UNodeType::BlockMath);
+	Node->AddChild(std::move(st.top()));
+
+	return true;
+}
+
+// Raw level
+
+bool CParser::PeekToken(int& l_current, UTokenType TokenType)
+{
+	return m_tokens[l_current].Type == TokenType;
+}
+
+bool CParser::PeekTokenThrow(int& l_current, UTokenType TokenType, std::string_view failMessage)
+{
+	if (m_tokens[l_current].Type == TokenType)
+	{
+		return true;
+	}
+
+	Error(std::to_string(m_tokens[l_current].Line) + ": " + std::string(failMessage));
+	return false;
+}
+
+bool CParser::ConsumeToken(int& l_current, UTokenType TokenType)
+{
+	if (m_tokens[l_current].Type == TokenType)
+	{
+		l_current++;
+		return true;
+	}
+	
+	return false;
+}
+
+bool CParser::ConsumeTokenThrow(int& l_current, UTokenType TokenType, std::string_view failMessage)
+{
+	if (m_tokens[l_current].Type == TokenType)
+	{
+		l_current++;
+		return true;
+	}
+	
+	Error(std::to_string(m_tokens[l_current].Line) + ": " + std::string(failMessage));
+	return false;
+}
+
+
+
+/*======================================================================*/
+/* Файл 17/19: D7\source\preprocessor\CStandartPreprocessor.cpp */
+/*======================================================================*/
+
+#include "CStandartPreprocessor.h"
+
+void CStandartPreprocessor::RunProcessing()
+{
+    DirectiveCollectUsing();
+    DirectiveApplyUsing();
+}
+
+void CStandartPreprocessor::Reset()
+{
+	m_inputFilePath = "";
+	m_outputFilePath = "";
+	m_tokens.clear();
+
+	m_usings.clear();
+}
+
+int CStandartPreprocessor::FindNextPreprocessorDirective()
+{
+    int index = -1;
+
+	for (const FToken& token : m_tokens)
+	{
+		index++;
+
+		if (token.Type == UTokenType::DIRECTIVE)
+		{
+			return index;
+		}
+	}
+
+	return -1;
+}
+
+void CStandartPreprocessor::DirectiveCollectUsing()
+{
+    auto it = m_tokens.begin();
+
+    while (it != m_tokens.end())
+    {
+        if (std::distance(it, m_tokens.end()) < 4)
+            break;
+
+        if (it->Lexeme != "#" || std::next(it, 1)->Lexeme != "using")
+        {
+            ++it;
+            continue;
+        }
+
+        std::string usingName = std::next(it, 2)->Lexeme;
+        FToken usingValue = *std::next(it, 3);
+
+        if (auto collectUsing = m_usings.find(usingName);
+            collectUsing != m_usings.end() && collectUsing->second.IsValid())
+        {
+            if (usingValue.Lexeme != collectUsing->second.Lexeme ||
+                usingValue.Type != collectUsing->second.Type)
+            {
+                Fatal("Already determined USING: \"" + usingValue.Dump() +
+                    "\" USING in \"" + collectUsing->second.Dump());
+            } 
+        }
+
+        m_usings[usingName] = usingValue;
+
+        it = m_tokens.erase(it, std::next(it, 4));
+    }
+}
+
+void CStandartPreprocessor::DirectiveApplyUsing()
+{
+    for (auto it = m_tokens.begin(); it != m_tokens.end(); ++it)
+    {
+        if (auto collectUsing = m_usings.find(it->Lexeme);
+            collectUsing != m_usings.end() && collectUsing->second.IsValid())
+        {
+            it->Lexeme = collectUsing->second.Lexeme;
+            it->Type = collectUsing->second.Type;
+            it->Modifiers.IsTokenValueChanged = true;
+            it->Modifiers.IsTokenTypeChanged = true;
+        }
+    }
+}
+
+
+
+/*======================================================================*/
+/* Файл 18/19: D7\source\preprocessor\IPreprocessor.cpp */
+/*======================================================================*/
+
+#include "IPreprocessor.h"
+#include "../Notify/Notify.h"
+#include <fstream>
+#include <iostream>
+
+bool IPreprocessor::RunFullCycle()
+{
+    if (!LoadTokens())
+        return false;
+
+    RunProcessing();
+
+    if (!SaveTokens())
+        return false;
+
+    return true;
+}
+
+bool IPreprocessor::LoadTokens(const std::string& filePath)
+{
+    if (!filePath.empty()) { m_inputFilePath = filePath; }
+
+    try
+    {
+        m_tokens = FToken::Deserialize<std::list<FToken>>(m_inputFilePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("LoadTokens: " + std::string(error.what()));
+        return false;
+    }
+
+    Success("LoadTokens: " + filePath);
+    return true;
+}
+
+bool IPreprocessor::SaveTokens(const std::string& filePath)
+{
+    if (!filePath.empty()) { m_outputFilePath = filePath; }
+
+    try
+    {
+        FToken::Serialize<std::list<FToken>>(m_tokens, filePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokens: " + std::string(error.what()));
+        return false;
+    }
+
+    Success("SaveTokens: " + filePath);
+    return true;
+}
+
+bool IPreprocessor::SaveTokensAsCode(const std::string& filePath)
+{
+    if (!filePath.empty()) { m_outputFilePath = filePath; }
+
+    try
+    {
+        FToken::SerializeAsCode<std::list<FToken>>(m_tokens, filePath);
+    }
+    catch (const std::runtime_error& error)
+    {
+        Error("SaveTokensAsCode: " + std::string(error.what()));
+        return false;
+    }
+
+    Success("SaveTokensAsCode: " + filePath);
+    return true;
+}
+
+void IPreprocessor::SetTokens(const std::vector<FToken>& tokens)
+{
+    m_inputFilePath = "IPreprocessor::SetTokens()";
+    m_tokens = { tokens.begin(), tokens.end() };
+}
+
+void IPreprocessor::SetTokens(const std::list<FToken>& tokens)
+{
+    m_inputFilePath = "IPreprocessor::SetTokens()";
+    m_tokens = tokens;
+}
+
+void IPreprocessor::SetTokens(std::list<FToken>&& tokens)
+{
+    m_inputFilePath = "IPreprocessor::SetTokens()";
+    m_tokens = std::move(tokens);
+}
+
+void IPreprocessor::DebugPrint() const
+{
+    Warning("DebugPrint()");
+    for (const FToken& token : m_tokens)
+    {
+        std::cout << token.Dump() << '\n';
+    }
+}
+
+const std::list<FToken>& IPreprocessor::GetTokens() const
+{
+    return m_tokens;
+}
+
+std::list<FToken> IPreprocessor::ExtractTokens()
+{
+	return std::exchange(m_tokens, {});
+}
+
+void IPreprocessor::Reset()
+{
+    m_inputFilePath = "";
+    m_outputFilePath = "";
+	m_tokens.clear();
+}
+
+void IPreprocessor::Fatal(const std::string& message) const
+{
+    FatalBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+void IPreprocessor::Error(const std::string& message) const
+{
+    ErrorBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+void IPreprocessor::Warning(const std::string& message) const
+{
+    WarningBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+void IPreprocessor::Success(const std::string& message) const
+{
+    SuccessBase(UNotifyFrom::PREPROCESSOR, message);
+}
+
+
+
+/*======================================================================*/
+/* Файл 19/19: D7\source\service\IBaseService.cpp */
+/*======================================================================*/
+
+#include "IBaseService.h"
+
+bool IBaseService::Main(int argc, char* argv[])
+{
+    if (argc < 3)
+    {
+        Warning("[1] input file, [2] output file, [3+]  -dp/--debugPrint");
+        return false;
+    }
+
+    m_inputFilePath = argv[1];
+    m_outputFilePath = argv[2];
+    bool l_enableDebugPrint = false;
+
+    for (int i = 3; i < argc; ++i)
+    {
+        std::string arg = argv[i];
+        if (arg == "-dp" || arg == "--debugPrint")
+        {
+            l_enableDebugPrint = true;
+        }
+        else
+        {
+            Warning("Unknown argument: " + arg);
+        }
+    }
+
+    bool successRunFullCycle = false;
+    try
+    {
+        successRunFullCycle = RunFullCycle();
+    }
+    catch (const std::exception& e)
+    {
+        Warning(std::string("Stop. Critical error during processing: ") + e.what());
+        return false;
+    }
+
+    if (l_enableDebugPrint)
+    {
+        DebugPrint();
+    }
+
+    return successRunFullCycle;
+}
+
+
