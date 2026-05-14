@@ -1,14 +1,14 @@
 # D7
 
-- [x] Lexer
-- - [x] Token
-- - [x] String <-> Token
-- [x] Preprocessor
-- - [x] Interface
-- - [x] Base test preprocessor
+- [ ] Lexer
+- - [ ] Token
+- - [ ] String <-> Token
+- [ ] Preprocessor
+- - [ ] Interface
+- - [ ] Base test preprocessor
 - - [ ] Full lang preprocessor
-- [x] Parser
-- - [x] AST
+- [ ] Parser
+- - [ ] AST
 - - [ ] Parse tokens to AST
 - - - [ ] Function
 - - - - [ ] Agreements
@@ -19,7 +19,7 @@
 - - - - - [x] For set variable
 - - - - - [ ] For comparison
 - - - [ ] Block code
-- - - - [x] Varibale define
+- - - - [ ] Varibale define
 - - - - [ ] Call func
 - - - [ ] Block args
 - - - - [ ] Agreements
