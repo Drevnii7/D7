@@ -1,5 +1,6 @@
-func int32 main()
+func float lenght([in] float X, [in] float Y)
+[const]
 {
-    var int32 ReturnVar = (2 + 3) * (4 - 1) + 12 / 4 - 5;
-    return ReturnVar;
+    var float ReturnLenght = X + Y;
+    return ReturnLenght;
 }
