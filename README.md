@@ -9,7 +9,20 @@
 - - [ ] Full lang preprocessor
 - [x] Parser
 - - [x] AST
-- - [x] Parse tokens to AST
+- - [ ] Parse tokens to AST
+- - - [ ] Function
+- - - - [ ] Agreements
+- - - - [ ] Args
+- - - [ ] Varibale
+- - - [ ] Block math
+- - - - [ ] Shunting yard
+- - - - - [x] For set variable
+- - - - - [ ] For comparison
+- - - [ ] Block code
+- - - - [x] Varibale define
+- - - - [ ] Call func
+- - - [ ] Block args
+- - - - [ ] Agreements
 - [ ] Semantic Analyzer
 - - [ ] Symbol Table
 - - [ ] Type Checking
