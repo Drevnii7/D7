@@ -33,12 +33,12 @@ namespace d7
         friend std::istream& operator>>(std::istream& is, FToken& token);
 
         template <typename Container>
-        static d7::expected::expected Serialize(const Container& Tokens, const std::string& FilePath)
+        static d7::expected Serialize(const Container& Tokens, const std::string& FilePath)
         {
             std::ofstream file(FilePath, std::ios::binary | std::ios::trunc);
             if (!file.is_open())
             {
-                return d7::expected::expected("Error opening file for writing");
+                return d7::expected::Fatal("Error opening file for writing");
             }
 
             size_t count = Tokens.size();
@@ -49,25 +49,25 @@ namespace d7
                 file << token;
                 if (!file.good())
                 {
-                    return d7::expected::expected("Error writing token to file");
+                    return d7::expected::Fatal("Error writing token to file");
                 }
             }
 
-            return d7::expected::expected();
+            return d7::expected::Success();
         }
 
 
         template <typename Container>
-        static d7::expected::expected Deserialize(Container& Tokens, const std::string& FilePath)
+        static d7::expected Deserialize(Container& Tokens, const std::string& FilePath)
         {
             std::ifstream file(FilePath, std::ios::binary);
             if (!file.is_open())
-                return d7::expected::expected("Error opening file for reading");
+                return d7::expected::Fatal("Error opening file for reading");
 
             size_t count = 0;
             file.read(reinterpret_cast<char*>(&count), sizeof(count));
             if (!file.good() || count > 1000000) 
-                return d7::expected::expected("Invalid token count");
+                return d7::expected::Fatal("Invalid token count");
 
             Tokens.clear();
             Tokens.reserve(count);
@@ -80,13 +80,13 @@ namespace d7
 
                 if (!file.good())
                 {
-                    return d7::expected::expected("Error reading token at index " + std::to_string(i));
+                    return d7::expected::Fatal("Error reading token at index " + std::to_string(i));
                 }
 
                 Tokens.push_back(std::move(token));
             }
 
-            return d7::expected::expected();
+            return d7::expected::Success();
         }
 	};
 

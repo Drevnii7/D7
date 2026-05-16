@@ -1,6 +1,8 @@
-#pragma once
+﻿#pragma once
 #include <iostream> // std::cerr
 #include <cstdlib>  // std::abort
+
+#include "consolecolors.hpp"
 
 /*
     Custom assert
@@ -31,23 +33,31 @@ namespace d7
             const char* dump_token = nullptr
         )
         {
-            std::cerr << "\n<=========ASSERTION FAILED==========\n";
-            std::cerr << "File: " << file << "\n";
-            std::cerr << "Line: " << line << "\n";
-            // Hide expression if call from unreachable
-            if (!strcmp(expression, "false"))
+            std::cerr << colors::REVERSE << "\n<=========ASSERTION FAILED==========\n" << colors::RESET;
+            std::cerr << colors::BRIGHT_CYAN << "File: " << colors::RESET
+                << colors::UNDERLINE << file << colors::RESET << "\n";
+
+            std::cerr << colors::BRIGHT_YELLOW << "Line: " << colors::RESET
+                << line << "\n";
+
+            if (strcmp(expression, "false") != 0)
             {
-                std::cerr << "Expression: " << expression << "\n";
+                std::cerr << colors::BRIGHT_GREEN << "Expression: " << colors::RESET
+                    << expression << colors::RESET << "\n";
             }
-            if (message != nullptr)
+
+            if (message != nullptr && message[0] != '\0')
             {
-                std::cerr << "Message: " << message << "\n";
+                std::cerr << colors::BRIGHT_MAGENTA << "Message: " << colors::RESET
+                    << colors::BOLD << message << colors::RESET << "\n";
             }
-            if (dump_token != nullptr)
+
+            if (dump_token != nullptr && dump_token[0] != '\0')
             {
-                std::cerr << "Token: " << dump_token << "\n";
+                std::cerr << colors::BRIGHT_RED << "Token dump: " << colors::RESET
+                    << dump_token << "\n";
             }
-            std::cerr << "==========ASSERTION FAILED=========>\n";
+            std::cerr << colors::REVERSE << "==========ASSERTION FAILED=========>\n" << colors::RESET;
         }
     }
 }
@@ -64,7 +74,7 @@ namespace d7
 // Args: message, token dump
 #define unreachable(...) assert(false, __VA_ARGS__)
 
-#define assertFlow(expr, ...) \
+#define assertSoft(expr, ...) \
     do { \
         if (!(expr)) { \
             d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, __VA_ARGS__); \

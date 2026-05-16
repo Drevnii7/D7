@@ -21,17 +21,17 @@ namespace d7
 
 		// Specify together with the file type
 		// Return only "Succes" and "Fatal"
-		d7::expected::expected LoadCode(std::string_view FilePath);
+		d7::expected LoadCode(std::string_view FilePath);
 		// Specify without the file extension
 		// Return only "Succes" and "Fatal"
-		d7::expected::expected SaveTokens(std::string_view FilePath);
+		d7::expected SaveTokens(std::string_view FilePath);
 
 		void SetCode(std::string&& Code);
 		// Before call ExtractTokens() you must call Run()
 		std::vector<FToken> ExtractTokens();
 
-		void Run();
-
+		d7::expected Run();
+		
 		void Reset();
 
 	private:
