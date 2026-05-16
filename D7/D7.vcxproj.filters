@@ -24,13 +24,19 @@
     <ClInclude Include="source\utils\expected.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\lexer\ETokenType.hpp">
+    <ClInclude Include="source\common\ETokenType.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\lexer\FToken.hpp">
+    <ClInclude Include="source\common\FToken.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\tests\Test_ETokenType.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\tests\Test_AllInOne.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\lexer\CLexer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,10 +44,13 @@
     <ClCompile Include="D7.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\lexer\FToken.cpp">
+    <ClCompile Include="source\common\FToken.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\lexer\ETokenType.cpp">
+    <ClCompile Include="source\common\ETokenType.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\lexer\CLexer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

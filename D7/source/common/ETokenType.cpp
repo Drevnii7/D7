@@ -2,6 +2,7 @@
 #include <set>
 
 #include "ETokenType.hpp"
+#include "../utils/assert.hpp"
 
 const std::map<std::string_view, d7::ETokenType> gl_stringToTokenType
 {
@@ -204,13 +205,13 @@ bool d7::ETokenTypeUtils::IsSeparator(ETokenType TokenType)
 
 bool d7::ETokenTypeUtils::IsConst(d7::ETokenType TokenType)
 {
-    return TokenType >= d7::ETokenType::INT 
+    return TokenType >= d7::ETokenType::INT
         && TokenType <= d7::ETokenType::BOOLEAN;
 }
 
 bool d7::ETokenTypeUtils::IsMath(d7::ETokenType TokenType)
 {
-    return TokenType >= d7::ETokenType::ADD 
+    return TokenType >= d7::ETokenType::ADD
         && TokenType <= d7::ETokenType::DEC;
 }
 

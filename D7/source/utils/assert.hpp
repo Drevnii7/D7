@@ -35,7 +35,7 @@ namespace d7
             std::cerr << "File: " << file << "\n";
             std::cerr << "Line: " << line << "\n";
             // Hide expression if call from unreachable
-            if (expression != "false")
+            if (!strcmp(expression, "false"))
             {
                 std::cerr << "Expression: " << expression << "\n";
             }

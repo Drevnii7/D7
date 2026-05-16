@@ -19,16 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\lexer\CLexer.cpp" />
     <ClCompile Include="D7.cpp" />
-    <ClCompile Include="source\lexer\ETokenType.cpp" />
-    <ClCompile Include="source\lexer\FToken.cpp" />
+    <ClCompile Include="source\common\ETokenType.cpp" />
+    <ClCompile Include="source\common\FToken.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\lexer\ETokenType.hpp" />
-    <ClInclude Include="source\lexer\FToken.hpp" />
+    <ClInclude Include="source\lexer\CLexer.h" />
+    <ClInclude Include="source\common\ETokenType.hpp" />
+    <ClInclude Include="source\common\FToken.hpp" />
+    <ClInclude Include="source\tests\Test_AllInOne.hpp" />
     <ClInclude Include="source\tests\Test_ETokenType.hpp" />
     <ClInclude Include="source\utils\assert.hpp" />
     <ClInclude Include="source\utils\expected.hpp" />

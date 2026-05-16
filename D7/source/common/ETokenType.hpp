@@ -1,9 +1,10 @@
 #pragma once
+
 #include <string>
 
 namespace d7
 {
-    enum ETokenType
+    enum class ETokenType
     {
         NONE = 0, // invalid, none
 
@@ -126,7 +127,7 @@ namespace d7
         // AGREMENT_VAR_ = 1001,
         // AGREMENT_VAR_ = 1002,
     };
-    
+
     namespace ETokenTypeUtils
     {
         std::string_view ETokenTypeToString(ETokenType Type);
