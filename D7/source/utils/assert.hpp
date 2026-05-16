@@ -29,6 +29,7 @@ namespace d7
             const char* expression,
             const char* file,
             int line,
+            const char* function = nullptr,
             const char* message = nullptr,
             const char* dump_token = nullptr
         )
@@ -36,6 +37,9 @@ namespace d7
             std::cerr << colors::REVERSE << "\n<=========ASSERTION FAILED==========\n" << colors::RESET;
             std::cerr << colors::BRIGHT_CYAN << "File: " << colors::RESET
                 << colors::UNDERLINE << file << colors::RESET << "\n";
+
+            std::cerr << colors::BRIGHT_BLUE << "Function: " << colors::RESET
+                << colors::BOLD << function << colors::RESET << "\n";
 
             std::cerr << colors::BRIGHT_YELLOW << "Line: " << colors::RESET
                 << line << "\n";
@@ -62,11 +66,19 @@ namespace d7
     }
 }
 
+#if defined(_MSC_VER)
+    #define D7_FUNC_SIGNATURE __FUNCSIG__
+#elif defined(__GNUC__) || defined(__clang__)
+    #define D7_FUNC_SIGNATURE __PRETTY_FUNCTION__
+#else
+    #define D7_FUNC_SIGNATURE __FUNCTION__  // fallback
+#endif
+
 // Args: expression, message, token dump
 #define assert(expr, ...) \
     do { \
         if (!(expr)) { \
-            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, __VA_ARGS__); \
+            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, D7_FUNC_SIGNATURE, __VA_ARGS__); \
             std::abort(); \
         } \
     } while(0)
@@ -77,7 +89,7 @@ namespace d7
 #define assertSoft(expr, ...) \
     do { \
         if (!(expr)) { \
-            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, __VA_ARGS__); \
+            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, D7_FUNC_SIGNATURE, __VA_ARGS__); \
         } \
     } while(0)
 
@@ -87,7 +99,7 @@ namespace d7
 #define assertTest(expr, ...) \
     do { \
         if (!(expr)) { \
-            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, __VA_ARGS__); \
+            d7::assert::AssertImplementation(#expr, __FILE__, __LINE__, D7_FUNC_SIGNATURE, __VA_ARGS__); \
             l_fails++; \
         } \
     } while(0)

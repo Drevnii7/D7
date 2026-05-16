@@ -23,7 +23,6 @@ int main()
 	
 	d7::CLexer Lexer;
 
-
 	if (expected Exp = Lexer.LoadCode(File_Source); !Exp)
 	{
 		notify_warning(("Lexer.LoadCode(): " + Exp.ExtractFatalMessageOrFail()).c_str());
