@@ -5,6 +5,8 @@
 #include "../lexer/CLexer.hpp"
 #include "../preprocessor/CPreprocessor.hpp"
 
+#include "../tests/Test_AllInOne.hpp"
+
 using expected = d7::expected;
 
 void d7::CService::SetConfig(const CServiceConfig& NewConfig)
@@ -80,6 +82,8 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 			notify_warning("\"--work-mask\" or \"-wm\" - set mask: 0) Lexer, 1) Preprocessor. Example: 01 - only preprocessor");
 			notify_warning("\"--help-lexer\" or \"-hl\" - show help for lexer");
 			notify_warning("\"--help-preprocessor\" or \"-hp\" - show help for preprocessor");
+			notify_warning("\"--run-test\" or \"-rt\" - run all tests");
+			
 			//notify_warning("\"--keep-temp\" or \"-kt\" - keep temp files after compleated");
 
 			return expected::Fail();
@@ -126,6 +130,12 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 
 			return expected::Fail();
 		}
+		else if PARSE_ARG_1("--run-test", "-rt")
+		{
+			tests::Test_AllInOne();
+
+			return expected::Fail();
+		}
 	}
 
 	return expected::Success();
@@ -134,6 +144,7 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 expected d7::CService::Run()
 {
 	d7::notify::MaskNotifyLevel = m_config.MaskNotify;
+	notify_warning("https://github.com/Drevnii7/D7");
 
 	// Lexer
 	d7::CLexer Lexer;

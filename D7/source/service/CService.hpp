@@ -22,6 +22,8 @@ namespace d7
 			// 0) Lexer, 2) Preprocessor
 			std::array<bool, 2> MaskWork = { 0, 0 };
 
+			bool RunTests = false;
+
 			//bool KeepTempFiles = false;
 		};
 

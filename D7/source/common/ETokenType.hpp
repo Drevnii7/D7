@@ -4,7 +4,7 @@
 
 namespace d7
 {
-    enum class ETokenType
+    enum class ETokenType : uint32_t
     {
         NONE = 0, // invalid, none
 

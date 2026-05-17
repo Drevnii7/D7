@@ -14,9 +14,6 @@
 
 #include "source/service/CService.hpp"
 
-#include "source/tests/Test_AllInOne.hpp"
-#include "source/tests/Test_ETokenType.hpp"
-
 std::string File_Source = "test_code.d7";
 std::string File_Tokens = "test_code.tokens";
 
@@ -43,8 +40,6 @@ int main(int argc, char* argv[])
 {
     enableANSI();
 
-	d7::tests::Test_AllInOne();
-	
 	d7::CService Service;
 
     int targc;
@@ -61,9 +56,7 @@ int main(int argc, char* argv[])
             static const char* default_argv[] =
             {
                 "program_name",     // 0
-
-                "-h",              // 1
-
+                "-h",               // 1
                 nullptr             // 2
             };
 
@@ -89,8 +82,6 @@ int main(int argc, char* argv[])
             targc = 9;
             targv = const_cast<char**>(default_argv);
 		#endif
-
-        
     }
 	
 	if (expected Exp = Service.SetConfig(targc, const_cast<char**>(targv)); !Exp)
@@ -106,12 +97,6 @@ int main(int argc, char* argv[])
         std::cin.get();
         return -2;
 	}
-
-
-
-
-
-
 
 	return 0;
 }

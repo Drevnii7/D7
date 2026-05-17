@@ -41,7 +41,10 @@
     <ClInclude Include="source\common\ETokenType.hpp" />
     <ClInclude Include="source\common\FToken.hpp" />
     <ClInclude Include="source\tests\Test_AllInOne.hpp" />
+    <ClInclude Include="source\tests\Test_CLexer.hpp" />
+    <ClInclude Include="source\tests\Test_CPreprocessor.hpp" />
     <ClInclude Include="source\tests\Test_ETokenType.hpp" />
+    <ClInclude Include="source\tests\Test_FToken.hpp" />
     <ClInclude Include="source\utils\assert.hpp" />
     <ClInclude Include="source\utils\consolecolors.hpp" />
     <ClInclude Include="source\utils\expected.hpp" />
@@ -122,10 +125,11 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -151,10 +155,11 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

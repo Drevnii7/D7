@@ -142,11 +142,11 @@ namespace d7
 
             if (l_fails == 0)
             {
-                std::cout << "Test_ETokenType: ALL TESTS PASSED" << std::endl;
+                notify_warning("Test_ETokenType: ALL TESTS PASSED");
             }
             else
             {
-                std::cout << "Test_ETokenType: FAILED with " << l_fails << " errors" << std::endl;
+                unreachable(("Test_ETokenType: FAILED with" + std::to_string(l_fails) + " errors").c_str());
             }
 
             return l_fails == 0;
