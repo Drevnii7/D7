@@ -12,6 +12,8 @@
 #include "source/preprocessor/IPreprocessor.hpp"
 #include "source/preprocessor/CPreprocessor.hpp"
 
+#include "source/service/CService.hpp"
+
 #include "source/tests/Test_AllInOne.hpp"
 #include "source/tests/Test_ETokenType.hpp"
 
@@ -20,49 +22,96 @@ std::string File_Tokens = "test_code.tokens";
 
 using expected = d7::expected;
 
-int main()
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+void enableANSI() {
+#ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return;
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
+#endif
+}
+
+
+
+int main(int argc, char* argv[])
 {
+    enableANSI();
+
 	d7::tests::Test_AllInOne();
 	
-	d7::CLexer Lexer;
+	d7::CService Service;
 
-	if (expected Exp = Lexer.LoadCode(File_Source); !Exp)
+    int targc;
+    char** targv;
+
+    if (argc > 1)
+    {
+        targc = argc;
+        targv = argv;
+    }
+    else
+    {   
+		#ifdef NDEBUG
+            static const char* default_argv[] =
+            {
+                "program_name",     // 0
+
+                "-h",              // 1
+
+                nullptr             // 2
+            };
+
+            targc = 2;
+            targv = const_cast<char**>(default_argv);
+		#else
+            static const char* default_argv[] =
+            {
+                "program_name",     // 0
+
+                "-li",              // 1
+                    "test_code.d7", // 2
+                "-lo",              // 3
+                    "test_code.lt", // 4
+                "-pi",              // 5
+                    "test_code.lt", // 6
+                "-po",              // 7
+                    "test_code.pt", // 8
+
+                nullptr             // 9
+            };
+
+            targc = 9;
+            targv = const_cast<char**>(default_argv);
+		#endif
+
+        
+    }
+	
+	if (expected Exp = Service.SetConfig(targc, const_cast<char**>(targv)); !Exp)
 	{
-		notify_warning(("Lexer.LoadCode(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-		return -1;
+		notify_warning(("Service.SetConfig(): " + Exp.ExtractFatalMessageOrFail()).c_str());
+        std::cin.get();
+        return -1;
 	}
 
-	if (expected Exp = Lexer.Run(); !Exp)
+	if (expected Exp = Service.Run(); !Exp)
 	{
-		notify_warning(("Lexer.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-		return -2;
+		notify_warning(("Service.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
+        std::cin.get();
+        return -2;
 	}
 
-	if (expected Exp = Lexer.SaveTokens(File_Tokens); !Exp)
-	{
-		notify_warning(("Lexer.SaveTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-		return -3;
-	}
 
-	d7::CPreprocessor Preprocessor;
 
-	if (expected Exp = Preprocessor.LoadTokens(File_Tokens); !Exp)
-	{
-		notify_warning(("Preprocessor.LoadTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-		return -4;
-	}
 
-	if (expected Exp = Preprocessor.Run(); !Exp)
-	{
-		notify_warning(("Preprocessor.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-		return -5;
-	}
 
-	if (expected Exp = Preprocessor.SaveTokens(File_Tokens); !Exp)
-	{
-		notify_warning(("Preprocessor.SaveTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-		return -6;
-	}
+
 
 	return 0;
 }

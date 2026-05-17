@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <array>
 
 #include "consolecolors.hpp"
 
@@ -16,6 +17,8 @@ namespace d7
             Info       = 2, // Load file
             Warning    = 3, // Failed to open the file
         };
+
+        inline std::array<bool, 4> MaskNotifyLevel = {1, 1, 1, 1};
 
         inline void SelectColorAndSet(ENotifyLevel level)
         {
@@ -105,6 +108,9 @@ namespace d7
             const char* message
         )
         {
+            if (MaskNotifyLevel[int(level)] == false)
+                return;
+
             SelectColorAndSet(level);
             std::cout << "[" << function << ":" << line << "] "
                 << "[" << ENotifyLevelUtils::ENotifyLevelToString(level) << "] " << d7::colors::RESET << d7::colors::BOLD

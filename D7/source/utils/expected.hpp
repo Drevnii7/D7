@@ -132,10 +132,11 @@ namespace d7
 		std::string ExtractFatalMessageOrFail()
 		{
 			assert(!IsSuccess(), "Try extract fatal message from \"expected\" or fail, but his type == succes");
-			assert(FatalMessagePtr != nullptr, "Fatal status set but message pointer is null :\\");
 
 			if (IsFatal())
 			{
+				assert(FatalMessagePtr != nullptr, "Fatal status set but message pointer is null :\\");
+
 				return ExtractFatalMessage();
 			}
 			else if (IsFail())

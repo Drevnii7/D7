@@ -176,6 +176,8 @@ expected d7::CLexer::Run()
 
     if (true)
     {
+        notify_trace("Dump tokens:");
+
         for (const FToken& token : m_tokens)
         {
             notify_trace(token.Dump().c_str());

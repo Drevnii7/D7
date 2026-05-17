@@ -27,6 +27,27 @@ void d7::IPreprocessor::SetTokens(std::list<FToken>&& Tokens)
     m_tokens = std::move(Tokens);
 }
 
+void d7::IPreprocessor::SetTokens(std::vector<FToken>&& Tokens)
+{
+    notify_callback("SetTokens (vector)");
+
+    m_tokens.clear();
+
+    if (Tokens.empty())
+    {
+        notify_trace("SetTokens: empty vector, nothing to move");
+        return;
+    }
+
+    m_tokens.insert(
+        m_tokens.end(),
+        std::make_move_iterator(Tokens.begin()),
+        std::make_move_iterator(Tokens.end())
+    );
+
+    Tokens.clear();
+}
+
 std::list<d7::FToken> d7::IPreprocessor::ExtractTokens()
 {
     notify_callback("ExtractTokens");

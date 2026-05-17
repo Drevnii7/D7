@@ -17,6 +17,8 @@ expected d7::CLexer::LoadCode(std::string_view FilePath)
         return ::expected::Fatal("Failed to open the file");
     }
     
+    notify_trace("Dump lines:");
+
     std::string line;
     while (std::getline(file, line))
     {

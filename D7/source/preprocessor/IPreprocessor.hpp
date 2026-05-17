@@ -28,6 +28,7 @@ namespace d7
 		d7::expected SaveTokens(std::string_view FilePath);
 
 		void SetTokens(std::list<d7::FToken>&& Tokens);
+		void SetTokens(std::vector<d7::FToken>&& Tokens);
 		// Before call ExtractTokens() you must call Run()
 		std::list<d7::FToken> ExtractTokens();
 

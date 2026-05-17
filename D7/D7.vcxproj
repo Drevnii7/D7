@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\service\CService.cpp" />
     <ClCompile Include="source\preprocessor\CPreprocessor.cpp" />
     <ClCompile Include="source\preprocessor\IPreprocessor.cpp" />
     <ClCompile Include="source\lexer\CLexer.cpp" />
@@ -33,6 +34,7 @@
     <None Include="test_code.tokens" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\service\CService.hpp" />
     <ClInclude Include="source\preprocessor\CPreprocessor.hpp" />
     <ClInclude Include="source\preprocessor\IPreprocessor.hpp" />
     <ClInclude Include="source\lexer\CLexer.hpp" />
