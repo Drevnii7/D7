@@ -7,7 +7,7 @@
 #include "source/common/ETokenType.hpp"
 #include "source/common/FToken.hpp"
 
-#include "source/lexer/CLexer.h"
+#include "source/lexer/CLexer.hpp"
 
 #include "source/tests/Test_AllInOne.hpp"
 #include "source/tests/Test_ETokenType.hpp"

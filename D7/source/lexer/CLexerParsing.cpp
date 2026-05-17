@@ -1,4 +1,4 @@
-#include "CLexer.h"
+#include "CLexer.hpp"
 
 #include "../utils/notify.hpp"
 

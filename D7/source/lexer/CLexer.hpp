@@ -28,7 +28,7 @@ namespace d7
 
 		void SetCode(std::vector<std::string>&& Code);
 		// Before call ExtractTokens() you must call Run()
-		std::vector<FToken> ExtractTokens();
+		std::vector<d7::FToken> ExtractTokens();
 
 		d7::expected Run();
 		
@@ -36,6 +36,6 @@ namespace d7
 
 	private:
 		std::vector<std::string> m_code;
-		std::vector<FToken> m_tokens;
+		std::vector<d7::FToken> m_tokens;
 	};
 }

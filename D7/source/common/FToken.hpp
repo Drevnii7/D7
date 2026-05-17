@@ -4,6 +4,9 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
+#include <fstream>
+#include <list>
+#include <vector>
 
 #include "ETokenType.hpp"
 #include "../utils/expected.hpp"
@@ -15,11 +18,11 @@ namespace d7
 		std::string lexeme = "";
 		d7::ETokenType type = d7::ETokenType::NONE;
 
-        size_t line = 0;
-        size_t row = 0;
+		size_t line = 0;
+		size_t row = 0;
 
-        FToken() = default;
-        FToken(size_t Line, size_t Row, std::string_view Lexeme)
+		FToken() = default;
+		FToken(size_t Line, size_t Row, std::string_view Lexeme)
 		{
 			line = Line;
 			row = Row;
@@ -29,66 +32,69 @@ namespace d7
 
 		std::string Dump() const;
 
-        friend std::ostream& operator<<(std::ostream& os, const FToken& token);
-        friend std::istream& operator>>(std::istream& is, FToken& token);
+		friend std::ostream& operator<<(std::ostream& os, const FToken& token);
+		friend std::istream& operator>>(std::istream& is, FToken& token);
 
-        template <typename Container>
-        static d7::expected Serialize(const Container& Tokens, const std::string& FilePath)
-        {
-            std::ofstream file(FilePath, std::ios::binary | std::ios::trunc);
-            if (!file.is_open())
-            {
-                return d7::expected::Fatal("Error opening file for writing");
-            }
+		template <typename Container>
+		static d7::expected Serialize(const Container& Tokens, const std::string& FilePath)
+		{
+			std::ofstream file(FilePath, std::ios::binary | std::ios::trunc);
+			if (!file.is_open())
+			{
+				return d7::expected::Fatal("Error opening file for writing");
+			}
 
-            size_t count = Tokens.size();
-            file.write(reinterpret_cast<const char*>(&count), sizeof(count));
+			size_t count = Tokens.size();
+			file.write(reinterpret_cast<const char*>(&count), sizeof(count));
 
-            for (const auto& token : Tokens)
-            {
-                file << token;
-                if (!file.good())
-                {
-                    return d7::expected::Fatal("Error writing token to file");
-                }
-            }
+			for (const auto& token : Tokens)
+			{
+				d7::operator<<(file, token);
+				if (!file.good())
+				{
+					return d7::expected::Fatal("Error writing token to file");
+				}
+			}
 
-            return d7::expected::Success();
-        }
+			return d7::expected::Success();
+		}
 
-        template <typename Container>
-        static d7::expected Deserialize(Container& Tokens, const std::string& FilePath)
-        {
-            std::ifstream file(FilePath, std::ios::binary);
-            if (!file.is_open())
-                return d7::expected::Fatal("Error opening file for reading");
+		template <typename Container>
+		static d7::expected Deserialize(Container& Tokens, const std::string& FilePath)
+		{
+			std::ifstream file(FilePath, std::ios::binary);
+			if (!file.is_open())
+				return d7::expected::Fatal("Error opening file for reading");
 
-            size_t count = 0;
-            file.read(reinterpret_cast<char*>(&count), sizeof(count));
-            if (!file.good() || count > 1000000) 
-                return d7::expected::Fatal("Invalid token count");
+			size_t count = 0;
+			file.read(reinterpret_cast<char*>(&count), sizeof(count));
+			if (!file.good() || count > 1000000) 
+				return d7::expected::Fatal("Invalid token count");
 
-            Tokens.clear();
-            Tokens.reserve(count);
+			Tokens.clear();
 
-            for (size_t i = 0; i < count; ++i)
-            {
-                FToken token;
+			if constexpr (requires { Tokens.reserve(count); }) {
+				Tokens.reserve(count);
+			}
 
-                d7::operator>>(file, token);
+			for (size_t i = 0; i < count; ++i)
+			{
+				FToken token;
 
-                if (!file.good())
-                {
-                    return d7::expected::Fatal("Error reading token at index " + std::to_string(i));
-                }
+				d7::operator>>(file, token);
 
-                Tokens.push_back(std::move(token));
-            }
+				if (!file.good())
+				{
+					return d7::expected::Fatal("Error reading token at index " + std::to_string(i));
+				}
 
-            return d7::expected::Success();
-        }
+				Tokens.push_back(std::move(token));
+			}
+
+			return d7::expected::Success();
+		}
 	};
 
-    std::ostream& operator<<(std::ostream& os, const FToken& token);
-    std::istream& operator>>(std::istream& is, FToken& token);
+	std::ostream& operator<<(std::ostream& os, const FToken& token);
+	std::istream& operator>>(std::istream& is, FToken& token);
 }
