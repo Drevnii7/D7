@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\common\EASTNodeType.cpp" />
+    <ClCompile Include="source\common\FASTNode.cpp" />
     <ClCompile Include="source\service\CService.cpp" />
     <ClCompile Include="source\preprocessor\CPreprocessor.cpp" />
     <ClCompile Include="source\preprocessor\IPreprocessor.cpp" />
@@ -34,6 +36,8 @@
     <None Include="test_code.tokens" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\common\EASTNodeType.hpp" />
+    <ClInclude Include="source\common\FASTNode.hpp" />
     <ClInclude Include="source\service\CService.hpp" />
     <ClInclude Include="source\preprocessor\CPreprocessor.hpp" />
     <ClInclude Include="source\preprocessor\IPreprocessor.hpp" />

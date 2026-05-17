@@ -63,6 +63,12 @@
     <ClInclude Include="source\tests\Test_CPreprocessor.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\common\FASTNode.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\common\EASTNodeType.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp">
@@ -87,6 +93,12 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\service\CService.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\common\FASTNode.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\common\EASTNodeType.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

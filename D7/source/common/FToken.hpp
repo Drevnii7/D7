@@ -32,6 +32,11 @@ namespace d7
 
 		std::string Dump() const;
 
+		bool IsValid() const
+		{
+			return type != d7::ETokenType::NONE;
+		}
+
 		friend std::ostream& operator<<(std::ostream& os, const FToken& token);
 		friend std::istream& operator>>(std::istream& is, FToken& token);
 
