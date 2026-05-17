@@ -1,14 +1,22 @@
 # D7
 
-- [ ] Lexer
-- - [ ] Token
-- - [ ] String <-> Token
-- [ ] Preprocessor
-- - [ ] Interface
-- - [ ] Base test preprocessor
+Base types
+- [x] TokenType
+- [x] Token
+- [ ] AST
+
+Tests
+- [x] TokenType
+- [ ] Token
+- [ ] AST
+
+Other
+- [x] Lexer
+- [x] Preprocessor
+- - [x] Interface
+- - [x] Base test preprocessor
 - - [ ] Full lang preprocessor
 - [ ] Parser
-- - [ ] AST
 - - [ ] Parse tokens to AST
 - - - [ ] Function
 - - - - [ ] Agreements
@@ -28,3 +36,4 @@
 - - [ ] Type Checking
 - - [ ] Scope Resolution
 - [ ] Code Generator
+- [ ] Compiler
