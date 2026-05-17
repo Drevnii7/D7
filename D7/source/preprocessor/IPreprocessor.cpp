@@ -15,7 +15,7 @@ expected d7::IPreprocessor::SaveTokens(std::string_view FilePath)
 {
     notify_callback(("SaveTokens. FilePath: " + colors::UNDERLINE + std::string(FilePath) + colors::RESET).c_str());
     
-    assert(mb_runCall, "You not call Run() - call Run() first.");
+    assert(mb_runCall, "You not call Run() - call Run() first. (if you call Run(), check description function Run() in IPreprocessor.hpp)");
 
     return d7::FToken::Serialize(m_tokens, std::string(FilePath));
 }
@@ -32,7 +32,7 @@ std::list<d7::FToken> d7::IPreprocessor::ExtractTokens()
     notify_callback("ExtractTokens");
 
     assert(!m_tokens.empty(), "No tokens set - set tokens first");
-    assert(mb_runCall, "You not call Run() - call Run() first.");
+    assert(mb_runCall, "You not call Run() - call Run() first. (if you call Run(), check description function Run() in IPreprocessor.hpp)");
 
     return std::exchange(m_tokens, {});
 }

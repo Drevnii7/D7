@@ -1,7 +1,7 @@
+var float Pi = 3.14f;
+
 func float length([in] float X, [in] float Y)
 [const]
 {
-    var string RR = "Hello  world!";
-    var float ReturnLength = X + Y;
-    return ReturnLength;
+    return X + Y;
 }

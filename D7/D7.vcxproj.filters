@@ -48,6 +48,9 @@
     <ClInclude Include="source\preprocessor\IPreprocessor.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\preprocessor\CPreprocessor.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp">
@@ -68,9 +71,13 @@
     <ClCompile Include="source\preprocessor\IPreprocessor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\preprocessor\CPreprocessor.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />
     <None Include="test_code.tokens" />
+    <None Include="source\preprocessor\CPreprocessor_RU.md" />
   </ItemGroup>
 </Project>

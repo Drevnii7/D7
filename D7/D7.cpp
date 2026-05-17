@@ -9,6 +9,9 @@
 
 #include "source/lexer/CLexer.hpp"
 
+#include "source/preprocessor/IPreprocessor.hpp"
+#include "source/preprocessor/CPreprocessor.hpp"
+
 #include "source/tests/Test_AllInOne.hpp"
 #include "source/tests/Test_ETokenType.hpp"
 
@@ -39,6 +42,26 @@ int main()
 	{
 		notify_warning(("Lexer.SaveTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
 		return -3;
+	}
+
+	d7::CPreprocessor Preprocessor;
+
+	if (expected Exp = Preprocessor.LoadTokens(File_Tokens); !Exp)
+	{
+		notify_warning(("Preprocessor.LoadTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
+		return -4;
+	}
+
+	if (expected Exp = Preprocessor.Run(); !Exp)
+	{
+		notify_warning(("Preprocessor.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
+		return -5;
+	}
+
+	if (expected Exp = Preprocessor.SaveTokens(File_Tokens); !Exp)
+	{
+		notify_warning(("Preprocessor.SaveTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
+		return -6;
 	}
 
 	return 0;

@@ -11,8 +11,8 @@ const std::map<std::string_view, d7::ETokenType> gl_stringToTokenType
     /* IDENTIFIER */
     { "::", d7::ETokenType::NAMESPACE },
     { "#",  d7::ETokenType::DIRECTIVE },
-    { "__", d7::ETokenType::MACRO },
-    { "##", d7::ETokenType::MACRO_S },
+    { "$", d7::ETokenType::MACRO },
+    { "@", d7::ETokenType::MACRO_S },
 
     // math
     { "+",  d7::ETokenType::ADD },

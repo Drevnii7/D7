@@ -10,9 +10,9 @@ namespace d7
 
         IDENTIFIER = 1, // func name, var name, var type
         NAMESPACE  = 2, // ::
-        DIRECTIVE  = 3, // #  call preprocessor directive                #include
-        MACRO      = 4, // __ return preprocessor property how tokens    __LINE__
-        MACRO_S    = 5, // ## return preprocessor property as string     ##LINE##
+        DIRECTIVE  = 3, // # call preprocessor directive                #include
+        MACRO      = 4, // $ return preprocessor property how tokens    $LINE$
+        MACRO_S    = 5, // @ return preprocessor property as string     @LINE@
 
         // const 
         // 100 - 199

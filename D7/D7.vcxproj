@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\preprocessor\CPreprocessor.cpp" />
     <ClCompile Include="source\preprocessor\IPreprocessor.cpp" />
     <ClCompile Include="source\lexer\CLexer.cpp" />
     <ClCompile Include="D7.cpp" />
@@ -27,10 +28,12 @@
     <ClCompile Include="source\lexer\CLexerParsing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="source\preprocessor\CPreprocessor_RU.md" />
     <None Include="test_code.d7" />
     <None Include="test_code.tokens" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\preprocessor\CPreprocessor.hpp" />
     <ClInclude Include="source\preprocessor\IPreprocessor.hpp" />
     <ClInclude Include="source\lexer\CLexer.hpp" />
     <ClInclude Include="source\common\ETokenType.hpp" />
