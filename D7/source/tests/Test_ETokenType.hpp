@@ -19,6 +19,10 @@ namespace d7
 
             {
                 assertTest(d7::ETokenTypeUtils::ETokenTypeFromString("42") == d7::ETokenType::INT);
+                assertTest(d7::ETokenTypeUtils::ETokenTypeFromString("\"Hello world!\"") == d7::ETokenType::STRING);
+                assertTest(d7::ETokenTypeUtils::ETokenTypeFromString("\"\'Hello world!\'\"") == d7::ETokenType::STRING);
+                assertTest(d7::ETokenTypeUtils::ETokenTypeFromString("\'\n\'") == d7::ETokenType::CHAR);
+                assertTest(d7::ETokenTypeUtils::ETokenTypeFromString("\'a\'") == d7::ETokenType::CHAR);
             }
 
             {

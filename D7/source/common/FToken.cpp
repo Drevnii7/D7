@@ -22,10 +22,11 @@ std::ostream& d7::operator<<(std::ostream& os, const d7::FToken& token)
 {
     size_t len = token.lexeme.size();
     os.write(reinterpret_cast<const char*>(&len), sizeof(len));
-    if (len > 0) {
+    if (len > 0) 
+    {
         os.write(token.lexeme.c_str(), len);
     }
-
+    
     os.write(reinterpret_cast<const char*>(&token.type), sizeof(token.type));
     os.write(reinterpret_cast<const char*>(&token.line), sizeof(token.line));
     os.write(reinterpret_cast<const char*>(&token.row), sizeof(token.row));
@@ -38,11 +39,13 @@ std::istream& d7::operator>>(std::istream& is, d7::FToken& token)
     size_t len = 0;
     is.read(reinterpret_cast<char*>(&len), sizeof(len));
 
-    if (len > 0) {
+    if (len > 0) 
+    {
         token.lexeme.resize(len);
         is.read(&token.lexeme[0], len);
     }
-    else {
+    else 
+    {
         token.lexeme.clear();
     }
 

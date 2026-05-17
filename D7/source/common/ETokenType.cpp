@@ -108,8 +108,6 @@ const std::map<d7::ETokenType, std::string_view> gl_tokenTypeToString = []
 
 const std::set<d7::ETokenType> gl_tokensSeparator
 {
-    d7::ETokenType::NONE,
-
     d7::ETokenType::NAMESPACE, // ::
     d7::ETokenType::DIRECTIVE, // #
     d7::ETokenType::MACRO,     // __

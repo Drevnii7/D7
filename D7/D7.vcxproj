@@ -27,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="test_code.d7" />
+    <None Include="test_code.tokens" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\lexer\CLexer.h" />

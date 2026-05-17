@@ -1,6 +1,7 @@
-func float lenght([in] float X, [in] float Y)
+func float length([in] float X, [in] float Y)
 [const]
 {
-    var float ReturnLenght = X + Y;
-    return ReturnLenght;
+    var string RR = "Hello  world!";
+    var float ReturnLength = X + Y;
+    return ReturnLength;
 }

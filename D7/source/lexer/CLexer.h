@@ -26,7 +26,7 @@ namespace d7
 		// Return only "Succes" and "Fatal"
 		d7::expected SaveTokens(std::string_view FilePath);
 
-		void SetCode(std::string&& Code);
+		void SetCode(std::vector<std::string>&& Code);
 		// Before call ExtractTokens() you must call Run()
 		std::vector<FToken> ExtractTokens();
 
@@ -35,7 +35,7 @@ namespace d7
 		void Reset();
 
 	private:
-		std::string m_code;
+		std::vector<std::string> m_code;
 		std::vector<FToken> m_tokens;
 	};
 }

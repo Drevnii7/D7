@@ -15,11 +15,11 @@ namespace d7
 		std::string lexeme = "";
 		d7::ETokenType type = d7::ETokenType::NONE;
 
-		int line = 0;
-		int row = 0;
+        size_t line = 0;
+        size_t row = 0;
 
         FToken() = default;
-        FToken(int Line, int Row, std::string_view Lexeme)
+        FToken(size_t Line, size_t Row, std::string_view Lexeme)
 		{
 			line = Line;
 			row = Row;
@@ -55,7 +55,6 @@ namespace d7
 
             return d7::expected::Success();
         }
-
 
         template <typename Container>
         static d7::expected Deserialize(Container& Tokens, const std::string& FilePath)

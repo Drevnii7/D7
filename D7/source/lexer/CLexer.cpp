@@ -8,25 +8,21 @@ using expected = d7::expected;
 
 expected d7::CLexer::LoadCode(std::string_view FilePath)
 {
-    notify_callback("LoadCode");
+    notify_callback(("LoadCode. FilePath: " + colors::UNDERLINE + std::string(FilePath) + colors::RESET).c_str());
 
-    std::ifstream file(std::string(FilePath), std::ios::in | std::ios::binary);
+    std::ifstream file(std::string(FilePath), std::ios::binary);
 
     if (!file.is_open()) 
     {
         return ::expected::Fatal("Failed to open the file");
     }
     
-    file.seekg(0, std::ios::end);
-    std::streamsize size = file.tellg();
-
-    file.seekg(0, std::ios::beg);
-
-    m_code.resize(size);
-
-    if (!file.read(&m_code[0], size)) 
+    std::string line;
+    while (std::getline(file, line))
     {
-        return ::expected::Fatal("Error reading the file");
+        m_code.push_back(line);
+
+        notify_trace(line.c_str());
     }
 
     if (m_code.empty())
@@ -39,14 +35,14 @@ expected d7::CLexer::LoadCode(std::string_view FilePath)
 
 expected d7::CLexer::SaveTokens(std::string_view FilePath)
 {
-    notify_callback("SaveTokens");
+    notify_callback(("SaveTokens. FilePath: " + colors::UNDERLINE + std::string(FilePath) + colors::RESET).c_str());
 
     assert(!m_tokens.empty(), "No tokens generated - call Run() first");
 
-	return d7::FToken::Deserialize(m_tokens, std::string(FilePath));
+    return d7::FToken::Serialize(m_tokens, std::string(FilePath));
 }
 
-void d7::CLexer::SetCode(std::string&& Code)
+void d7::CLexer::SetCode(std::vector<std::string>&& Code)
 {
     notify_callback("SetCode");
 
@@ -68,6 +64,6 @@ void d7::CLexer::Reset()
 {
     notify_callback("Reset");
 
-    m_code = "";
+    m_code.clear();
 	m_tokens.clear();
 }
