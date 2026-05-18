@@ -141,6 +141,10 @@ namespace d7
         bool IsEqual(ETokenType TokenType);
         bool IsAssign(ETokenType TokenType);
 
+        bool IsOperator(ETokenType TokenType);
+        bool IsValue(ETokenType TokenType);
+        int GetIntensity(ETokenType TokenType);
+
         bool IsBoolean(std::string_view Lexeme);
         bool IsInteger(std::string_view Lexeme);
         bool IsFloat(std::string_view Lexeme);

@@ -20,7 +20,6 @@ const std::map<std::string_view, d7::EASTNodeType> gl_stringToTokenType
     { "Setter",     d7::EASTNodeType::Setter },
     { "Call",       d7::EASTNodeType::Call },
 
-    { "Name",       d7::EASTNodeType::Name },
     { "Type",       d7::EASTNodeType::Type },
     { "Math",       d7::EASTNodeType::Math },
 

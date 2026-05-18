@@ -19,8 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\parser\CParser.cpp" />
     <ClCompile Include="source\common\EASTNodeType.cpp" />
     <ClCompile Include="source\common\FASTNode.cpp" />
+    <ClCompile Include="source\parser\CParserParsing.cpp" />
     <ClCompile Include="source\service\CService.cpp" />
     <ClCompile Include="source\preprocessor\CPreprocessor.cpp" />
     <ClCompile Include="source\preprocessor\IPreprocessor.cpp" />
@@ -31,11 +33,11 @@
     <ClCompile Include="source\lexer\CLexerParsing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="code\test_code.d7" />
     <None Include="source\preprocessor\CPreprocessor_RU.md" />
-    <None Include="test_code.d7" />
-    <None Include="test_code.tokens" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\parser\CParser.hpp" />
     <ClInclude Include="source\common\EASTNodeType.hpp" />
     <ClInclude Include="source\common\FASTNode.hpp" />
     <ClInclude Include="source\service\CService.hpp" />

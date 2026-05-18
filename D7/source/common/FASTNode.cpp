@@ -3,6 +3,8 @@
 #include <ostream>
 #include <istream>
 
+using expected = d7::expected;
+
 std::ostream& d7::operator<<(std::ostream& os, const d7::FASTNode& node)
 {
     os.write(reinterpret_cast<const char*>(&node.type), sizeof(node.type));
@@ -50,37 +52,32 @@ std::istream& d7::operator>>(std::istream& is, d7::FASTNode& node)
     return is;
 }
 
-void d7::FASTNode::Serialize(d7::FASTNode* root, const std::string& filename)
+expected d7::FASTNode::Serialize(const FASTNode& Root, const std::string& FilePath)
 {
-    std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+    std::ofstream file(FilePath, std::ios::binary | std::ios::trunc);
     if (!file.is_open())
     {
-        throw std::runtime_error("Cannot open file for writing: " + filename);
+        return expected::Fatal(("Cannot open file for writing: " + FilePath).c_str());
     }
 
-    if (root)
-    {
-        file << *root;
-    }
-    else
-    {
-        throw std::runtime_error("Cannot serialize null root node");
-    }
+    file << Root;
 
     file.close();
+
+    return expected::Success();
 }
 
-d7::FASTNode d7::FASTNode::Deserialize(const std::string& filename)
+expected d7::FASTNode::Deserialize(FASTNode& Root, const std::string& FilePath)
 {
-    std::ifstream file(filename, std::ios::binary);
+    std::ifstream file(FilePath, std::ios::binary);
     if (!file.is_open())
     {
-        throw std::runtime_error("Cannot open file for reading: " + filename);
+        return expected::Fatal(("Cannot open file for reading: " + FilePath).c_str());
     }
 
-    d7::FASTNode root;
-    file >> root;
+    file >> Root;
 
     file.close();
-    return std::exchange(root, {});
+
+    return expected::Success();
 }

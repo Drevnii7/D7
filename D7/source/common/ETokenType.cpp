@@ -231,6 +231,72 @@ bool d7::ETokenTypeUtils::IsAssign(d7::ETokenType TokenType)
         && TokenType <= d7::ETokenType::ASSIGN_MOD;
 }
 
+bool d7::ETokenTypeUtils::IsValue(ETokenType type)
+{
+    return type == ETokenType::INT ||
+        type == ETokenType::FLOAT ||
+        type == ETokenType::STRING ||
+        type == ETokenType::CHAR ||
+        type == ETokenType::BOOLEAN ||
+        type == ETokenType::IDENTIFIER;
+}
+
+bool d7::ETokenTypeUtils::IsOperator(ETokenType type)
+{
+    return (type >= ETokenType::ADD && type <= ETokenType::DEC) ||
+        (type >= ETokenType::AND && type <= ETokenType::NOT) ||
+        (type >= ETokenType::EQUAL && type <= ETokenType::GREATER_EQUAL) ||
+        (type >= ETokenType::ASSIGN && type <= ETokenType::ASSIGN_MOD);
+}
+
+int d7::ETokenTypeUtils::GetIntensity(ETokenType type)
+{
+    switch (type)
+    {
+    case ETokenType::ASSIGN:
+    case ETokenType::ASSIGN_ADD:
+    case ETokenType::ASSIGN_SUB:
+    case ETokenType::ASSIGN_MUL:
+    case ETokenType::ASSIGN_DIV:
+    case ETokenType::ASSIGN_MOD:
+        return 1;
+
+    case ETokenType::OR:
+        return 2;
+    case ETokenType::AND:
+        return 3;
+    case ETokenType::NOT:
+        return 4;
+
+    case ETokenType::EQUAL:
+    case ETokenType::NOT_EQUAL:
+    case ETokenType::LESS:
+    case ETokenType::GREATER:
+    case ETokenType::LESS_EQUAL:
+    case ETokenType::GREATER_EQUAL:
+        return 5;
+
+    case ETokenType::ADD:
+    case ETokenType::SUB:
+        return 6;
+
+    case ETokenType::MUL:
+    case ETokenType::DIV:
+    case ETokenType::MOD:
+        return 7;
+
+    case ETokenType::POW:
+        return 8;
+
+    case ETokenType::INC:
+    case ETokenType::DEC:
+        return 9;
+
+    default:
+        return 0;
+    }
+}
+
 bool d7::ETokenTypeUtils::IsBoolean(std::string_view Lexeme)
 {
     bool RetValue = false;

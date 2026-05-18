@@ -14,13 +14,17 @@ namespace d7
 		{
 			std::string FilePath_Lexer_In = "";
 			std::string FilePath_Lexer_Out = "";
+
 			std::string FilePath_Preprocessor_In = "";
 			std::string FilePath_Preprocessor_Out = "";
 
+			std::string FilePath_Parser_In = "";
+			std::string FilePath_Parser_Out = "";
+
 			// 0) Trace, 1) Callback, 2) Info, 3) Warning
 			std::array<bool, 4> MaskNotify = { 1, 1, 1, 1 };
-			// 0) Lexer, 2) Preprocessor
-			std::array<bool, 2> MaskWork = { 0, 0 };
+			// 0) Lexer, 2) Preprocessor, 2) Parser
+			std::array<bool, 3> MaskWork = { 0, 0, 0};
 
 			bool RunTests = false;
 

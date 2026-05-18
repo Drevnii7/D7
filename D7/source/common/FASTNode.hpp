@@ -33,7 +33,7 @@ namespace d7
         std::string Dump(int indent = 0) const
         {
             std::string pad(indent * 4, ' ');
-            std::string line = pad + "[" + std::string(internal::NodeTypeToString(type)) + "] ";
+            std::string line = pad + "[" + std::string(d7::EASTNodeTypeUtils::EASTNodeTypeToString(type)) + "] ";
 
             if (token.IsValid())
             {
@@ -49,14 +49,8 @@ namespace d7
             return line;
         }
 
-        struct internal
-        {
-            static std::string_view NodeTypeToString(EASTNodeType nodeType);
-            static EASTNodeType StringToNodeType(std::string_view string);
-        };
-
-        static void Serialize(FASTNode* root, const std::string& filename);
-        static FASTNode Deserialize(const std::string& filename);
+        static d7::expected Serialize(const FASTNode& Root, const std::string& FilePath);
+        static d7::expected Deserialize(FASTNode& Root, const std::string& FilePath);
 
         friend std::ostream& operator<<(std::ostream& os, const FASTNode& node);
         friend std::istream& operator>>(std::istream& is, FASTNode& node);

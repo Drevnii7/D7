@@ -23,9 +23,8 @@ namespace d7
         Setter   = 203, // pi = 3.14f;
         Call     = 204, // parse();
 
-        Name = 301, // name variable / function
-        Type = 302, // type variable / type returned function
-        Math = 303, // (8 * 5) + (4 / 2)
+        Type = 300, // type variable / type returned function
+        Math = 301, // (8 * 5) + (4 / 2)
 
         Return = 400 // return 42;
 	};

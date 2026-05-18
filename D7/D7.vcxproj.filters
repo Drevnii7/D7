@@ -69,6 +69,9 @@
     <ClInclude Include="source\common\EASTNodeType.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\parser\CParser.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D7.cpp">
@@ -101,10 +104,15 @@
     <ClCompile Include="source\common\EASTNodeType.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\parser\CParser.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\parser\CParserParsing.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test_code.d7" />
-    <None Include="test_code.tokens" />
     <None Include="source\preprocessor\CPreprocessor_RU.md" />
+    <None Include="code\test_code.d7" />
   </ItemGroup>
 </Project>

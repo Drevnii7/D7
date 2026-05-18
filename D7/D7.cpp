@@ -65,21 +65,25 @@ int main(int argc, char* argv[])
 		#else
             static const char* default_argv[] =
             {
-                "program_name",     // 0
+                "program_name",           // 0
 
-                "-li",              // 1
-                    "test_code.d7", // 2
-                "-lo",              // 3
-                    "test_code.lt", // 4
-                "-pi",              // 5
-                    "test_code.lt", // 6
-                "-po",              // 7
-                    "test_code.pt", // 8
+                "-li",                     // 1
+                    "code/test_code.d7",   // 2  .d7 - source code
+                "-lo",                     // 3
+                    "code/test_code.lt",   // 4  .lt - lexer token
+                "-ppi",                    // 5
+                    "code/test_code.lt",   // 6
+                "-ppo",                    // 7
+                    "code/test_code.ppt",  // 8  .ppt - pre processor token
+                "-pi",                     // 9
+                    "code/test_code.ppt",  // 10
+                "-po",                     // 11
+                    "code/test_code.past", // 12 .past - parser ast
 
-                nullptr             // 9
+                nullptr                   // 13
             };
 
-            targc = 9;
+            targc = 13;
             targv = const_cast<char**>(default_argv);
 		#endif
     }

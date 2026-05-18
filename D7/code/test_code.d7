@@ -1,0 +1,10 @@
+var float Pi = (3 + 8) * 2;
+
+
+/*
+func string print()
+[const]
+{
+    return "Hello world!";
+}
+*/
