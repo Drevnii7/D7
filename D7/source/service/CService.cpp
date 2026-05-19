@@ -32,42 +32,69 @@ void d7::CService::SetConfig(CServiceConfig&& NewConfig)
 
 expected d7::CService::SetConfig(int argc, char* argv[])
 {
+	std::string input_flag = "";
+	std::string output_flag = "";
+
 	for (int i = 1; i < argc; i++)
 	{
 		std::string arg = argv[i];
 
-		if PARSE_ARG("--lexer-in", "-li")
+		if PARSE_ARG("-i", "-i")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-i\"");
+
+			input_flag = argv[++i];
+		}
+		else if PARSE_ARG("-o", "-o")
+		{
+			output_flag = argv[++i];
+		}
+		else if PARSE_ARG("--lexer-in", "-li")
+		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-o\"");
+
 			m_config.FilePath_Lexer_In = argv[++i];
 			m_config.MaskWork[0] = true;
 		}
 		else if PARSE_ARG("--lexer-out", "-lo")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-lo\"");
+
 			m_config.FilePath_Lexer_Out = argv[++i];
 			m_config.MaskWork[0] = true;
 		}
 		else if PARSE_ARG("--preprocessor-in", "-ppi")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-ppi\"");
+
 			m_config.FilePath_Preprocessor_In = argv[++i];
 			m_config.MaskWork[1] = true;
 		}
 		else if PARSE_ARG("--preprocessor-out", "-ppo")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-ppo\"");
+
 			m_config.FilePath_Preprocessor_Out = argv[++i];
 			m_config.MaskWork[1] = true;
 		}
 		else if PARSE_ARG("--parser-in", "-pi")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-pi\"");
+
 			m_config.FilePath_Parser_In = argv[++i];
 			m_config.MaskWork[2] = true;
 		}
 		else if PARSE_ARG("--parser-out", "-po")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-po\"");
+
 			m_config.FilePath_Parser_Out = argv[++i];
 			m_config.MaskWork[2] = true;
 		}
 		else if PARSE_ARG("--notify-mask", "-nm")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-nm\"");
+
 			std::string Mask = argv[++i];
 			for (int li = 0; li < Mask.size() && li < m_config.MaskNotify.size(); li++)
 			{
@@ -76,6 +103,8 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 		}
 		else if PARSE_ARG("--work-mask", "-wm")
 		{
+			if (i + 1 >= argc) return expected::Fatal("Missing value for argument \"-wm\"");
+
 			std::string Mask = argv[++i];
 			for (int li = 0; li < Mask.size() && li < m_config.MaskWork.size(); li++)
 			{
@@ -84,6 +113,12 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 		}
 		else if PARSE_ARG_1("--help", "-h")
 		{
+			notify_warning("\"-i\" - input file");
+			notify_warning("\"-o\" - output file");
+			notify_warning("Example: \"-i source.d7 -o output.past\"");
+			notify_warning("Note: Default pipeline runs automatically. No extra flags needed.");
+			notify_warning("");
+			notify_warning("===LATER FOR EXPERTS===");
 			notify_warning("\"--help\" or \"-h\" - show this text");
 			notify_warning("\"--lexer-in\" or \"-li\" - set lexer input file");
 			notify_warning("\"--lexer-out\" or \"-lo\" - set lexer output file");
@@ -101,12 +136,36 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 		else if PARSE_ARG_1("--run-test", "-rt")
 		{
 #ifndef DISABLE_TEST
+			m_config.MaskNotify[0] = 1;
+			m_config.MaskNotify[1] = 1;
+			m_config.MaskNotify[2] = 1;
+			m_config.MaskNotify[3] = 1;
+
 			tests::Test_AllInOne();
 #endif
 			return expected::Fail();
 		}
 
 		
+	}
+
+	if (input_flag.empty() && !output_flag.empty())
+	{
+		return expected::Fatal("You enter \"-i\", but not enter \"-o\"");
+
+	}
+	if (!input_flag.empty() && output_flag.empty())
+	{
+		return expected::Fatal("You enter \"-o\", but not enter \"-i\"");
+	}
+	if (!input_flag.empty() && !output_flag.empty())
+	{
+		m_config.MaskWork[0] = 1;
+		m_config.MaskWork[1] = 1;
+		m_config.MaskWork[2] = 1;
+
+		m_config.FilePath_Lexer_In = input_flag;
+		m_config.FilePath_Parser_Out = output_flag;
 	}
 
 	return expected::Success();
@@ -191,7 +250,7 @@ expected d7::CService::Run()
 
 	// Parser
 	d7::CParser Parser;
-	if (m_config.MaskWork[1] == true)
+	if (m_config.MaskWork[2] == true)
 	{
 		if (m_config.FilePath_Parser_In.empty())
 		{

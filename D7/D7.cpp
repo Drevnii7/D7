@@ -80,11 +80,13 @@ int main(int argc, char* argv[])
                     "code/test_code.ppt",  // 10
                 "-po",                     // 11
                     "code/test_code.past", // 12 .past - parser ast
+                 "--notify-mask",          // 13
+                    "1111",                // 14
 
-                nullptr                   // 13
+                nullptr                   // 15
             };
 
-            targc = 13;
+            targc = 15;
             targv = const_cast<char**>(default_argv);
 		#endif
     }
@@ -92,14 +94,14 @@ int main(int argc, char* argv[])
 	if (expected Exp = Service.SetConfig(targc, const_cast<char**>(targv)); !Exp)
 	{
 		notify_warning(("Service.SetConfig(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-        std::cin.get();
+        //std::cin.get();
         return -1;
 	}
 
 	if (expected Exp = Service.Run(); !Exp)
 	{
 		notify_warning(("Service.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
-        std::cin.get();
+        //std::cin.get();
         return -2;
 	}
 

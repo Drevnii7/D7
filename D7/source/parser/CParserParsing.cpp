@@ -61,8 +61,8 @@ d7::expected d7::CParser::Parse_Program()
 d7::expected d7::CParser::TryParseAs_Var(std::unique_ptr<FASTNode>& outNode)
 {
 	// 0) var 1) type 2) name 3) ;
-	if(LastTokens() <= 3)
-		return d7::expected::Fail();
+	//if(LastTokens() <= 3)
+	//	return d7::expected::Fail();
 
 	// This not var
 	if (PeekToken().type != ETokenType::DEF_VAR)
@@ -160,7 +160,7 @@ d7::expected d7::CParser::TryParseAs_Func(std::unique_ptr<FASTNode>& outNode)
 		/*std::unique_ptr<FASTNode> CodeBlock;
 		if (expected Exp = ParseAs_BlockCode(CodeBlock); !Exp)
 		{
-			return d7::expected::Fatal("TryParseAs_Var(): " + Exp.ExtractFatalMessageOrFail());
+			return d7::expected::Fatal("TryParseAs_Func(): " + Exp.ExtractFatalMessageOrFail());
 		}
 
 		outNode = std::make_unique<FASTNode>(EASTNodeType::Func);
@@ -183,7 +183,7 @@ d7::expected d7::CParser::TryParseAs_Func(std::unique_ptr<FASTNode>& outNode)
 
 d7::expected d7::CParser::ParseAs_BlockMath(std::unique_ptr<FASTNode>& outNode, ETokenType begin, ETokenType end)
 {
-	if (LastTokens() <= 3)
+	if (LastTokens() <= 1)
 		return d7::expected::Fail();
 
 	if (PeekToken().type != begin)
@@ -406,7 +406,7 @@ size_t d7::CParser::FindClosedBracket(ETokenType begin, ETokenType end)
 {
 	size_t counter = 1;
 
-	for (size_t i = m_current; m_current < m_tokens.size(); i++)
+	for (size_t i = m_current; i < m_tokens.size(); i++)
 	{
 		if (m_tokens[i].type == begin)
 		{
@@ -429,7 +429,7 @@ size_t d7::CParser::FindClosedBracket(ETokenType begin, ETokenType end)
 
 size_t d7::CParser::FindSymbol(ETokenType type)
 {
-	for (size_t i = m_current; m_current < m_tokens.size(); i++)
+	for (size_t i = m_current; i < m_tokens.size(); i++)
 	{
 		if (m_tokens[i].type == type)
 		{

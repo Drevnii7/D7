@@ -112,6 +112,7 @@ expected d7::CLexer::Run()
                     }
                     ++i;
                 }
+                i--;
 
                 m_tokens.emplace_back(FToken(line, lexemeStart, std::move(literal)));
                 lexemeStart = i;

@@ -22,13 +22,11 @@ namespace d7
 			std::string FilePath_Parser_Out = "";
 
 			// 0) Trace, 1) Callback, 2) Info, 3) Warning
-			std::array<bool, 4> MaskNotify = { 1, 1, 1, 1 };
+			std::array<bool, 4> MaskNotify = { 0, 0, 1, 1 };
 			// 0) Lexer, 2) Preprocessor, 2) Parser
 			std::array<bool, 3> MaskWork = { 0, 0, 0};
 
 			bool RunTests = false;
-
-			//bool KeepTempFiles = false;
 		};
 
 		void SetConfig(const CServiceConfig& NewConfig);

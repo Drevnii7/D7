@@ -1,8 +1,25 @@
-var float Rnd = (7 + 3 ** 2 * 4 - 15 / 3);
+#define PI 3.14f
 
-func bool print
-(
-	string Message, 
-	color Color,
-	int32 World
-);
+#define Nested1 "Hello world"
+#define Nested2 $Nested1$
+#define Nested3 $Nested2$
+#define Nested4 $Nested3$
+#define Nested5 $Nested4$
+
+var string MacroString = $Nested5$;
+var string MacroString2 = @Nested5@;
+
+var float MacroPiValue = $PI$;
+var string MacroPiString = @PI@;
+
+var string TestString = "test";
+var char TestChar = 'q';
+var float TestFloat = 3.14f;
+var int TestInt = 321;
+var int TestInt2 = 1 + 2 * (3 - TestInt) / 5;
+var bool TestBoolFalse = false;
+var bool TestBoolTrue = true;
+
+func void click();
+func void print(string message);
+func int sum(int a, int b);
