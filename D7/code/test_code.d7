@@ -1,10 +1,8 @@
-var float Pi = (3 + 8) * 2;
+var float Rnd = (7 + 3 ** 2 * 4 - 15 / 3);
 
-
-/*
-func string print()
-[const]
-{
-    return "Hello world!";
-}
-*/
+func bool print
+(
+	string Message, 
+	color Color,
+	int32 World
+);

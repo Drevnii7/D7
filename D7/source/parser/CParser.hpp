@@ -42,16 +42,21 @@ namespace d7
 
 
 		d7::expected TryParseAs_Var(std::unique_ptr<FASTNode>& outNode);
+		d7::expected TryParseAs_Func(std::unique_ptr<FASTNode>& outNode);
 
 		// Medium level
 
 		d7::expected ParseAs_BlockMath(std::unique_ptr<FASTNode>& outNode, ETokenType begin, ETokenType end);
+		// []
+		//d7::expected ParseAs_BlockAgreements(std::unique_ptr<FASTNode>& outNode, ETokenType begin, ETokenType end);
+		// ()
+		d7::expected ParseAs_BlockArgs(std::unique_ptr<FASTNode>& outNode);
 
 		// Low level
 
 		d7::expected ParseAs_Name(FToken& outToken);
 		d7::expected ParseAs_Type(std::unique_ptr<FASTNode>& outNode);
-
+		d7::expected ParseAs_Arg(std::unique_ptr<FASTNode>& outNode);
 
 		d7::expected ParseAs_ShuntingYard(size_t from, size_t to, std::vector<FToken>& tokensOutput);
 		d7::expected SY_To_BlockMath(std::vector<FToken>&& tokens, std::unique_ptr<FASTNode>& node);
@@ -67,7 +72,5 @@ namespace d7
 		size_t LastTokens();
 		// m_current++
 		bool SkipToken();
-
-		
 	};
 }

@@ -6,7 +6,11 @@
 #include "../preprocessor/CPreprocessor.hpp"
 #include "../parser/CParser.hpp"
 
+#include "../utils/performance_timer.hpp"
+
+#ifndef DISABLE_TEST
 #include "../tests/Test_AllInOne.hpp"
+#endif
 
 using expected = d7::expected;
 
@@ -70,6 +74,14 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 				m_config.MaskNotify[li] = (Mask[li] == '1');
 			}
 		}
+		else if PARSE_ARG("--work-mask", "-wm")
+		{
+			std::string Mask = argv[++i];
+			for (int li = 0; li < Mask.size() && li < m_config.MaskWork.size(); li++)
+			{
+				m_config.MaskWork[li] = (Mask[li] == '1');
+			}
+		}
 		else if PARSE_ARG_1("--help", "-h")
 		{
 			notify_warning("\"--help\" or \"-h\" - show this text");
@@ -80,16 +92,21 @@ expected d7::CService::SetConfig(int argc, char* argv[])
 			notify_warning("\"--parser-in\" or \"-pi\" - set parser input file");
 			notify_warning("\"--parser-out\" or \"-po\" - set parser output file");
 			notify_warning("\"--notify-mask\" or \"-nm\" - set mask: 0) Trace, 1) Callback, 2) Info, 3) Warning. Example: 0001 - only warning");
+			notify_warning("\"--work-mask\" or \"-wm\" - set mask: 0) Lexer, 1) Preprocessor 3) Parser. Example: 010 - only preprocessor");
+#ifndef DISABLE_TEST
 			notify_warning("\"--run-test\" or \"-rt\" - run all tests");
-
+#endif
 			return expected::Fail();
 		}
 		else if PARSE_ARG_1("--run-test", "-rt")
 		{
+#ifndef DISABLE_TEST
 			tests::Test_AllInOne();
-
+#endif
 			return expected::Fail();
 		}
+
+		
 	}
 
 	return expected::Success();
@@ -100,6 +117,13 @@ expected d7::CService::Run()
 	d7::notify::MaskNotifyLevel = m_config.MaskNotify;
 	notify_warning("https://github.com/Drevnii7/D7");
 
+	d7::performance_timer CServiceRinTimer("CServiceRunTimer", true);
+	d7::performance_timer CServiceRinTimerLexer("CServiceRunTimer_Lexer", true);
+	d7::performance_timer CServiceRinTimerPreprocessor("CServiceRunTimerPreprocessor", true);
+	d7::performance_timer CServiceRinTimerParser("CServiceRunTimer_Parser", true);
+
+	CServiceRinTimer.Start();
+
 	// Lexer
 	d7::CLexer Lexer;
 	if (m_config.MaskWork[0] == true)
@@ -109,10 +133,12 @@ expected d7::CService::Run()
 			return expected::Fatal(("Lexer.LoadCode(): " + Exp.ExtractFatalMessageOrFail()).c_str());
 		}
 
+		CServiceRinTimerLexer.Start();
 		if (expected Exp = Lexer.Run(); !Exp)
 		{
 			return expected::Fatal(("Lexer.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
 		}
+		CServiceRinTimerLexer.Stop();
 
 		if (!m_config.FilePath_Lexer_Out.empty())
 		{
@@ -145,11 +171,13 @@ expected d7::CService::Run()
 				return expected::Fatal(("Preprocessor.LoadTokens(): " + Exp.ExtractFatalMessageOrFail()).c_str());
 			}
 		}
-		
+
+		CServiceRinTimerPreprocessor.Start();
 		if (expected Exp = Preprocessor.Run(); !Exp)
 		{
 			return expected::Fatal(("Preprocessor.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
 		}
+		CServiceRinTimerPreprocessor.Stop();
 
 		if (!m_config.FilePath_Preprocessor_Out.empty())
 		{
@@ -184,10 +212,12 @@ expected d7::CService::Run()
 			}
 		}
 
+		CServiceRinTimerParser.Start();
 		if (expected Exp = Parser.Run(); !Exp)
 		{
 			return expected::Fatal(("Parser.Run(): " + Exp.ExtractFatalMessageOrFail()).c_str());
 		}
+		CServiceRinTimerParser.Stop();
 
 		if (!m_config.FilePath_Parser_Out.empty())
 		{
@@ -198,5 +228,6 @@ expected d7::CService::Run()
 		}
 	}
 
+	CServiceRinTimer.Stop();
 	return expected::Success();
 }

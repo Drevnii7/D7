@@ -1,4 +1,5 @@
 #pragma once
+#ifndef DISABLE_TEST
 
 #include "../lexer/CLexer.hpp"
 #include "../utils/assert.hpp"
@@ -7,7 +8,6 @@ namespace d7
 {
     namespace tests
     {
-
         bool Test_CLexer()
         {
             int l_fails = 0;
@@ -73,3 +73,18 @@ namespace d7
         }
     }
 }
+
+#else
+
+namespace d7
+{
+    namespace tests
+    {
+        bool Test_FToken()
+        {
+            return true;
+        }
+    }
+}
+
+#endif

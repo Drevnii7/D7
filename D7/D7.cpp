@@ -23,7 +23,8 @@ using expected = d7::expected;
 #include <windows.h>
 #endif
 
-void enableANSI() {
+static void enableANSI() 
+{
 #ifdef _WIN32
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hOut == INVALID_HANDLE_VALUE) return;

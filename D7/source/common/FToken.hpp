@@ -73,8 +73,8 @@ namespace d7
 
 			size_t count = 0;
 			file.read(reinterpret_cast<char*>(&count), sizeof(count));
-			if (!file.good() || count > 1000000) 
-				return d7::expected::Fatal("Invalid token count");
+			if (!file.good())
+				return expected::Fatal("Error reading token count");
 
 			Tokens.clear();
 

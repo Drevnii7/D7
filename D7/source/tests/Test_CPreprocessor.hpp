@@ -1,4 +1,5 @@
 #pragma once
+#ifndef DISABLE_TEST
 
 #include "../preprocessor/CPreprocessor.hpp"
 #include "../utils/assert.hpp"
@@ -85,3 +86,18 @@ namespace d7
         }
     }
 }
+
+#else
+
+namespace d7
+{
+    namespace tests
+    {
+        bool Test_CPreprocessor()
+        {
+            return true;
+        }
+    }
+}
+
+#endif

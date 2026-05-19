@@ -24,10 +24,9 @@ namespace d7
 
         void AddChild(std::unique_ptr<FASTNode> child)
         {
-            if (child)
-            {
-                childNodes.push_back(std::move(child));
-            }
+            assert(child != nullptr, "Try add child invalid FASTNode");
+            
+            childNodes.push_back(std::move(child));
         }
 
         std::string Dump(int indent = 0) const

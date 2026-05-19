@@ -31,16 +31,13 @@ void d7::IPreprocessor::SetTokens(std::vector<FToken>&& Tokens)
 {
     notify_callback("SetTokens (vector)");
 
-    m_tokens.clear();
-
     if (Tokens.empty())
     {
         notify_trace("SetTokens: empty vector, nothing to move");
         return;
     }
 
-    m_tokens.insert(
-        m_tokens.end(),
+    m_tokens.assign(
         std::make_move_iterator(Tokens.begin()),
         std::make_move_iterator(Tokens.end())
     );

@@ -1,7 +1,9 @@
 #pragma once
+#ifndef DISABLE_TEST
 
 #include "../common/ETokenType.hpp"
 #include "../utils/assert.hpp"
+
 
 #include <filesystem>
 
@@ -9,7 +11,6 @@ namespace d7
 {
     namespace tests
     {
-
         bool Test_FToken()
         {
             int l_fails = 0;
@@ -149,3 +150,18 @@ namespace d7
         }
     }
 }
+
+#else
+
+namespace d7
+{
+    namespace tests
+    {
+        bool Test_FToken()
+        {
+            return true;
+        }
+    }
+}
+
+#endif

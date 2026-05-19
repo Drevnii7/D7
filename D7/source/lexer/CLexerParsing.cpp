@@ -15,6 +15,7 @@ expected d7::CLexer::Run()
     m_tokens.clear();
     std::string lexeme;
     lexeme.reserve(LEXEME_DEFAULT_RESERVE);
+    m_tokens.reserve(m_code.size() * 4);
 
     auto FlushLexeme = [&](size_t line, size_t startPos)
         {

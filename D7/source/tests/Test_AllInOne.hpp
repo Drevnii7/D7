@@ -1,4 +1,5 @@
 #pragma once
+#ifndef DISABLE_TEST
 
 #include "Test_ETokenType.hpp"
 #include "Test_FToken.hpp"
@@ -29,3 +30,18 @@ namespace d7
         }
     }
 }
+
+#else
+
+namespace d7
+{
+    namespace tests
+    {
+        bool Test_AllInOne()
+        {
+            return true;
+        }
+    }
+}
+
+#endif

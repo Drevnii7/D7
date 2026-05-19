@@ -1,4 +1,5 @@
 #pragma once
+#ifndef DISABLE_TEST
 
 #include "../common/ETokenType.hpp"
 #include "../utils/assert.hpp"
@@ -153,3 +154,18 @@ namespace d7
         }
     }
 }
+
+#else
+
+namespace d7
+{
+    namespace tests
+    {
+        bool bool Test_ETokenType()()
+        {
+            return true;
+        }
+    }
+}
+
+#endif
